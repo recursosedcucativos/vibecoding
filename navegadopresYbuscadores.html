@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Aprende la diferencia entre navegadores y buscadores. Descubre, compara y descarga los mejores navegadores web.">
+    <meta name="theme-color" content="#6366f1">
+    <title>🌐 Navegadores vs Buscadores | Guía Completa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+            animation: fadeInUp 0.6s ease 0.2s both;
+        }
+
+        /* Educational Banner */
+        .education-banner {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            padding: 25px 30px;
+            margin: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(251, 191, 36, 0.3);
+            animation: fadeIn 0.8s ease 0.4s both;
+        }
+
+        .education-banner h2 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .difference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .difference-card {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .difference-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .difference-card p {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            background: var(--light);
+            padding: 0 30px;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 20px 30px;
+            background: transparent;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            color: #64748b;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+
+        /* Filters */
+        .filters {
+            padding: 30px;
+            background: var(--light);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            color: var(--dark);
+            font-size: 0.95em;
+        }
+
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 2px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chip:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .chip.success.active { background: var(--success); border-color: var(--success); }
+        .chip.warning.active { background: var(--warning); border-color: var(--warning); }
+        .chip.info.active { background: var(--info); border-color: var(--info); }
+        .chip.danger.active { background: var(--danger); border-color: var(--danger); }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Grid */
+        .content {
+            padding: 30px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px var(--shadow);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid var(--border);
+            animation: fadeInUp 0.5s ease both;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            padding: 25px;
+            background: var(--gradient);
+            color: white;
+            text-align: center;
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-description {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .tag-popular { background: #dbeafe; color: #1e40af; }
+        .tag-security { background: #dcfce7; color: #166534; }
+        .tag-privacy { background: #fef3c7; color: #92400e; }
+        .tag-fast { background: #fee2e2; color: #991b1b; }
+        .tag-free { background: #e0e7ff; color: #3730a3; }
+        .tag-paid { background: #fce7f3; color: #831843; }
+        .tag-opensource { background: #d1fae5; color: #065f46; }
+        
+        .card-platforms {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .platform-chip {
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 0.75em;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1em;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #64748b;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                border-radius: 0;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .education-banner {
+                margin: 20px;
+                padding: 20px;
+            }
+
+            .difference-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .tabs {
+                padding: 0 20px;
+            }
+
+            .tab {
+                padding: 15px 20px;
+                font-size: 1em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .card-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+            white-space: nowrap;
+            width: 130px; /* Ancho para tooltips */
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🌐 Navegadores vs Buscadores</h1>
+            <p>Aprende la diferencia y encuentra el mejor navegador para ti</p>
+        </header>
+
+        <div class="education-banner">
+            <h2>💡 ¿Cuál es la diferencia?</h2>
+            <div class="difference-grid">
+                <div class="difference-card">
+                    <h3>🌐 NAVEGADOR</h3>
+                    <p><strong>¿Qué es?</strong> Un programa/aplicación que te permite acceder a internet y ver páginas web.</p>
+                    <p><strong>Ejemplos:</strong> Chrome, Firefox, Safari, Edge, Opera, Arc</p>
+                    <p><strong>Función:</strong> Es la "ventana" que te muestra internet</p>
+                </div>
+                <div class="difference-card">
+                    <h3>🔍 BUSCADOR</h3>
+                    <p><strong>¿Qué es?</strong> Un sitio web o servicio que te ayuda a encontrar información en internet.</p>
+                    <p><strong>Ejemplos:</strong> Google, Bing, DuckDuckGo, Perplexity, You.com</p>
+                    <p><strong>Función:</strong> Te ayuda a buscar contenido dentro de internet</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-section="navegadores">
+                🌐 Navegadores Web
+            </button>
+            <button class="tab" data-section="buscadores">
+                🔍 Buscadores/Motores de Búsqueda
+            </button>
+        </div>
+
+        <div class="filters">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Buscar navegador o buscador...">
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Filtrar por categoría:</label>
+                <div class="filter-chips" id="categoryFilters">
+                    <button class="chip active" data-filter="all">Todos</button>
+                    <button class="chip info" data-filter="popular">⭐ Populares</button>
+                    <button class="chip success" data-filter="security">🔒 Seguridad</button>
+                    <button class="chip warning" data-filter="privacy">🕵️ Privacidad</button>
+                    <button class="chip danger" data-filter="fast">⚡ Rápidos</button>
+                    <button class="chip" data-filter="opensource">💻 Código Abierto</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <label class="filter-label">Precio:</label>
+                <div class="filter-chips" id="priceFilters">
+                    <button class="chip active" data-price="all">Todos</button>
+                    <button class="chip success" data-price="free">🆓 Gratis</button>
+                    <button class="chip warning" data-price="paid">💰 Con Recompensas / Pago</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="grid" id="contentGrid"></div>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-state-icon">🔍</div>
+                <h3>No se encontraron resultados</h3>
+                <p>Intenta con otros filtros o términos de búsqueda</p>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>💡 <strong>Recuerda:</strong> El navegador es la aplicación, el buscador es el servicio que usas dentro del navegador.</p>
+            <p>Creado con ❤️ para ayudarte a elegir mejor | © 2025</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Sobre esta App</a>
+                <a href="#" class="footer-link">Compartir</a>
+                <a href="#" class="footer-link">Feedback</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // BASE DE DATOS
+        // ============================================
+        
+        const navegadores = [
+            {
+                id: 'chrome',
+                name: 'Google Chrome',
+                icon: '🌐',
+                subtitle: 'El más popular del mundo',
+                description: 'Navegador rápido y seguro de Google. Sincroniza tus datos entre dispositivos y ofrece acceso a miles de extensiones.',
+                categories: ['popular', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://www.google.com/chrome/',
+                officialUrl: 'https://www.google.com/chrome/',
+                stats: {
+                    share: '~65%',
+                    rating: '4.5/5',
+                    year: '2008'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'safari',
+                name: 'Safari',
+                icon: '🧭',
+                subtitle: 'El navegador de Apple',
+                description: 'Navegador nativo de Apple, optimizado para dispositivos Mac, iPhone y iPad. Rápido, eficiente y con excelente privacidad.',
+                categories: ['popular', 'fast', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://www.apple.com/safari/',
+                officialUrl: 'https://www.apple.com/safari/',
+                stats: {
+                    share: '~18%',
+                    rating: '4.4/5',
+                    year: '2003'
+                },
+                platforms: ['macOS', 'iOS']
+            },
+            {
+                id: 'edge',
+                name: 'Microsoft Edge',
+                icon: '🌊',
+                subtitle: 'Navegador moderno de Microsoft',
+                description: 'Basado en Chromium, el nuevo Edge es rápido, seguro e integra herramientas de productividad (IA Copilot). Viene preinstalado en Windows.',
+                categories: ['popular', 'fast', 'security'],
+                price: 'free',
+                downloadUrl: 'https://www.microsoft.com/edge',
+                officialUrl: 'https://www.microsoft.com/edge',
+                stats: {
+                    share: '~5.5%',
+                    rating: '4.3/5',
+                    year: '2015'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'samsung',
+                name: 'Samsung Internet',
+                icon: '📱',
+                subtitle: 'Optimizado para Galaxy',
+                description: 'El navegador predeterminado en dispositivos Samsung. Rápido, seguro y optimizado para móviles, con bloqueador de anuncios.',
+                categories: ['popular', 'fast', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://play.google.com/store/apps/details?id=com.sec.android.app.sbrowser',
+                officialUrl: 'https://www.samsung.com/global/galaxy/apps/samsung-internet/',
+                stats: {
+                    share: '~4.5%',
+                    rating: '4.4/5',
+                    year: '2012'
+                },
+                platforms: ['Android']
+            },
+            {
+                id: 'firefox',
+                name: 'Mozilla Firefox',
+                icon: '🦊',
+                subtitle: 'Privacidad y código abierto',
+                description: 'Navegador de código abierto centrado en la privacidad. Desarrollado por Mozilla Foundation, respeta tu privacidad por diseño.',
+                categories: ['privacy', 'security', 'opensource', 'popular'],
+                price: 'free',
+                downloadUrl: 'https://www.mozilla.org/firefox/',
+                officialUrl: 'https://www.mozilla.org/firefox/',
+                stats: {
+                    share: '~2.5%',
+                    rating: '4.6/5',
+                    year: '2002'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'opera',
+                name: 'Opera',
+                icon: '🎭',
+                subtitle: 'Navegador con VPN integrada',
+                description: 'Navegador innovador con VPN gratuita, bloqueador de anuncios integrado y modo ahorro de batería. Ideal para gaming.',
+                categories: ['privacy', 'fast', 'popular'],
+                price: 'free',
+                downloadUrl: 'https://www.opera.com/',
+                officialUrl: 'https://www.opera.com/',
+                stats: {
+                    share: '~2.5%',
+                    rating: '4.5/5',
+                    year: '1995'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'brave',
+                name: 'Brave',
+                icon: '🦁',
+                subtitle: 'Privacidad y recompensas BAT',
+                description: 'Navegador centrado en privacidad que bloquea anuncios y rastreadores. Opcionalmente, gana criptomonedas BAT viendo anuncios respetuosos.',
+                categories: ['privacy', 'security', 'fast', 'opensource'],
+                price: 'paid', // Se considera 'paid' por el sistema de Recompensas
+                downloadUrl: 'https://brave.com/',
+                officialUrl: 'https://brave.com/',
+                stats: {
+                    share: '~0.5%',
+                    rating: '4.7/5',
+                    year: '2016'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'yandex',
+                name: 'Yandex Browser',
+                icon: '🇷🇺',
+                subtitle: 'Navegador con IA rusa',
+                description: 'Navegador de Yandex, el gigante tecnológico ruso. Integra su asistente de IA "Alice" y servicios de seguridad propios.',
+                categories: ['popular', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://browser.yandex.com/',
+                officialUrl: 'https://browser.yandex.com/',
+                stats: {
+                    share: '~0.3%',
+                    rating: '4.3/5',
+                    year: '2012'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            {
+                id: 'opera-gx',
+                name: 'Opera GX',
+                icon: '🎮',
+                subtitle: 'Navegador gaming',
+                description: 'Versión de Opera diseñada para gamers. Controla el uso de RAM y CPU, integra Twitch y Discord, y tiene diseño gaming.',
+                categories: ['fast'],
+                price: 'free',
+                downloadUrl: 'https://www.opera.com/gx',
+                officialUrl: 'https://www.opera.com/gx',
+                stats: {
+                    share: '~0.2%',
+                    rating: '4.6/5',
+                    year: '2019'
+                },
+                platforms: ['Windows', 'macOS']
+            },
+            {
+                id: 'vivaldi',
+                name: 'Vivaldi',
+                icon: '🎨',
+                subtitle: 'Máxima personalización',
+                description: 'Navegador altamente personalizable creado por ex-fundador de Opera. Perfecto para usuarios avanzados que desean control total.',
+                categories: ['privacy', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://vivaldi.com/',
+                officialUrl: 'https://vivaldi.com/',
+                stats: {
+                    share: '~0.1%',
+                    rating: '4.6/5',
+                    year: '2016'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android']
+            },
+            {
+                id: 'arc', 
+                name: 'Arc',
+                icon: '🌉',
+                subtitle: 'El navegador reimaginado',
+                description: 'Un navegador de "The Browser Company" con un enfoque novedoso basado en barra lateral, espacios y organización. Rápido y basado en Chromium.',
+                categories: ['fast', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://arc.net/',
+                officialUrl: 'https://arc.net/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.8/5',
+                    year: '2022'
+                },
+                platforms: ['macOS', 'Windows', 'iOS']
+            },
+            { 
+                // --- AÑADIDO POR PETICIÓN #1 ---
+                id: 'comet-special',
+                name: 'Comet (Perplexity)',
+                icon: '☄️',
+                subtitle: 'Motor de Respuestas de IA',
+                description: 'Esta es la página del modelo de IA "Comet" para el motor de búsqueda Perplexity. Aunque no es un navegador, responde preguntas con IA y cita fuentes. [Añadido a Navegadores por petición especial].',
+                categories: ['fast', 'privacy'],
+                price: 'free', 
+                downloadUrl: 'https://www.perplexity.ai/comet', // Enlace del usuario
+                officialUrl: 'https://www.perplexity.ai/', // Enlace principal
+                stats: {
+                    share: 'N/A',
+                    rating: '4.8/5',
+                    year: '2024' // Año del modelo Comet
+                },
+                platforms: ['Web'] // Es una página web
+            },
+            { 
+                // --- AÑADIDO POR PETICIÓN #2 ---
+                id: 'chatgpt-atlas',
+                name: 'ChatGPT Atlas',
+                icon: '🤖',
+                subtitle: 'El navegador con ChatGPT integrado',
+                description: 'Lleva a ChatGPT contigo a cualquier parte de la web. [Añadido a Navegadores por petición especial].',
+                categories: ['fast', 'privacy'],
+                price: 'free', 
+                downloadUrl: 'https://openai.com/es-419/index/introducing-chatgpt-atlas/', // Enlace del usuario
+                officialUrl: 'https://openai.com/', // Enlace principal
+                stats: {
+                    share: 'N/A',
+                    rating: 'N/A',
+                    year: '2024'
+                },
+                platforms: ['macOS'] // De la info del usuario
+            },
+            {
+                id: 'tor',
+                name: 'Tor Browser',
+                icon: '🧅',
+                subtitle: 'Máxima privacidad y anonimato',
+                description: 'Navegador basado en Firefox que enruta tu conexión a través de la red Tor para máximo anonimato. Usado por activistas y periodistas.',
+                categories: ['privacy', 'security', 'opensource'],
+                price: 'free',
+                downloadUrl: 'https://www.torproject.org/',
+                officialUrl: 'https://www.torproject.org/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.5/5',
+                    year: '2008'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android']
+            },
+            {
+                id: 'duckduckgo-browser',
+                name: 'DuckDuckGo Browser',
+                icon: '🦆',
+                subtitle: 'Privacidad móvil simplificada',
+                description: 'Navegador móvil (y ahora de escritorio) de DuckDuckGo con protección de privacidad automática. Bloquea rastreadores y fuerza conexiones cifradas.',
+                categories: ['privacy', 'security'],
+                price: 'free',
+                downloadUrl: 'https://duckduckgo.com/app',
+                officialUrl: 'https://duckduckgo.com/app',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.7/5',
+                    year: '2018'
+                },
+                platforms: ['Android', 'iOS', 'Windows', 'macOS']
+            },
+            { 
+                id: 'avast',
+                name: 'Avast Secure Browser',
+                icon: '🛡️',
+                subtitle: 'Privacidad por Avast',
+                description: 'Navegador basado en Chromium de la compañía de antivirus Avast. Se centra en bloquear rastreo, phishing y malware automáticamente.',
+                categories: ['security', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://www.avast.com/secure-browser',
+                officialUrl: 'https://www.avast.com/secure-browser',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.1/5',
+                    year: '2016'
+                },
+                platforms: ['Windows', 'macOS', 'Android', 'iOS']
+            },
+            { 
+                id: 'maxthon',
+                name: 'Maxthon',
+                icon: '☁️',
+                subtitle: 'Navegador en la nube',
+                description: 'Un navegador veterano que innovó con la sincronización en la nube. Utiliza motores Trident (IE) y Blink (Chrome) y tiene herramientas integradas.',
+                categories: ['fast'],
+                price: 'free',
+                downloadUrl: 'https://www.maxthon.com/',
+                officialUrl: 'https://www.maxthon.com/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.0/5',
+                    year: '2002'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android', 'iOS']
+            },
+            { 
+                id: 'waterfox',
+                name: 'Waterfox',
+                icon: '💧',
+                subtitle: 'Firefox de 64-bit enfocado en potencia',
+                description: 'Un fork popular de Firefox diseñado originalmente para ser una versión de 64-bit más rápida. Mantiene soporte para extensiones clásicas (XUL).',
+                categories: ['opensource', 'privacy', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://www.waterfox.net/',
+                officialUrl: 'https://www.waterfox.net/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.3/5',
+                    year: '2011'
+                },
+                platforms: ['Windows', 'macOS', 'Linux']
+            },
+            { 
+                id: 'librewolf',
+                name: 'LibreWolf',
+                icon: '🐺',
+                subtitle: 'Firefox enfocado 100% en privacidad',
+                description: 'Un fork de Firefox que elimina toda la telemetría, el rastreo y las integraciones de Mozilla. Máxima privacidad y control para el usuario.',
+                categories: ['opensource', 'privacy', 'security'],
+                price: 'free',
+                downloadUrl: 'https://librewolf.net/',
+                officialUrl: 'https://librewolf.net/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.6/5',
+                    year: '2020'
+                },
+                platforms: ['Windows', 'macOS', 'Linux']
+            },
+            { 
+                id: 'palemoon',
+                name: 'Pale Moon',
+                icon: '🌕',
+                subtitle: 'Navegador de la vieja escuela',
+                description: 'Un fork de Firefox que usa su propio motor (Goanna) y mantiene la interfaz clásica de Firefox 4-28. Soporta extensiones XUL antiguas.',
+                categories: ['opensource', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://www.palemoon.org/',
+                officialUrl: 'https://www.palemoon.org/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.2/5',
+                    year: '2009'
+                },
+                platforms: ['Windows', 'Linux']
+            },
+            { 
+                id: 'seamonkey',
+                name: 'SeaMonkey',
+                icon: '🐒',
+                subtitle: 'La suite de internet "todo en uno"',
+                description: 'Proyecto de código abierto sucesor de Mozilla Suite. Incluye un navegador, cliente de email (Thunderbird), editor HTML y chat IRC.',
+                categories: ['opensource'],
+                price: 'free',
+                downloadUrl: 'https://www.seamonkey-project.org/',
+                officialUrl: 'https://www.seamonkey-project.org/',
+                stats: {
+                    share: '< 0.01%',
+                    rating: '4.1/5',
+                    year: '2005'
+                },
+                platforms: ['Windows', 'macOS', 'Linux']
+            },
+            { 
+                id: 'midori',
+                name: 'Midori',
+                icon: '🍃',
+                subtitle: 'Navegador ligero',
+                description: 'Un navegador de código abierto conocido por ser extremadamente ligero y rápido, ideal para equipos con pocos recursos. Ahora usa el motor de Edge (WebView2).',
+                categories: ['opensource', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://astian.org/midori-browser/',
+                officialUrl: 'https://astian.org/midori-browser/',
+                stats: {
+                    share: '< 0.01%',
+                    rating: '3.9/5',
+                    year: '2007'
+                },
+                platforms: ['Windows', 'Linux', 'Android']
+            },
+            {
+                id: 'chromium',
+                name: 'Chromium',
+                icon: '⚙️',
+                subtitle: 'Código abierto de Chrome',
+                description: 'Proyecto de código abierto en el que se basa Chrome. Para usuarios técnicos que desean transparencia total.',
+                categories: ['opensource', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://www.chromium.org/getting-involved/download-chromium/',
+                officialUrl: 'https://www.chromium.org/',
+                stats: {
+                    share: '< 0.01%',
+                    rating: '4.0/5',
+                    year: '2008'
+                },
+                platforms: ['Windows', 'macOS', 'Linux', 'Android']
+            },
+            { 
+                id: 'lynx',
+                name: 'Lynx',
+                icon: '⌨️',
+                subtitle: 'Navegador en modo texto',
+                description: 'Un navegador histórico (y aún mantenido) que funciona en la terminal. No carga imágenes ni CSS/JS, solo texto. Rápido e imposible de rastrear.',
+                categories: ['opensource', 'privacy', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://lynx.browser.org/',
+                officialUrl: 'https://lynx.browser.org/',
+                stats: {
+                    share: '< 0.01%',
+                    rating: '4.7/5',
+                    year: '1992'
+                },
+                platforms: ['Linux', 'macOS', 'Windows']
+            }
+        ];
+
+        const buscadores = [
+            {
+                id: 'google',
+                name: 'Google',
+                icon: '🔍',
+                subtitle: 'El rey de las búsquedas',
+                description: 'Motor de búsqueda más usado del mundo. Algoritmos avanzados, búsqueda por voz, imágenes, mapas y ahora fuertemente integrado con IA (Gemini).',
+                categories: ['popular', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://www.google.com/',
+                officialUrl: 'https://www.google.com/',
+                stats: {
+                    share: '~90%',
+                    rating: '4.8/5',
+                    year: '1998'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'bing',
+                name: 'Bing',
+                icon: '🅱️',
+                subtitle: 'Buscador de Microsoft con IA',
+                description: 'Buscador de Microsoft con integración nativa de IA (Copilot/GPT-4). Ofrece recompensas por búsquedas y excelentes búsquedas de imágenes.',
+                categories: ['popular', 'fast'],
+                price: 'free',
+                downloadUrl: 'https://www.bing.com/',
+                officialUrl: 'https://www.bing.com/',
+                stats: {
+                    share: '~3.5%',
+                    rating: '4.3/5',
+                    year: '2009'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'duckduckgo',
+                name: 'DuckDuckGo',
+                icon: '🦆',
+                subtitle: 'Privacidad ante todo',
+                description: 'Buscador que no rastrea tu actividad ni crea perfiles. No hay filtro burbuja. Recientemente ha añadido "DuckAssist" (IA).',
+                categories: ['privacy', 'security', 'popular'],
+                price: 'free',
+                downloadUrl: 'https://duckduckgo.com/',
+                officialUrl: 'https://duckduckgo.com/',
+                stats: {
+                    share: '~0.8%',
+                    rating: '4.7/5',
+                    year: '2008'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            { 
+                id: 'perplexity',
+                name: 'Perplexity AI',
+                icon: '🤖',
+                subtitle: 'Motor de respuesta con IA',
+                description: 'Motor conversacional de IA que usa su propio modelo rápido "Comet", además de GPT-4 y Claude 3. Da respuestas directas con fuentes citadas.',
+                categories: ['fast', 'privacy'],
+                price: 'free', // Tiene versión Pro de pago
+                downloadUrl: 'https://www.perplexity.ai/', 
+                officialUrl: 'https://www.perplexity.ai/', 
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.8/5',
+                    year: '2022'
+                },
+                platforms: ['Web', 'iOS', 'Android']
+            },
+            {
+                id: 'you', 
+                name: 'You.com',
+                icon: '💬',
+                subtitle: 'El buscador con IA personalizable',
+                description: 'Buscador conversacional que te permite activar "apps" (Reddit, StackOverflow, etc.) y chatear con IA. Personalizable y enfocado a la IA.',
+                categories: ['fast', 'privacy'],
+                price: 'free',
+                downloadUrl: 'https://you.com/',
+                officialUrl: 'https://you.com/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.5/5',
+                    year: '2021'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'kagi', 
+                name: 'Kagi',
+                icon: '✨',
+                subtitle: 'Buscador Premium (de pago)',
+                description: 'Buscador 100% de pago y sin anuncios. Ofrece resultados de alta calidad, personalización extrema (subir/bajar dominios) y herramientas de IA.',
+                categories: ['privacy', 'security', 'fast'],
+                price: 'paid', // Es su principal característica
+                downloadUrl: 'https://kagi.com/',
+                officialUrl: 'https://kagi.com/',
+                stats: {
+                    share: '< 0.01%',
+                    rating: '4.9/5',
+                    year: '2019'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'yahoo',
+                name: 'Yahoo! Search',
+                icon: '🟣',
+                subtitle: 'Pionero de internet',
+                description: 'Uno de los buscadores más antiguos. Ahora impulsado por Bing, ofrece noticias, correo y servicios integrados.',
+                categories: ['popular'],
+                price: 'free',
+                downloadUrl: 'https://www.yahoo.com/',
+                officialUrl: 'https://www.yahoo.com/',
+                stats: {
+                    share: '~1.1%',
+                    rating: '3.9/5',
+                    year: '1995'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'ecosia',
+                name: 'Ecosia',
+                icon: '🌳',
+                subtitle: 'Busca y planta árboles',
+                description: 'Buscador ecológico que usa sus ganancias para plantar árboles. Transparente y centrado en la privacidad (resultados de Bing).',
+                categories: ['privacy'],
+                price: 'free',
+                downloadUrl: 'https://www.ecosia.org/',
+                officialUrl: 'https://www.ecosia.org/',
+                stats: {
+                    share: '~0.1%',
+                    rating: '4.6/5',
+                    year: '2009'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'startpage',
+                name: 'Startpage',
+                icon: '🔐',
+                subtitle: 'Privacidad con resultados de Google',
+                description: 'Buscador que te da resultados de Google pero sin rastreo. Tu IP se mantiene privada y no se guardan logs de búsqueda.',
+                categories: ['privacy', 'security'],
+                price: 'free',
+                downloadUrl: 'httpswww.startpage.com/',
+                officialUrl: 'https://www.startpage.com/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.5/5',
+                    year: '2006'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'brave-search',
+                name: 'Brave Search',
+                icon: '🦁',
+                subtitle: 'Búsqueda independiente',
+                description: 'Motor de búsqueda propio de Brave con índice independiente. No rastrea usuarios y no usa perfiles de Google/Bing. Integrado en el navegador Brave.',
+                categories: ['privacy', 'security'],
+                price: 'free',
+                downloadUrl: 'https://search.brave.com/',
+                officialUrl: 'https://search.brave.com/',
+                stats: {
+                    share: '< 0.1%',
+                    rating: '4.4/5',
+                    year: '2021'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'yandex',
+                name: 'Yandex',
+                icon: '🇷🇺',
+                subtitle: 'Motor ruso',
+                description: 'Principal buscador en Rusia. Ofrece también mapas, email, almacenamiento en la nube y traducción.',
+                categories: ['popular'],
+                price: 'free',
+                downloadUrl: 'https://yandex.com/',
+                officialUrl: 'https://yandex.com/',
+                stats: {
+                    share: '~1.5%',
+                    rating: '4.1/5',
+                    year: '1997'
+                },
+                platforms: ['Web', 'Todas']
+            },
+            {
+                id: 'baidu',
+                name: 'Baidu',
+                icon: '🐾',
+                subtitle: 'El Google de China',
+                description: 'Principal motor de búsqueda en China. Domina el mercado chino con servicios localizados y en mandarín.',
+                categories: ['popular'],
+                price: 'free',
+                downloadUrl: 'https://www.baidu.com/',
+                officialUrl: 'https://www.baidu.com/',
+                stats: {
+                    share: '~0.5%',
+                    rating: '4.0/5',
+                    year: '2000'
+                },
+                platforms: ['Web', 'Todas']
+            }
+        ];
+
+
+        // ============================================
+        // ESTADO DE LA APLICACIÓN
+        // ============================================
+        
+        let currentSection = 'navegadores';
+        let currentCategoryFilter = 'all';
+        let currentPriceFilter = 'all';
+        let searchTerm = '';
+
+        // ============================================
+        // FUNCIONES DE RENDERIZADO
+        // ============================================
+        
+        function createCard(item, type) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.style.animationDelay = '0.1s';
+
+            // --- INICIO: Generación de Tags de Categoría ---
+            const tags = [];
+            item.categories.forEach(cat => {
+                const tagName = {
+                    'popular': '⭐ Popular',
+                    'security': '🔒 Seguro',
+                    'privacy': '🕵️ Privado',
+                    'fast': '⚡ Rápido',
+                    'opensource': '💻 Código Abierto'
+                };
+                if (tagName[cat]) {
+                    tags.push(`<span class="tag tag-${cat}">${tagName[cat]}</span>`);
+                }
+            });
+
+            if (item.price === 'paid') {
+                tags.push('<span class="tag tag-paid">💰 Pago/Recompensas</span>');
+            } else {
+                tags.push('<span class="tag tag-free">🆓 Gratis</span>');
+            }
+            // --- FIN: Generación de Tags ---
+
+            // --- INICIO: MEJORA - Generación de Chips de Plataforma ---
+            const platforms = item.platforms || [];
+            let platformChips = '';
+            
+            // Solo mostrar chips de plataforma para navegadores (tienen SO específicos y variados)
+            if (type === 'navegadores' && platforms.length > 0) {
+                platformChips = `
+                    <div class="card-platforms">
+                        ${platforms.map(p => `<span class="platform-chip">${p}</span>`).join('')}
+                    </div>
+                `;
+            }
+            // --- FIN: MEJORA ---
+            
+
+            // --- INICIO: MEJORA - Generación de Estadísticas con Tooltips ---
+            const statsHtml = item.stats ? `
+                <div class="stats">
+                    <div class="stat tooltip">
+                        <span class="tooltiptext">Cuota de Mercado (Aprox. 2024/25)</span>
+                        <div class="stat-value">${item.stats.share}</div>
+                        <div class="stat-label">Cuota</div>
+                    </div>
+                    <div class="stat tooltip">
+                        <span class="tooltiptext">Valoración de usuarios</span>
+                        <div class="stat-value">${item.stats.rating}</div>
+                        <div class="stat-label">Valoración</div>
+                    </div>
+                    <div class="stat tooltip">
+                        <span class="tooltiptext">Año de lanzamiento</span>
+                        <div class="stat-value">${item.stats.year}</div>
+                        <div class="stat-label">Lanzamiento</div>
+                    </div>
+                </div>
+            ` : '';
+            // --- FIN: MEJORA ---
+
+
+            // --- INICIO: Ensamblaje del HTML de la Tarjeta ---
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="card-icon">${item.icon}</span>
+                    <h3 class="card-title">${item.name}</h3>
+                    <p class="card-subtitle">${item.subtitle}</p>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">${item.description}</p>
+                    <div class="card-tags">
+                        ${tags.join('')}
+                    </div>
+                    ${platformChips} <div class="card-actions">
+                        <a href="${item.downloadUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                            📥 ${type === 'navegadores' ? 'Descargar' : 'Visitar'}
+                        </a>
+                        <a href="${item.officialUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                            🌐 Sitio Oficial
+                        </a>
+                    </div>
+                    ${statsHtml} </div>
+            `;
+            // --- FIN: Ensamblaje ---
+
+            return card;
+        }
+
+        function renderContent() {
+            const grid = document.getElementById('contentGrid');
+            const emptyState = document.getElementById('emptyState');
+            grid.innerHTML = '';
+
+            const data = currentSection === 'navegadores' ? navegadores : buscadores;
+            
+            const filtered = data.filter(item => {
+                // Filtro de búsqueda
+                const matchesSearch = searchTerm === '' || 
+                    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    item.subtitle.toLowerCase().includes(searchTerm.toLowerCase());
+
+                // Filtro de categoría
+                const matchesCategory = currentCategoryFilter === 'all' || 
+                    item.categories.includes(currentCategoryFilter);
+
+                // Filtro de precio
+                const matchesPrice = currentPriceFilter === 'all' || 
+                    item.price === currentPriceFilter;
+
+                return matchesSearch && matchesCategory && matchesPrice;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.style.display = 'block';
+                grid.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                grid.style.display = 'grid';
+                filtered.forEach(item => {
+                    grid.appendChild(createCard(item, currentSection));
+                });
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentSection = tab.dataset.section;
+                
+                // Reset filters
+                currentCategoryFilter = 'all';
+                currentPriceFilter = 'all';
+                searchTerm = '';
+                document.getElementById('searchInput').value = '';
+                
+                document.querySelectorAll('.chip').forEach(chip => {
+                    chip.classList.remove('active');
+                    if (chip.dataset.filter === 'all' || chip.dataset.price === 'all') {
+                        chip.classList.add('active');
+                    }
+                });
+                
+                renderContent();
+            });
+        });
+
+        // Category Filters
+        document.getElementById('categoryFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('chip')) {
+                document.querySelectorAll('#categoryFilters .chip').forEach(chip => {
+                    chip.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                currentCategoryFilter = e.target.dataset.filter;
+                renderContent();
+            }
+        });
+
+        // Price Filters
+        document.getElementById('priceFilters').addEventListener('click', (e) => {
+            if (e.target.classList.contains('chip')) {
+                document.querySelectorAll('#priceFilters .chip').forEach(chip => {
+                    chip.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                currentPriceFilter = e.target.dataset.price;
+                renderContent();
+            }
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderContent();
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        
+        renderContent();
+
+        // PWA - Service Worker Registration (básico)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(
+                    registration => console.log('✅ SW registrado'),
+                    error => console.log('❌ SW falló:', error)
+                );
+            });
+        }
+    </script>
+</body>
+</html>
