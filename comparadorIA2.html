@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Comparator Pro - Compara IAs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* GALERÍA DE IAs */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .gallery::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .gallery::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .gallery::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .ai-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 3px solid transparent;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .ai-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #fff;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .ai-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+
+        .ai-card .name {
+            font-weight: 700;
+            font-size: 0.95em;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .ai-card.selected .name {
+            color: white;
+        }
+
+        .ai-card .category {
+            font-size: 0.75em;
+            opacity: 0.7;
+            color: #666;
+        }
+
+        .ai-card.selected .category {
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ai-card .checkmark {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .ai-card.selected .checkmark {
+            display: flex;
+        }
+
+        .category-title {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #667eea;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-title:first-child {
+            margin-top: 0;
+        }
+
+        /* PANEL DE CONTROL */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .selected-display {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .selected-display h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .selected-ias {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .selected-ia-item {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-ia-item.empty {
+            background: #f8f9fa;
+            border-left-color: #ddd;
+            color: #999;
+            justify-content: center;
+        }
+
+        .selected-ia-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .selected-ia-icon {
+            font-size: 1.8em;
+        }
+
+        .selected-ia-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selected-ia-text .name {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .selected-ia-text .url {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover {
+            background: #ff5252;
+            transform: scale(1.1);
+        }
+
+        .prompt-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prompt-section label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .prompt-section textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .prompt-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        #launchBtn, .reset-btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 1.05em;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #launchBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #launchBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        #launchBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .reset-btn {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+
+        .reset-btn:hover {
+            background: #e0e0e0;
+            border-color: #999;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 0.95em;
+            color: #856404;
+        }
+
+        @media (max-width: 900px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🚀 AI Comparator Pro</h1>
+            <p>Elige 3 IAs y compara sus respuestas simultáneamente</p>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- SECCIÓN IZQUIERDA: GALERÍA -->
+            <div class="section">
+                <h2>🎨 Galería de IAs</h2>
+                <div class="gallery" id="gallery">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+                <div class="info-box" style="margin-top: 15px;">
+                    ℹ️ Selecciona exactamente 3 IAs haciendo clic en las tarjetas
+                </div>
+            </div>
+
+            <!-- SECCIÓN DERECHA: PANEL DE CONTROL -->
+            <div class="section">
+                <h2>⚙️ Control</h2>
+                
+                <div class="control-panel">
+                    <!-- IAs SELECCIONADAS -->
+                    <div class="selected-display">
+                        <h3>✅ IAs Seleccionadas (3/3)</h3>
+                        <div class="selected-ias" id="selectedIas">
+                            <div class="selected-ia-item empty">
+                                <span>Selecciona 3 IAs...</span>
+                            </div>
+                            <div class="selected-ia-item empty">
+                                <span>-</span>
+                            </div>
+                            <div class="selected-ia-item empty">
+                                <span>-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PROMPT -->
+                    <div class="prompt-section">
+                        <label for="promptText">📝 Escribe tu prompt:</label>
+                        <textarea id="promptText" placeholder="Ejemplo: Explícame la teoría de la relatividad de forma sencilla...">Explícame la teoría de la relatividad de forma sencilla</textarea>
+                    </div>
+
+                    <!-- BOTONES -->
+                    <div class="button-group">
+                        <button id="launchBtn" disabled>🚀 Abrir y Copiar</button>
+                        <button class="reset-btn" id="resetBtn">↻ Reiniciar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        ✅ Texto copiado al portapapeles<br>
+        🪟 Ventanas abiertas<br>
+        👉 Solo presiona Ctrl+V en cada una
+    </div>
+
+    <script>
+        // BASE DE DATOS DE IAs
+        const aiDatabase = {
+            'populares': [
+                { name: 'ChatGPT', url: 'https://chatgpt.com', icon: '🤖', category: 'Populares' },
+                { name: 'Claude', url: 'https://claude.ai', icon: '🧠', category: 'Populares' },
+                { name: 'Gemini', url: 'https://gemini.google.com', icon: '✨', category: 'Populares' }
+            ],
+            'especializadas': [
+                { name: 'DeepSeek', url: 'https://chat.deepseek.com', icon: '🔍', category: 'Especializadas' },
+                { name: 'Grok', url: 'https://grok.x.ai', icon: '⚡', category: 'Especializadas' },
+                { name: 'Qwen', url: 'https://qwenchat.cn', icon: '🎯', category: 'Especializadas' }
+            ],
+            'academia': [
+                { name: 'Perplexity', url: 'https://www.perplexity.ai', icon: '🔬', category: 'Academia' },
+                { name: 'Consensus', url: 'https://consensus.app', icon: '📊', category: 'Academia' },
+                { name: 'Elicit', url: 'https://elicit.org', icon: '📚', category: 'Academia' }
+            ],
+            'codigo': [
+                { name: 'GitHub Copilot', url: 'https://github.com/copilot', icon: '👨‍💻', category: 'Código' },
+                { name: 'Replit', url: 'https://replit.com', icon: '⌨️', category: 'Código' },
+                { name: 'Codeium', url: 'https://codeium.com', icon: '💻', category: 'Código' }
+            ],
+            'contenido': [
+                { name: 'Jasper', url: 'https://www.jasper.ai', icon: '✍️', category: 'Contenido' },
+                { name: 'Copy.ai', url: 'https://www.copy.ai', icon: '📝', category: 'Contenido' },
+                { name: 'Writesonic', url: 'https://writesonic.com', icon: '🎨', category: 'Contenido' }
+            ],
+            'imagen': [
+                { name: 'DALL-E', url: 'https://openai.com/dall-e-3', icon: '🖼️', category: 'Imagen' },
+                { name: 'Midjourney', url: 'https://www.midjourney.com', icon: '🎭', category: 'Imagen' },
+                { name: 'Stable Diffusion', url: 'https://www.stablediffusionweb.com', icon: '🌈', category: 'Imagen' }
+            ]
+        };
+
+        let selectedIas = [];
+        const MAX_SELECTED = 3;
+
+        // Inicializar galería
+        function initGallery() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+
+            Object.entries(aiDatabase).forEach(([categoryKey, ias]) => {
+                const categoryTitle = document.createElement('div');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = getCategoryLabel(categoryKey);
+                gallery.appendChild(categoryTitle);
+
+                ias.forEach(ai => {
+                    const card = createAiCard(ai);
+                    gallery.appendChild(card);
+                });
+            });
+        }
+
+        function getCategoryLabel(key) {
+            const labels = {
+                'populares': '⭐ Las Más Populares',
+                'especializadas': '🔥 Especializadas',
+                'academia': '🏆 Academia & Investigación',
+                'codigo': '👨‍💻 Desarrollo',
+                'contenido': '✍️ Generación de Contenido',
+                'imagen': '🖼️ Generación de Imagen'
+            };
+            return labels[key] || key;
+        }
+
+        function createAiCard(ai) {
+            const card = document.createElement('div');
+            card.className = 'ai-card';
+            card.innerHTML = `
+                <div class="checkmark">✓</div>
+                <div class="icon">${ai.icon}</div>
+                <div class="name">${ai.name}</div>
+                <div class="category">${ai.category}</div>
+            `;
+
+            card.addEventListener('click', () => selectAi(ai, card));
+            return card;
+        }
+
+        function selectAi(ai, card) {
+            const isSelected = selectedIas.some(s => s.name === ai.name);
+
+            if (isSelected) {
+                // Deseleccionar
+                selectedIas = selectedIas.filter(s => s.name !== ai.name);
+                card.classList.remove('selected');
+            } else {
+                // Seleccionar
+                if (selectedIas.length < MAX_SELECTED) {
+                    selectedIas.push(ai);
+                    card.classList.add('selected');
+                } else {
+                    alert(`⚠️ Ya tienes 3 IAs seleccionadas. Deselecciona una para elegir otra.`);
+                    return;
+                }
+            }
+
+            updateSelectedDisplay();
+            updateLaunchButton();
+        }
+
+        function updateSelectedDisplay() {
+            const container = document.getElementById('selectedIas');
+            container.innerHTML = '';
+
+            for (let i = 0; i < MAX_SELECTED; i++) {
+                if (i < selectedIas.length) {
+                    const ai = selectedIas[i];
+                    const item = document.createElement('div');
+                    item.className = 'selected-ia-item';
+                    item.innerHTML = `
+                        <div class="selected-ia-info">
+                            <div class="selected-ia-icon">${ai.icon}</div>
+                            <div class="selected-ia-text">
+                                <div class="name">${ai.name}</div>
+                                <div class="url">${ai.url}</div>
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="removeIa('${ai.name}')">✕</button>
+                    `;
+                    container.appendChild(item);
+                } else {
+                    const item = document.createElement('div');
+                    item.className = 'selected-ia-item empty';
+                    item.innerHTML = `<span>Selecciona una IA...</span>`;
+                    container.appendChild(item);
+                }
+            }
+        }
+
+        function removeIa(name) {
+            selectedIas = selectedIas.filter(ai => ai.name !== name);
+            
+            // Deseleccionar tarjeta
+            document.querySelectorAll('.ai-card').forEach(card => {
+                if (card.querySelector('.name').textContent === name) {
+                    card.classList.remove('selected');
+                }
+            });
+
+            updateSelectedDisplay();
+            updateLaunchButton();
+        }
+
+        function updateLaunchButton() {
+            const launchBtn = document.getElementById('launchBtn');
+            launchBtn.disabled = selectedIas.length !== MAX_SELECTED;
+        }
+
+        // Evento del botón Lanzar
+        document.getElementById('launchBtn').addEventListener('click', async () => {
+            const prompt = document.getElementById('promptText').value.trim();
+            
+            if (!prompt) {
+                alert('⚠️ Por favor escribe un prompt antes de continuar');
+                return;
+            }
+
+            if (selectedIas.length !== MAX_SELECTED) {
+                alert(`⚠️ Debes seleccionar exactamente ${MAX_SELECTED} IAs`);
+                return;
+            }
+
+            try {
+                // Copiar al portapapeles
+                await navigator.clipboard.writeText(prompt);
+
+                // Obtener dimensiones
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+                const windowWidth = Math.floor(screenWidth / 3);
+                const windowHeight = screenHeight;
+
+                // Abrir ventanas
+                selectedIas.forEach((ai, index) => {
+                    const left = index * windowWidth;
+                    const features = `width=${windowWidth},height=${windowHeight},left=${left},top=0,resizable=yes,scrollbars=yes`;
+                    window.open(ai.url, ai.name, features);
+                });
+
+                // Mostrar notificación
+                const notification = document.getElementById('notification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 5000);
+
+            } catch (err) {
+                console.error('Error:', err);
+                alert('❌ Error. Asegúrate de permitir ventanas emergentes y permisos del portapapeles.');
+            }
+        });
+
+        // Botón reiniciar
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            selectedIas = [];
+            document.querySelectorAll('.ai-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            updateSelectedDisplay();
+            updateLaunchButton();
+            document.getElementById('promptText').value = '';
+        });
+
+        // Inicializar
+        initGallery();
+        updateSelectedDisplay();
+    </script>
+</body>
+</html>
