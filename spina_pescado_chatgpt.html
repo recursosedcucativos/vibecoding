@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Espina de Pescado – Webapp (SVG + JS puro)</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#111a2e;
+    --accent:#6be4ff;
+    --accent-2:#8b5cf6;
+    --ink:#e5f0ff;
+    --muted:#93a2c2;
+    --danger:#ff6b6b;
+    --ok:#31d0aa;
+    --grid: rgba(255,255,255,.05);
+  }
+  *{ box-sizing: border-box }
+  html,body{ height:100% }
+  body{
+    margin:0; background: radial-gradient(1200px 600px at 70% -10%, #1b2a4b 0%, var(--bg) 45%),
+             radial-gradient(800px 400px at -10% 110%, #121a2c 0%, var(--bg) 60%);
+    color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial;
+    display:grid; grid-template-columns: 360px 1fr; grid-template-rows: auto 1fr; gap:16px; padding:16px;
+  }
+  header{ grid-column: 1 / -1; display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background: linear-gradient(180deg, #14213a, #0f1730); border:1px solid #1d2b4f; border-radius:16px; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  header h1{ font-size: clamp(18px, 2.5vw, 22px); margin:0; letter-spacing:.5px }
+  header .actions { display:flex; gap:8px; flex-wrap:wrap }
+  button, .ghost{
+    appearance:none; cursor:pointer; border-radius:14px; border:1px solid #2a3c6a; padding:10px 14px; background: linear-gradient(180deg, #1a284e, #121d3b);
+    color:var(--ink); font-weight:600; letter-spacing:.2px; transition:.2s transform ease, .2s filter ease, .2s background ease;
+  }
+  button:hover{ transform: translateY(-1px); filter: brightness(1.1) }
+  button:active{ transform: translateY(0) scale(.98) }
+  button.primary{ border-color:#3f66ff55; outline:1px solid #3f66ff33; background: linear-gradient(180deg, #2240a6, #1a2d72); box-shadow: 0 0 0 2px #000, 0 0 26px #5da0ff22 inset; }
+  button.success{ border-color:#2b7a66; background: linear-gradient(180deg, #1a5b49, #124536) }
+  button.danger{ border-color:#7a2b2b; background: linear-gradient(180deg, #5b1a1a, #451212) }
+  .ghost{ background:transparent; border-style:dashed; opacity:.85 }
+
+  /* Sidebar */
+  aside{
+    background: linear-gradient(180deg, #0f1730, #0b1220 40%); border:1px solid #1d2b4f; border-radius:16px; padding:14px; overflow:auto; box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .section{ margin-bottom:16px; padding-bottom:12px; border-bottom:1px dashed #2a3c6a }
+  .section:last-of-type{ border-bottom:none }
+  label{ display:block; font-size:12px; text-transform:uppercase; color:var(--muted); letter-spacing:.12em; margin:10px 0 6px }
+  input[type="text"], textarea{ width:100%; border-radius:12px; border:1px solid #2a3c6a; background:#0c1530; color:var(--ink); padding:10px 12px; outline:none; font-size:14px; box-shadow: inset 0 0 0 1px #000;
+  }
+  textarea{ min-height:68px; resize:vertical }
+  .row{ display:flex; gap:8px; align-items:center }
+  .row > *{ flex:1 }
+  .muted{ color:var(--muted); font-size:12px }
+
+  .category{ background:#0c1530; border:1px solid #2a3c6a; border-radius:12px; padding:10px; margin:10px 0; box-shadow: inset 0 0 0 1px #000; }
+  .category .header{ display:flex; gap:8px; align-items:center }
+  .category h4{ margin:0; font-size:14px; flex:1 }
+  .pills{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid #2a3c6a; border-radius:999px; background:#0b132a; font-size:12px }
+  .pill button{ padding:4px 8px; font-size:11px }
+  .category .add-cause{ margin-top:8px }
+
+  /* Canvas area */
+  main{ position:relative; background: linear-gradient(180deg, #0f1730, #0b1220); border:1px solid #1d2b4f; border-radius:16px; overflow:hidden; box-shadow: 0 10px 40px rgba(0,0,0,.45); }
+  .board-wrap{ position:absolute; inset:0; }
+  .grid{ position:absolute; inset:0; background-size: 64px 64px, 16px 16px; background-image:
+        linear-gradient(to right, var(--grid) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+        pointer-events:none }
+  svg{ width:100%; height:100%; display:block }
+
+  /* Legend / watermark */
+  .legend{ position:absolute; bottom:8px; left:12px; font-size:12px; color:var(--muted) }
+
+  /* Toast */
+  .toast{ position:fixed; right:16px; bottom:16px; background:#0b142a; border:1px solid #274177; padding:10px 12px; border-radius:12px; opacity:0; transform: translateY(8px); transition:.25s; pointer-events:none }
+  .toast.show{ opacity:1; transform:none }
+
+  @media (max-width: 1100px){ body{ grid-template-columns: 1fr; grid-template-rows: auto auto 1fr } }
+</style>
+</head>
+<body>
+  <header>
+    <h1>🦴 Diagrama de Espina de Pescado (Ishikawa) – SVG</h1>
+    <div class="actions">
+      <button class="ghost" id="tpl6m">Cargar plantilla 6M</button>
+      <button class="ghost" id="tpl4p">Plantilla 4P (Marketing)</button>
+      <button class="primary" id="renderBtn">Generar/Actualizar</button>
+      <button id="autoLayoutBtn">Auto‑layout</button>
+      <button class="success" id="exportPNGBtn">Descargar PNG</button>
+      <button class="success" id="exportSVGBtn">Descargar SVG</button>
+      <button class="danger" id="resetBtn">Reiniciar</button>
+    </div>
+  </header>
+
+  <aside>
+    <div class="section">
+      <label for="problem">Problema (cabeza del pez)</label>
+      <input id="problem" type="text" placeholder="Ej: Aumento de defectos en producción" />
+      <div class="row">
+        <div style="flex:2">
+          <label for="goal">Meta/criterio</label>
+          <input id="goal" type="text" placeholder="Ej: Reducir defectos 50% en 90 días" />
+        </div>
+        <div>
+          <label for="orientation">Orientación</label>
+          <select id="orientation" style="width:100%; padding:10px; border-radius:12px; background:#0c1530; color:var(--ink); border:1px solid #2a3c6a">
+            <option value="right" selected> cabeza a la derecha</option>
+            <option value="left"> cabeza a la izquierda</option>
+          </select>
+        </div>
+      </div>
+      <div class="muted">Añade categorías (huesos principales) y causas (ramas secundarias). Alternaremos arriba/abajo para un gráfico equilibrado.</div>
+    </div>
+
+    <div class="section" id="categories"></div>
+
+    <div class="row">
+      <input id="newCatInput" type="text" placeholder="Nueva categoría (p.ej. Método)" />
+      <button id="addCatBtn">Añadir categoría</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="board-wrap">
+      <div class="grid"></div>
+      <svg id="fishSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" aria-label="Diagrama de espina de pescado">
+        <!-- Se dibuja dinámicamente con JS -->
+      </svg>
+      <div class="legend">Arrastra para desplazarte: usa el scroll del navegador para hacer zoom del SVG con Ctrl/Cmd + rueda.</div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">Copiado / exportado</div>
+
+<script>
+(function(){
+  // --- Estado ---
+  let state = {
+    problem: '',
+    goal: '',
+    orientation: 'right',
+    categories: [], // [{id, name, causes:["..."]}]
+  };
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const svg = $('#fishSVG');
+  const categoriesEl = $('#categories');
+
+  // Utilidades
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const clamp = (v,min,max)=>Math.max(min,Math.min(max,v));
+  const showToast = (msg)=>{ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 1600)}
+
+  // --- Plantillas ---
+  const templates = {
+    sixM: [
+      'Método', 'Máquina', 'Material', 'Mano de Obra', 'Medición', 'Medio Ambiente'
+    ],
+    fourP: [
+      'Producto', 'Precio', 'Plaza', 'Promoción'
+    ]
+  };
+
+  // --- Render UI de categorías ---
+  function renderCategories(){
+    categoriesEl.innerHTML = '';
+    state.categories.forEach(cat =>{
+      const wrap = document.createElement('div');
+      wrap.className='category';
+      wrap.innerHTML = `
+        <div class="header">
+          <input type="text" class="cat-name" value="${cat.name}" data-id="${cat.id}" />
+          <button data-id="${cat.id}" class="ghost up">↑</button>
+          <button data-id="${cat.id}" class="ghost down">↓</button>
+          <button data-id="${cat.id}" class="danger del">Eliminar</button>
+        </div>
+        <div class="pills">${cat.causes.map((c,i)=>
+          `<span class="pill">${escapeHTML(c)} <button data-id="${cat.id}" data-idx="${i}" class="ghost remove-cause">✕</button></span>`
+        ).join('')}</div>
+        <div class="row add-cause">
+          <input type="text" placeholder="Añadir causa" data-id="${cat.id}" class="cause-input" />
+          <button class="add-cause-btn" data-id="${cat.id}">Añadir</button>
+        </div>`;
+      categoriesEl.appendChild(wrap);
+    })
+  }
+
+  function escapeHTML(str){
+    return str.replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]));
+  }
+
+  // --- Eventos de sidebar ---
+  $('#addCatBtn').addEventListener('click', ()=>{
+    const val = $('#newCatInput').value.trim();
+    if(!val) return;
+    state.categories.push({ id: uid(), name: val, causes: [] });
+    $('#newCatInput').value='';
+    renderCategories();
+  });
+
+  categoriesEl.addEventListener('input', (e)=>{
+    if(e.target.classList.contains('cat-name')){
+      const id = e.target.dataset.id;
+      const cat = state.categories.find(c=>c.id===id);
+      if(cat){ cat.name = e.target.value; }
+    }
+  });
+
+  categoriesEl.addEventListener('click', (e)=>{
+    const id = e.target.dataset.id;
+    if(e.target.classList.contains('del')){
+      state.categories = state.categories.filter(c=>c.id!==id);
+      renderCategories();
+      return;
+    }
+    if(e.target.classList.contains('up')){
+      const idx = state.categories.findIndex(c=>c.id===id);
+      if(idx>0){ const [c] = state.categories.splice(idx,1); state.categories.splice(idx-1,0,c); renderCategories(); }
+      return;
+    }
+    if(e.target.classList.contains('down')){
+      const idx = state.categories.findIndex(c=>c.id===id);
+      if(idx>=0 && idx<state.categories.length-1){ const [c] = state.categories.splice(idx,1); state.categories.splice(idx+1,0,c); renderCategories(); }
+      return;
+    }
+    if(e.target.classList.contains('add-cause-btn')){
+      const input = categoriesEl.querySelector(`.cause-input[data-id="${id}"]`);
+      const val = (input?.value||'').trim();
+      if(!val) return;
+      const cat = state.categories.find(c=>c.id===id);
+      cat?.causes.push(val);
+      input.value='';
+      renderCategories();
+    }
+    if(e.target.classList.contains('remove-cause')){
+      const idx = Number(e.target.dataset.idx);
+      const cat = state.categories.find(c=>c.id===id);
+      if(cat){ cat.causes.splice(idx,1); renderCategories(); }
+    }
+  });
+
+  // Entradas superiores
+  $('#problem').addEventListener('input', e=> state.problem = e.target.value);
+  $('#goal').addEventListener('input', e=> state.goal = e.target.value);
+  $('#orientation').addEventListener('change', e=> state.orientation = e.target.value);
+
+  // Plantillas
+  $('#tpl6m').addEventListener('click', ()=>{
+    state.categories = templates.sixM.map(n=>({id:uid(), name:n, causes:[]}));
+    renderCategories();
+  });
+  $('#tpl4p').addEventListener('click', ()=>{
+    state.categories = templates.fourP.map(n=>({id:uid(), name:n, causes:[]}));
+    renderCategories();
+  });
+
+  $('#resetBtn').addEventListener('click', ()=>{
+    state = { problem:'', goal:'', orientation:'right', categories: [] };
+    $('#problem').value=''; $('#goal').value=''; $('#orientation').value='right';
+    renderCategories(); drawFish();
+  });
+
+  // --- Dibujo del pez (SVG) ---
+  function drawFish(){
+    const W=1600, H=900; // viewBox base
+    const margin = 80;
+    const headSize = 140; // radio de cabeza (elipse)
+    const spineLen = W - margin*2 - headSize*1.2; // largo de la espina principal
+    const leftX = margin;
+    const rightX = margin + spineLen;
+    const headX = state.orientation==='right' ? rightX + headSize*0.3 : leftX - headSize*0.3;
+    const spineY = H/2;
+
+    // Limpia SVG
+    svg.innerHTML = '';
+
+    // Defs: gradientes, filtros sutiles
+    const defs = el('defs');
+    defs.innerHTML = `
+      <linearGradient id="gSpine" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#4fc3f7"/>
+        <stop offset="100%" stop-color="#8b5cf6"/>
+      </linearGradient>
+      <linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0d1a33"/>
+        <stop offset="100%" stop-color="#0a1426"/>
+      </linearGradient>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+      </filter>
+    `;
+    svg.appendChild(defs);
+
+    // Cálculo de posiciones de costillas
+    const n = Math.max(1, state.categories.length);
+    const spacing = spineLen/(n+1);
+    const angle = 28 * Math.PI/180; // inclinación costillas
+    const ribLenBase = 260; // longitud base de costillas
+
+    const startX = state.orientation==='right'? leftX : rightX;
+    const dir = state.orientation==='right'? 1 : -1; // dirección hacia la cabeza
+
+    // Cola estilizada (triángulo)
+    const tailWidth = 200, tailHeight = 240;
+    const tailCX = state.orientation==='right'? leftX - 30 : rightX + 30;
+    const tailPoints = state.orientation==='right'
+      ? `${tailCX},${spineY} ${tailCX - tailWidth},${spineY - tailHeight/2} ${tailCX - tailWidth},${spineY + tailHeight/2}`
+      : `${tailCX},${spineY} ${tailCX + tailWidth},${spineY - tailHeight/2} ${tailCX + tailWidth},${spineY + tailHeight/2}`;
+    const tail = el('polygon', { points: tailPoints, fill:'url(#gBody)', stroke:'url(#gSpine)', 'stroke-width':3, filter:'url(#soft)'});
+    svg.appendChild(tail);
+
+    // Espina dorsal (línea principal)
+    const spine = el('line', { x1:startX, y1:spineY, x2:startX + dir*spineLen, y2:spineY, stroke:'url(#gSpine)', 'stroke-width':6, 'stroke-linecap':'round'});
+    svg.appendChild(spine);
+
+    // Aletas dorsal y ventral cerca de la mitad
+    const finOffset = 220, finLen = 120;
+    const finX = startX + dir*finOffset;
+    const dorsal = el('path', { d: `M ${finX} ${spineY} q ${dir*60} -70 ${dir*120} -10`, fill:'none', stroke:'#3cd0ff', 'stroke-width':4, 'stroke-linecap':'round', opacity:.6});
+    const ventral = el('path', { d: `M ${finX} ${spineY} q ${dir*60} 70 ${dir*120} 10`, fill:'none', stroke:'#a58bff', 'stroke-width':4, 'stroke-linecap':'round', opacity:.45});
+    svg.appendChild(dorsal); svg.appendChild(ventral);
+
+    // Cabeza (elipse) + ojo (+ texto de problema y meta)
+    const head = el('ellipse', { cx: headX, cy: spineY, rx: headSize, ry: headSize*0.62, fill:'url(#gBody)', stroke:'url(#gSpine)', 'stroke-width':4, filter:'url(#soft)'});
+    svg.appendChild(head);
+    const eyeR = 12;
+    const eyeX = headX - dir*headSize*0.45;
+    const eye = el('circle', { cx:eyeX, cy:spineY - 12, r:eyeR, fill:'#fff'});
+    const pupil = el('circle', { cx:eyeX+2, cy:spineY - 12, r:6, fill:'#0b1220'});
+    svg.appendChild(eye); svg.appendChild(pupil);
+
+    // Texto en la cabeza
+    const problem = (state.problem||'Define el problema…');
+    const goal = state.goal ? `\n${state.goal}` : '';
+    const headText = el('text', { x: headX - dir*headSize*0.15, y: spineY, 'text-anchor': dir>0? 'end':'start', 'dominant-baseline':'middle', fill:'#d7e8ff', 'font-size': 24, 'font-weight':700 });
+    headText.appendChild(document.createTextNode(problem + goal));
+    svg.appendChild(headText);
+
+    // Costillas + subramas y etiquetas
+    const upFirst = true; // alterna arriba/abajo
+    const fontSizeCat = 16;
+    const fontSizeCause = 13;
+
+    state.categories.forEach((cat, i)=>{
+      const x = startX + dir*spacing*(i+1);
+      const up = (i % 2 === 0) ? upFirst : !upFirst;
+      const s = up? -1 : 1; // signo vertical
+      const ribLen = ribLenBase + (cat.causes.length*14); // crece con causas
+      const dx = Math.cos(angle)*ribLen * dir;
+      const dy = Math.sin(angle)*ribLen * s;
+
+      // costilla principal
+      const rib = el('line', { x1:x, y1:spineY, x2:x+dx, y2:spineY+dy, stroke:'#7edcff', 'stroke-width':4, 'stroke-linecap':'round'});
+      svg.appendChild(rib);
+
+      // etiqueta de categoría (al final de costilla)
+      const tx = x + dx + dir* (up? -10:10);
+      const ty = spineY + dy + s*8;
+      const catText = el('text', { x:tx, y:ty, 'text-anchor': up? 'end':'start', 'font-size': fontSizeCat, 'font-weight':700, fill:'#cde7ff' });
+      catText.textContent = cat.name || 'Categoría';
+      svg.appendChild(catText);
+
+      // subramas (causas) a lo largo de la costilla
+      const segs = Math.max(1, cat.causes.length);
+      for(let k=0;k<segs;k++){
+        const t = (k+1)/(segs+1); // posición relativa 0..1
+        const px = x + dx*t;
+        const py = spineY + dy*t;
+        const subLen = 90 + Math.min(6*cat.causes.length, 90); // subrama proporcional
+        const subDx = Math.cos(angle)*(subLen)*dir;
+        const subDy = Math.sin(angle)*(subLen)*s;
+        const sub = el('line', { x1:px, y1:py, x2:px + subDx, y2:py + subDy, stroke:'#9aa9ff', 'stroke-width':3, 'stroke-linecap':'round', opacity:.9 });
+        svg.appendChild(sub);
+
+        const label = el('text', {
+          x: px + subDx + dir*(up? -6:6), y: py + subDy + s*6, 'text-anchor': up? 'end':'start', 'font-size': fontSizeCause, fill:'#b6c9ff'
+        });
+        label.textContent = cat.causes[k] || `Causa ${k+1}`;
+        svg.appendChild(label);
+      }
+    });
+
+    // Nariz/morro para darle forma de pez
+    const nose = el('path', { d: `M ${headX + dir*headSize*0.95} ${spineY}
+                                q ${dir*40} -30 ${dir*60} 0
+                                q ${dir*-20} 30 ${dir*-60} 0 z`, fill:'#102446', stroke:'url(#gSpine)', 'stroke-width':2, opacity:.8 });
+    svg.appendChild(nose);
+
+    // Línea decorativa del cuerpo suavizada
+    const bodyPath = el('path', { d: `M ${startX} ${spineY}
+      C ${startX + dir*200} ${spineY-140}, ${headX - dir*180} ${spineY-140}, ${headX} ${spineY}
+      C ${headX - dir*180} ${spineY+140}, ${startX + dir*200} ${spineY+140}, ${startX} ${spineY}`,
+      fill:'none', stroke:'rgba(107,228,255,.25)', 'stroke-width':2});
+    svg.appendChild(bodyPath);
+  }
+
+  function el(name, attrs={}){
+    const n = document.createElementNS('http://www.w3.org/2000/svg', name);
+    for(const k in attrs){ n.setAttribute(k, attrs[k]); }
+    return n;
+  }
+
+  // Auto‑layout: alterna orientación según densidad de texto
+  function autoLayout(){
+    const topChars = state.categories.filter((_,i)=>i%2===0).reduce((a,c)=>a + (c.name.length + c.causes.join('').length),0);
+    const botChars = state.categories.filter((_,i)=>i%2===1).reduce((a,c)=>a + (c.name.length + c.causes.join('').length),0);
+    if(Math.abs(topChars - botChars) > 12){
+      // reordenar por tamaño descendente alternando arriba/abajo
+      const sorted = [...state.categories].sort((a,b)=> (b.name.length + b.causes.join('').length) - (a.name.length + a.causes.join('').length));
+      const top=[], bot=[];
+      sorted.forEach((c,i)=> (i%2===0? top:bot).push(c));
+      const merged=[]; const L=Math.max(top.length, bot.length);
+      for(let i=0;i<L;i++){ if(top[i]) merged.push(top[i]); if(bot[i]) merged.push(bot[i]); }
+      state.categories = merged;
+      renderCategories();
+    }
+    drawFish();
+    showToast('Layout equilibrado');
+  }
+
+  // Exportar SVG
+  function download(filename, dataUrl){
+    const a = document.createElement('a');
+    a.href = dataUrl; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  function exportSVG(){
+    const clone = svg.cloneNode(true);
+    // Incrusta estilos para exportar auto‑contenida
+    const css = Array.from(document.styleSheets).map(ss=>{
+      try{ return Array.from(ss.cssRules).map(r=>r.cssText).join('\n'); }catch(e){ return ''; }
+    }).join('\n');
+    const style = document.createElement('style'); style.innerHTML = css; clone.insertBefore(style, clone.firstChild);
+    const xml = new XMLSerializer().serializeToString(clone);
+    const blob = new Blob([xml], {type:'image/svg+xml'});
+    const url = URL.createObjectURL(blob);
+    download('espina-pescado.svg', url);
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    showToast('SVG exportado');
+  }
+
+  function exportPNG(){
+    const xml = new XMLSerializer().serializeToString(svg);
+    const svg64 = btoa(unescape(encodeURIComponent(xml)));
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = 2400; canvas.height = 1350; // mayor resolución
+      const ctx = canvas.getContext('2d');
+      // Fondo
+      const grd = ctx.createLinearGradient(0,0,0,canvas.height);
+      grd.addColorStop(0,'#0f1730'); grd.addColorStop(1,'#0b1220');
+      ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
+      // Dibuja SVG
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(blob=>{
+        const url = URL.createObjectURL(blob);
+        download('espina-pescado.png', url);
+        setTimeout(()=>URL.revokeObjectURL(url), 1000);
+        showToast('PNG exportado');
+      }, 'image/png');
+    };
+    img.src = 'data:image/svg+xml;base64,' + svg64;
+  }
+
+  // Botones
+  $('#renderBtn').addEventListener('click', ()=>{ drawFish(); });
+  $('#autoLayoutBtn').addEventListener('click', autoLayout);
+  $('#exportSVGBtn').addEventListener('click', exportSVG);
+  $('#exportPNGBtn').addEventListener('click', exportPNG);
+
+  // Interacción: pan del SVG con arrastre
+  (function enablePan(){
+    let isDown=false, start={x:0,y:0}, vb = svg.viewBox.baseVal;
+    svg.addEventListener('mousedown', (e)=>{ isDown=true; start={x:e.clientX, y:e.clientY}; svg.style.cursor='grabbing'; });
+    window.addEventListener('mouseup', ()=>{ isDown=false; svg.style.cursor=''; });
+    window.addEventListener('mousemove', (e)=>{
+      if(!isDown) return; const dx=(e.clientX-start.x), dy=(e.clientY-start.y); start={x:e.clientX,y:e.clientY};
+      vb.x -= dx; vb.y -= dy; // mover viewBox
+    });
+  })();
+
+  // Estado inicial de demostración
+  (function demo(){
+    state.problem = 'Retrasos en entregas a clientes';
+    state.goal = 'Reducir tiempo de ciclo 30%';
+    $('#problem').value = state.problem; $('#goal').value = state.goal;
+    state.categories = [
+      {id:uid(), name:'Método', causes:['Falta de estandarización','Aprobaciones tardías']},
+      {id:uid(), name:'Máquina', causes:['Caídas del servidor','Baja capacidad de cómputo']},
+      {id:uid(), name:'Material', causes:['Inventario insuficiente','Proveedores únicos']},
+      {id:uid(), name:'Mano de Obra', causes:['Falta de capacitación','Sobrecarga del equipo']},
+      {id:uid(), name:'Medición', causes:['KPIs desalineados','Datos incompletos']},
+      {id:uid(), name:'Medio Ambiente', causes:['Cortes de energía','Tráfico urbano']}
+    ];
+    renderCategories();
+    drawFish();
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Diagrama de Espina de Pescado (Ishikawa)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .fishbone-diagram {
+            stroke: #2d3748; /* gris oscuro */
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .fishbone-diagram text {
+            fill: #1a202c; /* casi negro */
+            font-size: 16px;
+            font-weight: 500;
+            stroke: none;
+        }
+        .fishbone-diagram .problem-text {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .fishbone-diagram .category-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .cause-text {
+             font-size: 15px;
+             font-weight: 400;
+        }
+        .add-cause-btn, .remove-cause-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .add-cause-btn:hover {
+            transform: scale(1.1);
+        }
+         .remove-cause-btn:hover {
+            background-color: #ef4444;
+            color: white;
+        }
+        .smooth-shadow {
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-700">Generador de Diagrama de Espina de Pescado</h1>
+            <p class="text-gray-500 mt-2">Crea diagramas de causa y efecto (Ishikawa) de forma sencilla y profesional.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Columna de Entradas de Datos -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-xl smooth-shadow">
+                <form id="fishbone-form">
+                    <div class="mb-6">
+                        <label for="problem" class="block text-lg font-semibold text-gray-700 mb-2">Problema o Efecto</label>
+                        <input type="text" id="problem" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Ej: Bajas ventas del producto" required>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Categorías Principales y Causas</h3>
+
+                    <div id="categories-container" class="space-y-6">
+                        <!-- Las categorías se insertarán aquí dinámicamente -->
+                    </div>
+
+                    <button type="submit" class="w-full mt-8 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                        Generar Diagrama
+                    </button>
+                </form>
+            </div>
+
+            <!-- Columna del Diagrama -->
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl smooth-shadow min-h-[600px] flex items-center justify-center">
+                <div id="diagram-container" class="w-full h-full">
+                    <!-- El SVG se insertará aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('fishbone-form');
+            const categoriesContainer = document.getElementById('categories-container');
+            const diagramContainer = document.getElementById('diagram-container');
+
+            const initialCategories = [
+                { name: "Personal", placeholder: "Ej: Falta de capacitación" },
+                { name: "Procesos", placeholder: "Ej: Proceso de pago complejo" },
+                { name: "Tecnología", placeholder: "Ej: Web lenta" },
+                { name: "Materiales", placeholder: "Ej: Empaque poco atractivo" },
+                { name: "Entorno", placeholder: "Ej: Fuerte competencia" },
+                { name: "Medición", placeholder: "Ej: No se miden KPIs" },
+            ];
+            
+            // Inicializar las categorías en el formulario
+            initialCategories.forEach(cat => {
+                const categoryId = cat.name.toLowerCase().replace(/\s/g, '-');
+                const categoryHtml = `
+                    <div id="category-${categoryId}" class="p-4 border rounded-lg bg-gray-50">
+                        <label for="cat-input-${categoryId}" class="block text-md font-semibold text-gray-600">${cat.name}</label>
+                        <div id="causes-${categoryId}" class="mt-2 space-y-2">
+                            <div class="flex items-center space-x-2">
+                                <input type="text" class="cause-input w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-blue-400" placeholder="${cat.placeholder}">
+                                <button type="button" class="remove-cause-btn hidden p-1 rounded-full bg-gray-200 text-gray-500 hover:bg-red-500 hover:text-white">&times;</button>
+                            </div>
+                        </div>
+                         <button type="button" class="add-cause-btn mt-2 text-blue-500 font-semibold text-sm hover:text-blue-700">+ Añadir causa</button>
+                    </div>
+                `;
+                categoriesContainer.innerHTML += categoryHtml;
+            });
+            
+            updateRemoveButtons();
+
+            // Delegación de eventos para añadir y quitar causas
+            categoriesContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('add-cause-btn')) {
+                    const causesContainer = e.target.previousElementSibling;
+                    const newCauseHtml = `
+                        <div class="flex items-center space-x-2">
+                            <input type="text" class="cause-input w-full px-3 py-1.5 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-blue-400" placeholder="Causa específica">
+                            <button type="button" class="remove-cause-btn p-1 rounded-full bg-gray-200 text-gray-500 hover:bg-red-500 hover:text-white">&times;</button>
+                        </div>
+                    `;
+                    causesContainer.insertAdjacentHTML('beforeend', newCauseHtml);
+                    updateRemoveButtons();
+                }
+
+                if (e.target.classList.contains('remove-cause-btn')) {
+                    const causeDiv = e.target.parentElement;
+                    const causesContainer = causeDiv.parentElement;
+                    causeDiv.remove();
+                    updateRemoveButtons(causesContainer);
+                }
+            });
+            
+            function updateRemoveButtons(container) {
+                const containers = container ? [container] : categoriesContainer.querySelectorAll('[id^="causes-"]');
+                containers.forEach(cont => {
+                    const allCauses = cont.querySelectorAll('.cause-input');
+                    const allRemoveBtns = cont.querySelectorAll('.remove-cause-btn');
+                    if (allCauses.length <= 1) {
+                         allRemoveBtns.forEach(btn => btn.classList.add('hidden'));
+                    } else {
+                         allRemoveBtns.forEach(btn => btn.classList.remove('hidden'));
+                    }
+                });
+            }
+
+            // Manejar el envío del formulario
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const problem = document.getElementById('problem').value;
+                const categoriesData = [];
+
+                initialCategories.forEach(cat => {
+                    const categoryId = cat.name.toLowerCase().replace(/\s/g, '-');
+                    const causesContainer = document.getElementById(`causes-${categoryId}`);
+                    const causeInputs = causesContainer.querySelectorAll('.cause-input');
+                    const causes = Array.from(causeInputs)
+                                      .map(input => input.value.trim())
+                                      .filter(value => value !== '');
+                    if (causes.length > 0) {
+                        categoriesData.push({ name: cat.name, causes });
+                    }
+                });
+
+                generateDiagram(problem, categoriesData);
+            });
+
+            // Función para generar el SVG
+            function generateDiagram(problem, categories) {
+                diagramContainer.innerHTML = '';
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, "svg");
+                svg.setAttribute('viewBox', '0 0 1200 600');
+                svg.setAttribute('class', 'fishbone-diagram');
+                svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+                
+                // ---- Elementos del pez ----
+                // Espina dorsal
+                const spine = document.createElementNS(svgNS, 'line');
+                spine.setAttribute('x1', 50);
+                spine.setAttribute('y1', 300);
+                spine.setAttribute('x2', 1050);
+                spine.setAttribute('y2', 300);
+                svg.appendChild(spine);
+                
+                // Cabeza
+                const head = document.createElementNS(svgNS, 'path');
+                head.setAttribute('d', 'M 1050 270 Q 1100 300, 1050 330 L 1050 270 Z');
+                svg.appendChild(head);
+                
+                const eye = document.createElementNS(svgNS, 'circle');
+                eye.setAttribute('cx', 1060);
+                eye.setAttribute('cy', 295);
+                eye.setAttribute('r', 4);
+                eye.setAttribute('fill', '#2d3748');
+                svg.appendChild(eye);
+
+                // Cola
+                const tail = document.createElementNS(svgNS, 'path');
+                tail.setAttribute('d', 'M 50 300 L 0 250 M 50 300 L 0 350 M 0 250 Q 25 300, 0 350');
+                svg.appendChild(tail);
+
+                // ---- Texto del Problema ----
+                const problemText = createText(problem, 1080, 305, 'problem-text');
+                problemText.setAttribute('text-anchor', 'start');
+                svg.appendChild(problemText);
+
+                // ---- Espinas (Categorías y Causas) ----
+                const topCategories = categories.filter((_, i) => i % 2 === 0);
+                const bottomCategories = categories.filter((_, i) => i % 2 !== 0);
+
+                const drawBones = (categoryList, isTop) => {
+                    const boneCount = categoryList.length;
+                    const spacing = 800 / (boneCount + 1);
+                    
+                    categoryList.forEach((cat, index) => {
+                        const startX = 150 + (index + 1) * spacing;
+                        const startY = 300;
+                        const endX = startX + 100;
+                        const endY = isTop ? 100 : 500;
+                        
+                        // Espina principal de la categoría (curvada)
+                        const bonePath = document.createElementNS(svgNS, 'path');
+                        const controlX = startX + 20;
+                        const controlY = isTop ? startY - 100 : startY + 100;
+                        bonePath.setAttribute('d', `M ${startX} ${startY} Q ${controlX} ${controlY}, ${endX} ${endY}`);
+                        svg.appendChild(bonePath);
+
+                        // Texto de la categoría
+                        const categoryText = createText(cat.name, endX + 10, endY + (isTop ? -10 : 20), 'category-text');
+                        categoryText.setAttribute('text-anchor', 'start');
+                        svg.appendChild(categoryText);
+                        
+                        // Espinas de las causas
+                        cat.causes.forEach((cause, causeIndex) => {
+                            const ratio = (causeIndex + 1) / (cat.causes.length + 1);
+                            
+                            // Punto sobre la curva de bezier para la espina de la causa
+                            const t = 0.3 + 0.6 * ratio; // Distribuir en el medio de la espina
+                            const p = getQuadraticBezierXYatT({x:startX, y:startY}, {x:controlX, y:controlY}, {x:endX, y:endY}, t);
+
+                            const causeLine = document.createElementNS(svgNS, 'line');
+                            causeLine.setAttribute('x1', p.x);
+                            causeLine.setAttribute('y1', p.y);
+                            causeLine.setAttribute('x2', p.x + 120);
+                            causeLine.setAttribute('y2', p.y);
+                            svg.appendChild(causeLine);
+                            
+                            // Texto de la causa
+                            const causeText = createText(cause, p.x + 125, p.y + 5, 'cause-text');
+                            causeText.setAttribute('text-anchor', 'start');
+                            svg.appendChild(causeText);
+                        });
+                    });
+                };
+                
+                drawBones(topCategories, true);
+                drawBones(bottomCategories, false);
+
+                diagramContainer.appendChild(svg);
+            }
+
+            function createText(content, x, y, className) {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', x);
+                text.setAttribute('y', y);
+                text.setAttribute('class', className);
+                text.textContent = content;
+                return text;
+            }
+
+            // Función para calcular un punto en una curva de Bezier cuadrática
+            function getQuadraticBezierXYatT(startPt, controlPt, endPt, T) {
+                const x = Math.pow(1 - T, 2) * startPt.x + 2 * (1 - T) * T * controlPt.x + Math.pow(T, 2) * endPt.x;
+                const y = Math.pow(1 - T, 2) * startPt.y + 2 * (1 - T) * T * controlPt.y + Math.pow(T, 2) * endPt.y;
+                return { x, y };
+            }
+
+            // Generar un diagrama de ejemplo al cargar
+            document.getElementById('problem').value = "Bajo rendimiento del equipo";
+            // Llenar algunas causas de ejemplo
+            document.querySelector('#causes-personal .cause-input').value = "Falta de motivación";
+            document.querySelector('#causes-procesos .cause-input').value = "Comunicación ineficiente";
+            document.querySelector('#causes-tecnología .cause-input').value = "Software desactualizado";
+            
+            form.dispatchEvent(new Event('submit'));
+
+        });
+    </script>
+</body>
+</html>
