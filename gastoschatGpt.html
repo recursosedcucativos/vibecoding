@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gastos Familia</title>
+<style>
+  :root{
+    --azul:#007bff;--gris:#6c757d;--verde:#28a745;--rojo:#dc3545;--fondo:#f4f7f6;--blanco:#fff;--radio:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+  body{background:var(--fondo);color:#333;line-height:1.5;}
+  header{background:var(--blanco);color:var(--azul);padding:0.5rem;text-align:center;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:10;}
+  nav{display:flex;justify-content:space-around;background:var(--blanco);border-bottom:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,.05);}
+  nav button{flex:1;background:none;border:none;color:var(--gris);font-weight:600;padding:.75rem 0;cursor:pointer;}
+  nav button.active{color:var(--azul);border-bottom:2px solid var(--azul);}
+  main{display:flex;flex-direction:column;gap:1rem;padding:1rem;max-width:600px;margin:auto;}
+  section{background:var(--blanco);border-radius:var(--radio);box-shadow:0 2px 5px rgba(0,0,0,.05);padding:1rem;}
+  h1,h2{margin-bottom:.5rem;color:var(--azul);}
+  input,select,button{width:100%;padding:.75rem;margin-top:.25rem;border-radius:var(--radio);border:1px solid #ccc;font-size:1rem;}
+  button{background:var(--azul);color:#fff;border:none;cursor:pointer;font-weight:600;}
+  button:hover{background:#0056b3}
+  table{width:100%;border-collapse:collapse;margin-top:.5rem;font-size:.95rem;}
+  th,td{padding:.5rem;text-align:left;}
+  tr:nth-child(even){background:#fafafa;}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Control de Gastos Familiar</h1>
+    <nav>
+      <button data-view="add" class="active">Registrar</button>
+      <button data-view="list">Lista</button>
+      <button data-view="data">Datos</button>
+    </nav>
+  </header>
+  <main>
+    <section id="add">
+      <h2>Registrar Gasto o Ingreso</h2>
+      <form id="form">
+        <label>Descripción<input id="desc" required placeholder="Ej. Comida, luz..."/></label>
+        <label>Monto<input id="amount" type="number" required /></label>
+        <label>Tipo<select id="type"><option value="ingreso">Ingreso</option><option value="egreso">Egreso</option></select></label>
+        <button>Guardar</button>
+      </form>
+    </section>
+
+    <section id="list" style="display:none;">
+      <h2>Movimientos</h2>
+      <table><thead><tr><th>Descripción</th><th>Monto</th><th>Tipo</th></tr></thead><tbody id="tbody"></tbody></table>
+    </section>
+
+    <section id="data" style="display:none;">
+      <h2>Datos</h2>
+      <button id="export">Exportar</button>
+      <input id="import" type="file" accept="application/json" />
+      <button id="clear">Borrar todo</button>
+    </section>
+  </main>
+  <script>
+    const $=s=>document.querySelector(s);
+    const views=document.querySelectorAll('main section');
+    document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      views.forEach(v=>v.style.display=v.id===b.dataset.view?'block':'none');
+    });
+
+    const STORAGE='gastos';let data=JSON.parse(localStorage.getItem(STORAGE)||'[]');
+    const fmt=new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',minimumFractionDigits:0});
+
+    function save(){localStorage.setItem(STORAGE,JSON.stringify(data));render();}
+    function render(){const tb=$('#tbody');tb.innerHTML=data.map(x=>`<tr><td>${x.desc}</td><td>${fmt.format(x.amount)}</td><td>${x.type}</td></tr>`).join('');}
+    $('#form').onsubmit=e=>{e.preventDefault();data.push({desc:$('#desc').value,amount:Number($('#amount').value),type:$('#type').value});save();e.target.reset();};
+    $('#export').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'}));a.download='gastos.json';a.click();};
+    $('#import').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{data=JSON.parse(t);save();});};
+    $('#clear').onclick=()=>{if(confirm('¿Borrar todo?')){data=[];save();}};
+    render();
+  </script>
+</body>
+</html>

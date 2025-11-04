@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Sorteo de Estudiantes</title>
+  <style>
+    :root{
+      --bg: #0f172a;          /* slate-900 */
+      --panel:#111827;        /* gray-900 */
+      --muted:#334155;        /* slate-600 */
+      --text:#e5e7eb;         /* gray-200 */
+      --accent:#22c55e;       /* green-500 */
+      --accent-2:#38bdf8;     /* sky-400 */
+      --danger:#ef4444;       /* red-500 */
+      --warn:#f59e0b;         /* amber-500 */
+      --ring: 2px solid #22c55e55;
+      --radius: 16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --gap: 12px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f8fafc;         /* slate-50 */
+        --panel:#ffffff;
+        --muted:#64748b;      /* slate-500 */
+        --text:#0f172a;       /* slate-900 */
+        --accent:#16a34a;
+        --accent-2:#0284c7;
+        --danger:#dc2626;
+        --warn:#d97706;
+        --ring: 2px solid #16a34a44;
+      }
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(56,189,248,.15), transparent 60%),
+                  radial-gradient(800px 600px at -10% 100%, rgba(34,197,94,.14), transparent 60%),
+                  var(--bg);
+      line-height:1.45;
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: clamp(16px,2.5vw,28px);
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: clamp(12px,2vw,16px);
+    }
+
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding: clamp(12px,1.8vw,18px);
+      background: color-mix(in oklab, var(--panel), black 2%);
+      border: 1px solid color-mix(in oklab, var(--panel), white 8%);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .title{
+      display:flex; align-items:center; gap:12px;
+      font-weight:800; letter-spacing:.2px;
+      font-size: clamp(18px,3.6vw,28px);
+    }
+    .badge{
+      font-size:.75rem; font-weight:700; letter-spacing:.5px;
+      padding:4px 8px; border-radius:999px; background:var(--accent); color:#08220f;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+    }
+    @media(min-width: 880px){
+      .grid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .card{
+      background: var(--panel);
+      border: 1px solid color-mix(in oklab, var(--panel), white 10%);
+      border-radius: var(--radius);
+      padding: clamp(14px,1.8vw,18px);
+      box-shadow: var(--shadow);
+    }
+
+    h2{
+      margin:0 0 8px; font-size: clamp(16px,2.4vw,20px);
+    }
+    p.helper{ color:var(--muted); margin:.25rem 0 1rem; font-size:.95rem }
+
+    label{ font-weight:600; display:block; margin:8px 0 6px }
+
+    input[type="text"], textarea{
+      width:100%; padding:14px 12px; font-size:1rem;
+      background: color-mix(in oklab, var(--panel), black 3%);
+      color: var(--text);
+      border: 1px solid color-mix(in oklab, var(--panel), white 14%);
+      border-radius: 12px; outline: none;
+    }
+    input[type="text"]:focus, textarea:focus, .btn:focus{
+      box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent), transparent 70%);
+      border-color: var(--accent);
+    }
+    textarea{ min-height: 140px; resize: vertical }
+
+    .row{ display:flex; gap:8px; flex-wrap:wrap }
+    .btn{
+      appearance:none; border:1px solid transparent;
+      padding: 12px 14px; border-radius: 12px; font-weight:700;
+      background: var(--accent); color: #05240f; cursor:pointer;
+      min-height: 44px; min-width: 44px;
+      transition: transform .06s ease, filter .2s ease;
+    }
+    .btn:hover{ filter:brightness(1.02) }
+    .btn:active{ transform: scale(.98) }
+    .btn.secondary{ background: color-mix(in oklab, var(--panel), white 8%); color: var(--text); border-color: color-mix(in oklab, var(--panel), white 20%) }
+    .btn.warn{ background: var(--warn); color:#231a00 }
+    .btn.danger{ background: var(--danger); color:#2c0101 }
+    .btn.ghost{ background: transparent; border-color: color-mix(in oklab, var(--panel), white 14%); color: var(--text) }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px; margin:6px 6px 0 0;
+      background: color-mix(in oklab, var(--panel), white 8%);
+      border: 1px solid color-mix(in oklab, var(--panel), white 16%);
+      font-weight:600;
+    }
+    .pill button{ border:none; background:none; color:var(--danger); cursor:pointer; font-weight:800 }
+    .pill input{ inline-size: 1em; block-size: 1em }
+
+    .switch{
+      display:inline-flex; align-items:center; gap:10px; user-select:none; cursor:pointer;
+    }
+    .switch input{ appearance:none; width:46px; height:28px; background: color-mix(in oklab, var(--panel), white 20%);
+      border-radius:999px; position:relative; outline:none; border:1px solid color-mix(in oklab, var(--panel), white 30%); }
+    .switch input::after{ content:""; position:absolute; inset:3px auto 3px 3px; width:20px; border-radius:999px; background:#fff; transition: transform .2s ease }
+    .switch input:checked{ background: color-mix(in oklab, var(--accent), white 40%) }
+    .switch input:checked::after{ transform: translateX(18px) }
+    .switch span{ font-weight:600; color:var(--muted) }
+
+    .result{
+      display:grid; place-items:center; text-align:center;
+      border-radius: var(--radius); padding: 18px;
+      background: repeating-conic-gradient(from 0deg, color-mix(in oklab, var(--panel), white 6%) 0 15deg, transparent 15deg 30deg);
+      border:1px dashed color-mix(in oklab, var(--panel), white 24%);
+      min-height: 140px;
+    }
+    .name{
+      font-size: clamp(28px, 8vw, 64px);
+      font-weight: 900; letter-spacing:.5px;
+      line-height:1.05;
+      display:inline-block;
+      transform-origin: 50% 60%;
+    }
+
+    @keyframes pop {
+      0%{ transform: scale(.8) rotate(-2deg); opacity:.2 }
+      60%{ transform: scale(1.08) rotate(2deg); opacity:1 }
+      100%{ transform: scale(1) rotate(0) }
+    }
+    .animate-pop{ animation: pop .5s cubic-bezier(.2,.7,.2,1) both }
+
+    /* Simple confetti */
+    .confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden }
+    .confetti span{
+      position:absolute; top:-10px; width:8px; height:12px; border-radius:2px;
+      opacity:.9; animation: fall linear forwards;
+    }
+    @keyframes fall{
+      to{ transform: translate3d(var(--x,0), 110vh, 0) rotate(var(--r,180deg)) }
+    }
+
+    .sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0 }
+
+    footer{ color:var(--muted); font-size:.85rem; text-align:center; padding: 12px 0 4px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title" aria-label="Sorteo de estudiantes">
+        🎓 Sorteo de Estudiantes
+        <span class="badge" aria-hidden="true">Offline · Local</span>
+      </div>
+      <button class="btn ghost" id="exportBtn" aria-label="Exportar lista a archivo">Exportar</button>
+    </header>
+
+    <main class="grid">
+      <!-- Panel izquierda: Gestión de lista -->
+      <section class="card" aria-labelledby="gestiona">
+        <h2 id="gestiona">Lista de estudiantes</h2>
+        <p class="helper">Añade nombres individuales o pega varios (uno por línea). Se guardan automáticamente en este dispositivo.</p>
+
+        <form id="singleForm" class="row" autocomplete="off">
+          <label class="sr-only" for="singleName">Nombre del estudiante</label>
+          <input id="singleName" name="singleName" type="text" inputmode="text" placeholder="Ej.: Ana Pérez" aria-describedby="a11y-single" />
+          <button class="btn" type="submit" aria-label="Agregar estudiante">Agregar</button>
+        </form>
+        <p id="a11y-single" class="sr-only">Escribe un nombre y pulsa Agregar para sumarlo a la lista.</p>
+
+        <label for="bulk">Pegado masivo</label>
+        <textarea id="bulk" placeholder="Pega varios nombres, uno por línea"></textarea>
+        <div class="row">
+          <button class="btn secondary" id="bulkAdd">Añadir en bloque</button>
+          <button class="btn warn" id="dedupeBtn" title="Eliminar duplicados exactos">Quitar duplicados</button>
+          <button class="btn danger" id="clearBtn">Vaciar lista</button>
+        </div>
+
+        <div aria-live="polite" aria-atomic="true" class="sr-only" id="liveList"></div>
+
+        <div id="list" aria-label="Nombres actuales" style="margin-top:10px"></div>
+      </section>
+
+      <!-- Panel derecha: Sorteo -->
+      <section class="card" aria-labelledby="sorteo">
+        <h2 id="sorteo">Sorteo</h2>
+        <p class="helper">Evita repetidos hasta reiniciar, muestra el resultado y el historial. Total actuales: <strong id="count">0</strong>.</p>
+
+        <label class="switch" for="noRepeat">
+          <input type="checkbox" id="noRepeat" />
+          <span>Evitar repetidos hasta reinicio</span>
+        </label>
+
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="drawBtn" aria-label="Sortear un estudiante">🎲 Sortear</button>
+          <button class="btn secondary" id="resetBtn" aria-label="Reiniciar elegidos">Reiniciar</button>
+          <button class="btn ghost" id="shuffleBtn" aria-label="Barajar lista">Barajar</button>
+        </div>
+
+        <div class="result" role="status" aria-live="polite" aria-atomic="true" style="margin-top:12px">
+          <span id="result" class="name" aria-label="Resultado del sorteo">—</span>
+        </div>
+
+        <div id="historyWrap" style="margin-top:12px">
+          <label>Historial</label>
+          <div id="history" class="row" aria-live="polite" aria-atomic="false"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <small>Funciona sin conexión. Accesible con teclado y lector de pantalla. Tamaños táctiles ≥44px.</small>
+    </footer>
+  </div>
+
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script>
+  (function(){
+    const $ = sel => document.querySelector(sel);
+    const listEl = $('#list');
+    const countEl = $('#count');
+    const resultEl = $('#result');
+    const historyEl = $('#history');
+    const liveList = $('#liveList');
+    const confettiEl = $('#confetti');
+
+    const singleForm = $('#singleForm');
+    const singleName = $('#singleName');
+    const bulk = $('#bulk');
+    const bulkAdd = $('#bulkAdd');
+    const clearBtn = $('#clearBtn');
+    const dedupeBtn = $('#dedupeBtn');
+    const drawBtn = $('#drawBtn');
+    const resetBtn = $('#resetBtn');
+    const shuffleBtn = $('#shuffleBtn');
+    const noRepeat = $('#noRepeat');
+    const exportBtn = $('#exportBtn');
+
+    const LS_KEY = 'sorteo_estudiantes:list:v1';
+    const LS_PICKED = 'sorteo_estudiantes:picked:v1';
+    const LS_SETTINGS = 'sorteo_estudiantes:settings:v1';
+
+    let names = load(LS_KEY, []);
+    let picked = load(LS_PICKED, []);
+    let settings = load(LS_SETTINGS, { noRepeat: true });
+
+    noRepeat.checked = !!settings.noRepeat;
+
+    /** UTIL **/
+    function load(key, fallback){
+      try{ return JSON.parse(localStorage.getItem(key)) ?? fallback }catch{ return fallback }
+    }
+    function save(key, val){
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+    const norm = s => s.trim().replace(/\s+/g,' ');
+    const unique = arr => Array.from(new Set(arr));
+    const rand = max => Math.floor(Math.random()*max);
+
+    function announce(el, msg){ el.textContent = msg }
+
+    /** RENDER **/
+    function renderList(){
+      listEl.innerHTML = '';
+      if(names.length === 0){
+        const p = document.createElement('p');
+        p.className = 'helper';
+        p.textContent = 'No hay estudiantes aún. Añade algunos arriba.';
+        listEl.appendChild(p);
+      } else {
+        const frag = document.createDocumentFragment();
+        names.forEach((name, i)=>{
+          const pill = document.createElement('span');
+          pill.className = 'pill';
+          pill.setAttribute('role','group');
+          pill.setAttribute('aria-label', `Estudiante ${name}`);
+
+          const lab = document.createElement('span');
+          lab.textContent = name;
+
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.setAttribute('aria-label', `Eliminar a ${name} de la lista`);
+          btn.textContent = '✕';
+          btn.addEventListener('click', ()=>{
+            names.splice(i,1);
+            save(LS_KEY, names);
+            announce(liveList, `${name} eliminado`);
+            renderAll();
+          });
+
+          pill.append(lab, btn);
+          frag.appendChild(pill);
+        });
+        listEl.appendChild(frag);
+      }
+      countEl.textContent = String(names.length);
+    }
+
+    function renderHistory(){
+      historyEl.innerHTML = '';
+      if(picked.length === 0){
+        const p = document.createElement('p');
+        p.className = 'helper';
+        p.textContent = 'Aún no hay sorteos.';
+        historyEl.appendChild(p);
+        return;
+      }
+      const frag = document.createDocumentFragment();
+      picked.slice().reverse().forEach(n=>{
+        const tag = document.createElement('span');
+        tag.className = 'pill';
+        tag.textContent = n;
+        frag.appendChild(tag);
+      });
+      historyEl.appendChild(frag);
+    }
+
+    function renderAll(){
+      renderList();
+      renderHistory();
+      save(LS_SETTINGS, { noRepeat: noRepeat.checked });
+    }
+
+    /** CONFETTI (simple y ligero) **/
+    function dropConfetti(){
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(prefersReduced) return;
+      confettiEl.innerHTML = '';
+      const colors = ['#22c55e','#38bdf8','#f59e0b','#ef4444','#a78bfa','#eab308','#10b981'];
+      const count = Math.min(120, Math.max(40, Math.round(window.innerWidth/8)));
+      for(let i=0;i<count;i++){
+        const s = document.createElement('span');
+        const x = (Math.random()*100|0) + 'vw';
+        const dx = ((Math.random()*200)-100) + 'px';
+        const dur = (Math.random()*1.8+1.2).toFixed(2) + 's';
+        const delay = (Math.random()*0.6).toFixed(2)+'s';
+        s.style.left = x;
+        s.style.background = colors[i % colors.length];
+        s.style.animationDuration = dur;
+        s.style.animationDelay = delay;
+        s.style.setProperty('--x', dx);
+        s.style.setProperty('--r', (Math.random()*540|0)+'deg');
+        confettiEl.appendChild(s);
+      }
+      setTimeout(()=>{ confettiEl.innerHTML=''; }, 2600);
+    }
+
+    /** ACTIONS **/
+    singleForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const v = norm(singleName.value);
+      if(!v) return;
+      names.push(v);
+      names = unique(names);
+      save(LS_KEY, names);
+      announce(liveList, `${v} añadido`);
+      singleName.value='';
+      renderAll();
+      singleName.focus();
+    });
+
+    bulkAdd.addEventListener('click', ()=>{
+      const lines = bulk.value.split(/\r?\n/).map(norm).filter(Boolean);
+      if(!lines.length) return;
+      names = unique(names.concat(lines));
+      save(LS_KEY, names);
+      announce(liveList, `${lines.length} añadido(s)`);
+      bulk.value='';
+      renderAll();
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      if(!names.length) return;
+      const ok = confirm('¿Vaciar la lista de estudiantes? Esta acción no se puede deshacer.');
+      if(!ok) return;
+      names = [];
+      picked = [];
+      save(LS_KEY, names);
+      save(LS_PICKED, picked);
+      resultEl.textContent = '—';
+      renderAll();
+    });
+
+    dedupeBtn.addEventListener('click', ()=>{
+      const before = names.length;
+      names = unique(names.map(norm));
+      save(LS_KEY, names);
+      announce(liveList, `Se eliminaron ${before - names.length} duplicado(s)`);
+      renderAll();
+    });
+
+    shuffleBtn.addEventListener('click', ()=>{
+      // Fisher-Yates
+      for(let i=names.length-1;i>0;i--){
+        const j = rand(i+1);
+        [names[i], names[j]] = [names[j], names[i]];
+      }
+      save(LS_KEY, names);
+      announce(liveList, 'Lista barajada');
+      renderAll();
+    });
+
+    drawBtn.addEventListener('click', ()=>{
+      if(names.length === 0){
+        alert('Añade estudiantes primero.');
+        return;
+      }
+      const pool = settings.noRepeat || noRepeat.checked
+        ? names.filter(n => !picked.includes(n))
+        : names.slice();
+
+      if(pool.length === 0){
+        alert('Todos ya fueron elegidos. Pulsa “Reiniciar” o desactiva “Evitar repetidos”.');
+        return;
+      }
+      const choice = pool[rand(pool.length)];
+      resultEl.textContent = choice;
+      resultEl.classList.remove('animate-pop');
+      void resultEl.offsetWidth; // restart animation
+      resultEl.classList.add('animate-pop');
+
+      // Marcar como elegido si "no repetidos" activo
+      if(noRepeat.checked){
+        picked.push(choice);
+        save(LS_PICKED, picked);
+        renderHistory();
+      }
+      dropConfetti();
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      picked = [];
+      save(LS_PICKED, picked);
+      announce(liveList, 'Reinicio de elegidos');
+      renderHistory();
+    });
+
+    noRepeat.addEventListener('change', ()=>{
+      settings.noRepeat = noRepeat.checked;
+      save(LS_SETTINGS, settings);
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      const blob = new Blob([names.join('\n')], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'estudiantes.txt';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    });
+
+    // Accesibilidad: Enter en sorteo y botones accesibles con teclado
+    document.addEventListener('keydown', (e)=>{
+      if((e.key === 'Enter' || e.key === ' ') && document.activeElement === drawBtn){
+        e.preventDefault(); drawBtn.click();
+      }
+    });
+
+    // Gestos táctiles grandes: nada extra requerido, botones ≥44px ya definidos
+
+    // Inicializar
+    renderAll();
+  })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Asegura la correcta visualización en móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Gastos Familiar</title>
+    
+    <!-- 
+      CSS (Estilos) Integrados
+      - Diseño adaptable (responsive) con Flexbox y Grid.
+      - Mobile-First: Diseñado primero para móviles.
+      - Accesibilidad considerada (colores, roles).
+    -->
+    <style>
+        /* --- Variables y Reseteo Global --- */
+        :root {
+            --color-primario: #007bff;
+            --color-primario-hover: #0056b3;
+            --color-secundario: #6c757d;
+            --color-exito: #28a745;
+            --color-peligro: #dc3545;
+            --color-fondo: #f4f7f6;
+            --color-tarjeta: #ffffff;
+            --color-texto: #333;
+            --color-texto-claro: #f8f9fa;
+            --sombra: 0 4px 8px rgba(0, 0, 0, 0.05);
+            --radio-borde: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.6;
+        }
+
+        /* --- Encabezado y Navegación --- */
+        header {
+            background-color: var(--color-primario);
+            color: var(--color-texto-claro);
+            padding: 1.2rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--color-tarjeta);
+            box-shadow: var(--sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav button {
+            flex: 1;
+            padding: 1rem 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            color: var(--color-secundario);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent; /* Mejora experiencia táctil */
+        }
+
+        nav button.active {
+            color: var(--color-primario);
+            border-bottom-color: var(--color-primario);
+        }
+
+        /* --- Contenido Principal y Vistas --- */
+        main {
+            padding: 1rem;
+        }
+
+        .view {
+            display: none; /* Oculto por defecto */
+        }
+
+        .view.active {
+            display: block; /* Visible */
+        }
+
+        /* --- Estilos de Tarjetas (Reutilizable) --- */
+        .card {
+            background-color: var(--color-tarjeta);
+            border-radius: var(--radio-borde);
+            box-shadow: var(--sombra);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h2 {
+            margin-bottom: 1rem;
+            color: var(--color-primario);
+            border-bottom: 2px solid var(--color-fondo);
+            padding-bottom: 0.5rem;
+        }
+
+        /* --- Vista: Dashboard --- */
+        #summary-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .summary-card {
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1rem;
+            color: var(--color-secundario);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .amount {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        #balance .amount { color: var(--color-primario); }
+        #total-ingresos .amount { color: var(--color-exito); }
+        #total-egresos .amount { color: var(--color-peligro); }
+
+        #graph-container {
+            min-height: 250px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 1rem 0.5rem;
+            overflow-x: auto; /* Permite scroll horizontal si hay muchas categorías */
+        }
+
+        /* --- Vista: Formulario de Registro --- */
+        #transaction-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: var(--radio-borde);
+            font-size: 1rem;
+            /* Mejora para iOS */
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .form-group select {
+             /* Flecha para selects */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primario);
+            box-shadow: 0 0 5px rgba(0,123,255,0.25);
+        }
+
+        .btn {
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radio-borde);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primario);
+            color: var(--color-texto-claro);
+        }
+        .btn-primary:hover {
+            background-color: var(--color-primario-hover);
+        }
+
+        /* --- Vista: Transacciones (Lista) --- */
+        #transactions-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #transactions-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--color-tarjeta);
+            border-radius: var(--radio-borde);
+            margin-bottom: 0.75rem;
+            box-shadow: var(--sombra);
+            flex-wrap: wrap; /* Para móviles pequeños */
+        }
+
+        .transaction-details {
+            display: flex;
+            flex-direction: column;
+            flex-basis: 60%; /* Ocupa más espacio */
+        }
+
+        .transaction-desc {
+            font-weight: 600;
+        }
+
+        .transaction-cat {
+            font-size: 0.85rem;
+            color: var(--color-secundario);
+            font-style: italic;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            flex-basis: 40%; /* Ocupa menos espacio */
+            justify-content: flex-end; /* Alinea a la derecha */
+        }
+        
+        .transaction-amount.ingreso { color: var(--color-exito); }
+        .transaction-amount.gasto { color: var(--color-peligro); }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 8px;
+            line-height: 1;
+        }
+        .edit-btn { color: var(--color-secundario); }
+        .delete-btn { color: var(--color-peligro); }
+
+
+        /* --- Vista: Datos (Importar/Exportar) --- */
+        #data-view .btn {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-secondary {
+            background-color: var(--color-secundario);
+            color: var(--color-texto-claro);
+        }
+        
+        #import-file-label {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: var(--color-exito);
+            color: var(--color-texto-claro);
+        }
+        
+        #import-file {
+            display: none;
+        }
+
+        /* --- Media Queries (Adaptabilidad) --- */
+        @media (min-width: 768px) {
+            nav button {
+                font-size: 1rem;
+            }
+            
+            main {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 1.5rem;
+            }
+            
+            #summary-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            #dashboard-content {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5rem;
+            }
+
+            #graph-card {
+                margin-bottom: 0; /* Ya está en el grid */
+            }
+            
+            .transaction-details {
+                flex-basis: auto;
+            }
+            .transaction-amount {
+                flex-basis: auto;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Control de Gastos Familiar</h1>
+    </header>
+
+    <nav id="nav-bar">
+        <button class="nav-btn active" data-view="dashboard-view" role="tab" aria-selected="true">Dashboard</button>
+        <button class="nav-btn" data-view="form-view" role="tab" aria-selected="false">Registrar</button>
+        <button class="nav-btn" data-view="transactions-view" role="tab" aria-selected="false">Reporte</button>
+        <button class="nav-btn" data-view="data-view" role="tab" aria-selected="false">Datos</button>
+    </nav>
+
+    <main>
+        <!-- =========================== -->
+        <!--      VISTA: DASHBOARD       -->
+        <!-- =========================== -->
+        <section id="dashboard-view" class="view active">
+            
+            <!-- Resumen -->
+            <div id="summary-cards">
+                <div class="summary-card card" id="balance">
+                    <h3>Balance General</h3>
+                    <p class="amount" id="balance-amount">$0</p>
+                </div>
+                <div class="summary-card card" id="total-ingresos">
+                    <h3>Ingresos Totales</h3>
+                    <p class="amount" id="ingresos-amount">$0</p>
+                </div>
+                <div class="summary-card card" id="total-egresos">
+                    <h3>Egresos Totales</h3>
+                    <p class="amount" id="egresos-amount">$0</p>
+                </div>
+            </div>
+            
+            <div id="dashboard-content">
+                <!-- Gráfica -->
+                <div id="graph-card" class="card">
+                    <h2>Gráfica de Gastos</h2>
+                    <div id="graph-container">
+                        <!-- El gráfico SVG se generará aquí -->
+                    </div>
+                </div>
+                
+                <!-- Reporte Rápido -->
+                <div id="quick-report-card" class="card">
+                    <h2>Gastos por Categoría</h2>
+                    <ul id="category-report-list">
+                        <!-- El reporte se generará aquí -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================== -->
+        <!--    VISTA: REGISTRAR TX      -->
+        <!-- =========================== -->
+        <section id="form-view" class="view">
+            <div class="card">
+                <h2 id="form-title">Registrar Transacción</h2>
+                <form id="transaction-form">
+                    
+                    <div class="form-group">
+                        <label for="type">Tipo</label>
+                        <select id="type" name="type" required>
+                            <option value="ingreso">Ingreso</option>
+                            <option value="gasto" selected>Gasto</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Descripción</label>
+                        <input type="text" id="description" name="description" placeholder="Ej: Supermercado, Salario" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Monto</label>
+                        <input type="number" id="amount" name="amount" min="0.01" step="0.01" placeholder="0.00" required>
+                    </div>
+                    
+                    <div class="form-group" id="category-group">
+                        <label for="category">Categoría (Gasto)</label>
+                        <select id="category" name="category">
+                            <option value="fijo">Gasto Fijo (Ej: Arriendo, Servicios)</option>
+                            <option value="variable">Gasto Variable (Ej: Comida, Ocio)</option>
+                            <option value="otro">Otro Gasto</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Fecha</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Guardar Transacción</button>
+                    <input type="hidden" id="edit-id">
+                </form>
+            </div>
+        </section>
+        
+        <!-- =========================== -->
+        <!--    VISTA: REPORTE/LISTA     -->
+        <!-- =========================== -->
+        <section id="transactions-view" class="view">
+            <div class="card">
+                <h2>Historial de Transacciones</h2>
+                <ul id="transactions-list">
+                    <!-- Las transacciones se listarán aquí -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- =========================== -->
+        <!--    VISTA: IMPORT/EXPORT     -->
+        <!-- =========================== -->
+        <section id="data-view" class="view">
+            <div class="card">
+                <h2>Importar y Exportar Datos</h2>
+                <p style="margin-bottom: 1rem; color: var(--color-secundario);">Guarda una copia de seguridad o carga datos desde un archivo.</p>
+                
+                <button id="export-btn" class="btn btn-primary">Exportar Datos (JSON)</button>
+                
+                <input type="file" id="import-file" accept="application/json">
+                <label for="import-file" id="import-file-label" class="btn btn-secondary" role="button">Importar Datos (JSON)</label>
+
+                <button id="clear-data-btn" class="btn" style="background-color: var(--color-peligro); color: white; margin-top: 2rem;">Borrar Todos los Datos</button>
+            </div>
+        </section>
+
+        <!-- Modal de Confirmación Personalizado -->
+        <div id="confirm-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+            <div style="background-color: var(--color-tarjeta); margin: 15%; padding: 20px; border-radius: var(--radio-borde); box-shadow: 0 5px 15px rgba(0,0,0,0.3); max-width: 400px; width: 90%;">
+                <h3 id="modal-title" style="margin-bottom: 1rem;">Confirmación</h3>
+                <p id="modal-text" style="margin-bottom: 1.5rem;">¿Estás seguro?</p>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button id="modal-cancel-btn" class="btn btn-secondary">Cancelar</button>
+                    <button id="modal-confirm-btn" class="btn btn-primary" style="background-color: var(--color-peligro);">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 
+      JAVASCRIPT (Lógica) Integrado
+      - Sin librerías (Vanilla JS).
+      - Manejo de estado.
+      - Renderizado de UI.
+      - Lógica de LocalStorage.
+      - Generador de gráficas SVG.
+      - Lógica de Importar/Exportar.
+    -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- REFERENCIAS AL DOM ---
+        const navBar = document.getElementById('nav-bar');
+        const views = document.querySelectorAll('.view');
+        
+        // Dashboard
+        const balanceAmountEl = document.getElementById('balance-amount');
+        const ingresosAmountEl = document.getElementById('ingresos-amount');
+        const egresosAmountEl = document.getElementById('egresos-amount');
+        const graphContainer = document.getElementById('graph-container');
+        const categoryReportList = document.getElementById('category-report-list');
+
+        // Formulario
+        const transactionForm = document.getElementById('transaction-form');
+        const typeSelect = document.getElementById('type');
+        const categoryGroup = document.getElementById('category-group');
+        const formTitle = document.getElementById('form-title');
+        const editIdInput = document.getElementById('edit-id');
+
+        // Lista de Transacciones
+        const transactionsList = document.getElementById('transactions-list');
+
+        // Datos
+        const exportBtn = document.getElementById('export-btn');
+        const importFile = document.getElementById('import-file');
+        const clearDataBtn = document.getElementById('clear-data-btn');
+
+        // Modal
+        const confirmModal = document.getElementById('confirm-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalText = document.getElementById('modal-text');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+
+        // --- ESTADO DE LA APLICACIÓN ---
+        let state = {
+            transactions: []
+        };
+        
+        const STORAGE_KEY = 'gastosFamiliarApp';
+        let confirmCallback = null; // Para manejar la acción del modal
+
+        // --- NAVEGACIÓN (SPA Falsa) ---
+        navBar.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') {
+                const targetView = e.target.dataset.view;
+
+                // Actualizar botones
+                navBar.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                e.target.classList.add('active');
+                e.target.setAttribute('aria-selected', 'true');
+
+                // Actualizar vistas
+                views.forEach(view => {
+                    view.classList.remove('active');
+                    if (view.id === targetView) {
+                        view.classList.add('active');
+                    }
+                });
+            }
+        });
+
+        // --- LÓGICA DE FORMULARIO ---
+        
+        // Mostrar/Ocultar categoría según el tipo
+        typeSelect.addEventListener('change', () => {
+            categoryGroup.style.display = (typeSelect.value === 'gasto') ? 'flex' : 'none';
+        });
+
+        // Enviar formulario
+        transactionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(transactionForm);
+            const editId = editIdInput.value;
+            
+            const transactionData = {
+                id: editId ? parseInt(editId) : Date.now(),
+                type: formData.get('type'),
+                description: formData.get('description'),
+                amount: parseFloat(formData.get('amount')),
+                category: formData.get('type') === 'gasto' ? formData.get('category') : 'ingreso',
+                date: formData.get('date')
+            };
+
+            if (editId) {
+                // Actualizar existente
+                state.transactions = state.transactions.map(t => t.id === transactionData.id ? transactionData : t);
+            } else {
+                // Añadir nuevo
+                state.transactions.push(transactionData);
+            }
+
+            // Ordenar por fecha (más reciente primero)
+            state.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            saveState();
+            updateUI();
+            
+            transactionForm.reset();
+            editIdInput.value = '';
+            formTitle.textContent = 'Registrar Transacción';
+            transactionForm.elements['date'].value = new Date().toISOString().split('T')[0];
+            typeSelect.dispatchEvent(new Event('change')); // Resetear visibilidad de categoría
+            
+            // Volver al dashboard
+            showView('dashboard-view');
+        });
+        
+        // --- LÓGICA DE EDICIÓN Y BORRADO ---
+        transactionsList.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            
+            const li = target.closest('li');
+            const id = parseInt(li.dataset.id);
+
+            if (target.classList.contains('delete-btn')) {
+                // Borrar
+                showConfirmModal(
+                    'Borrar Transacción',
+                    '¿Estás seguro de que quieres borrar esta transacción?',
+                    () => {
+                        state.transactions = state.transactions.filter(t => t.id !== id);
+                        saveState();
+                        updateUI();
+                    }
+                );
+            } else if (target.classList.contains('edit-btn')) {
+                // Editar
+                const tx = state.transactions.find(t => t.id === id);
+                if (tx) {
+                    formTitle.textContent = 'Editar Transacción';
+                    editIdInput.value = tx.id;
+                    transactionForm.elements['type'].value = tx.type;
+                    transactionForm.elements['description'].value = tx.description;
+                    transactionForm.elements['amount'].value = tx.amount;
+                    transactionForm.elements['date'].value = tx.date;
+                    
+                    // Disparar evento change para mostrar/ocultar categoría
+                    typeSelect.dispatchEvent(new Event('change')); 
+                    
+                    if (tx.type === 'gasto') {
+                         transactionForm.elements['category'].value = tx.category;
+                    }
+                    
+                    showView('form-view');
+                }
+            }
+        });
+
+        // --- ACTUALIZACIÓN DE UI (Renderizado) ---
+        function updateUI() {
+            // 1. Calcular Totales
+            const { totalIngresos, totalEgresos, balance, gastosPorCategoria } = calculateSummary();
+
+            // 2. Actualizar Dashboard - Resumen
+            balanceAmountEl.textContent = formatCurrency(balance);
+            ingresosAmountEl.textContent = formatCurrency(totalIngresos);
+            egresosAmountEl.textContent = formatCurrency(totalEgresos);
+            
+            balanceAmountEl.style.color = balance >= 0 ? 'var(--color-exito)' : 'var(--color-peligro)';
+            if (balance === 0) balanceAmountEl.style.color = 'var(--color-primario)';
+
+            // 3. Renderizar Gráfica (SVG)
+            renderBarChart(gastosPorCategoria);
+            
+            // 4. Renderizar Reporte Rápido de Categorías
+            renderCategoryReport(gastosPorCategoria, totalEgresos);
+
+            // 5. Renderizar Lista de Transacciones
+            renderTransactionList();
+        }
+        
+        function calculateSummary() {
+            let totalIngresos = 0;
+            let totalEgresos = 0;
+            const gastosPorCategoria = {};
+
+            // Usar un array válido, incluso si el estado está corrupto
+            const transactions = Array.isArray(state.transactions) ? state.transactions : [];
+
+            transactions.forEach(tx => {
+                if (tx.type === 'ingreso') {
+                    totalIngresos += tx.amount;
+                } else {
+                    totalEgresos += tx.amount;
+                    
+                    // Sumar por categoría
+                    const cat = tx.category || 'otro';
+                    gastosPorCategoria[cat] = (gastosPorCategoria[cat] || 0) + tx.amount;
+                }
+            });
+
+            const balance = totalIngresos - totalEgresos;
+            return { totalIngresos, totalEgresos, balance, gastosPorCategoria };
+        }
+        
+        function renderTransactionList() {
+            transactionsList.innerHTML = ''; // Limpiar lista
+            
+            if (!state.transactions || state.transactions.length === 0) {
+                transactionsList.innerHTML = '<li><p style="text-align: center; color: var(--color-secundario); padding: 1rem;">No hay transacciones registradas.</p></li>';
+                return;
+            }
+            
+            state.transactions.forEach(tx => {
+                const li = document.createElement('li');
+                li.dataset.id = tx.id;
+                
+                const typeClass = tx.type === 'ingreso' ? 'ingreso' : 'gasto';
+                
+                // Formatear fecha (asegurando que la fecha sea válida)
+                let fechaStr = 'Fecha inválida';
+                if (tx.date) {
+                    try {
+                        fechaStr = new Date(tx.date).toLocaleDateString('es-ES', { timeZone: 'UTC' });
+                    } catch(e) { console.warn("Fecha inválida:", tx.date); }
+                }
+
+                li.innerHTML = `
+                    <div class="transaction-details">
+                        <span class="transaction-desc">${escapeHTML(tx.description)}</span>
+                        <span class="transaction-cat">${fechaStr} - ${escapeHTML(tx.category)}</span>
+                    </div>
+                    <div class="transaction-amount ${typeClass}">
+                        ${tx.type === 'gasto' ? '-' : '+'}${formatCurrency(tx.amount)}
+                        <button class="btn-icon edit-btn" aria-label="Editar">✏️</button>
+                        <button class="btn-icon delete-btn" aria-label="Borrar">&times;</button>
+                    </div>
+                `;
+                transactionsList.appendChild(li);
+            });
+        }
+        
+        function renderCategoryReport(gastosPorCategoria, totalEgresos) {
+            categoryReportList.innerHTML = ''; // Limpiar
+            
+            if (Object.keys(gastosPorCategoria).length === 0) {
+                categoryReportList.innerHTML = '<li><p style="color: var(--color-secundario); padding: 1rem 0;">Sin gastos.</p></li>';
+                return;
+            }
+            
+            const entries = Object.entries(gastosPorCategoria)
+                                .sort(([,a], [,b]) => b - a); // Ordenar de mayor a menor
+            
+            entries.forEach(([categoria, monto]) => {
+                const porcentaje = totalEgresos > 0 ? ((monto / totalEgresos) * 100).toFixed(1) : 0;
+                const li = document.createElement('li');
+                li.style.listStyle = 'none';
+                li.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;">${escapeHTML(categoria)} (${porcentaje}%)</span>
+                        <strong style="color: var(--color-peligro);">${formatCurrency(monto)}</strong>
+                    </div>
+                    <div style="background: var(--color-fondo); border-radius: 5px; height: 10px; overflow: hidden;">
+                        <div style="width: ${porcentaje}%; height: 10px; background-color: var(--color-peligro); border-radius: 5px; transition: width 0.3s ease;"></div>
+                    </div>
+                `;
+                categoryReportList.appendChild(li);
+            });
+        }
+        
+        // --- GENERADOR DE GRÁFICA SVG (Sin librerías) ---
+        function renderBarChart(gastosPorCategoria) {
+            graphContainer.innerHTML = ''; // Limpiar
+            
+            const entries = Object.entries(gastosPorCategoria);
+            
+            if (entries.length === 0) {
+                graphContainer.innerHTML = '<p style="text-align: center; color: var(--color-secundario); padding: 1rem;">No hay gastos para mostrar en la gráfica.</p>';
+                return;
+            }
+
+            const chartHeight = 220;
+            // Ancho dinámico basado en el contenedor, pero con un mínimo por barra
+            const minBarWidth = 40;
+            const barMargin = 15;
+            const chartWidth = Math.max(graphContainer.clientWidth || 300, entries.length * (minBarWidth + barMargin) + barMargin);
+            
+            const barWidth = (chartWidth - (barMargin * (entries.length + 1))) / entries.length;
+            const maxAmount = Math.max(...entries.map(([, amount]) => amount), 1); // Evitar división por cero
+            
+            const colors = ['#dc3545', '#fd7e14', '#ffc107', '#6f42c1', '#17a2b8']; // Colores para las barras
+            
+            let svgContent = `<svg width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-labelledby="chartTitle" style="display: block; margin: auto;">
+                <title id="chartTitle">Gráfica de gastos por categoría</title>
+            `;
+            
+            const labelAreaHeight = 30; // Espacio para etiquetas abajo
+            const plotHeight = chartHeight - labelAreaHeight;
+
+            entries.forEach(([category, amount], index) => {
+                const barHeight = Math.max((amount / maxAmount) * plotHeight * 0.9, 1); // 0.9 para dejar espacio, 1px altura mín.
+                const x = barMargin + index * (barWidth + barMargin);
+                const y = plotHeight - barHeight;
+                const color = colors[index % colors.length];
+
+                svgContent += `
+                    <g role="group" aria-label="${escapeHTML(category)}: ${formatCurrency(amount)}">
+                        <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" rx="4">
+                            <title>${escapeHTML(category)}: ${formatCurrency(amount)}</title>
+                        </rect>
+                        <text x="${x + barWidth / 2}" y="${y - 5}" font-size="12" fill="var(--color-texto)" text-anchor="middle">${formatCurrency(amount, true)}</text>
+                        <text x="${x + barWidth / 2}" y="${chartHeight - 10}" font-size="12" fill="var(--color-secundario)" text-anchor="middle">${escapeHTML(category)}</text>
+                    </g>
+                `;
+            });
+
+            svgContent += '</svg>';
+            graphContainer.innerHTML = svgContent;
+        }
+
+        // --- PERSISTENCIA (LocalStorage) ---
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (error) {
+                console.error("Error al guardar en localStorage:", error);
+                // Opcional: mostrar un error al usuario
+            }
+        }
+
+        function loadState() {
+            try {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (savedState) {
+                    state = JSON.parse(savedState);
+                    // Asegurarse de que las transacciones son un array
+                    if (!Array.isArray(state.transactions)) {
+                        state.transactions = [];
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar de localStorage (datos corruptos?):", error);
+                state = { transactions: [] }; // Resetear a estado seguro
+            }
+        }
+
+        // --- LÓGICA DE IMPORTAR/EXPORTAR ---
+        
+        // Exportar
+        exportBtn.addEventListener('click', () => {
+            try {
+                const dataStr = JSON.stringify(state, null, 2); // Formateado para legibilidad
+                const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(dataBlob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `gastos_familiares_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error("Error al exportar:", error);
+                alert("Hubo un error al intentar exportar los datos.");
+            }
+        });
+
+        // Importar
+        importFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedState = JSON.parse(event.target.result);
+                    // Validación simple
+                    if (importedState && Array.isArray(importedState.transactions)) {
+                        
+                        showConfirmModal(
+                            'Importar Datos',
+                            'Esto reemplazará todos tus datos actuales. ¿Continuar?',
+                            () => {
+                                state = importedState;
+                                saveState();
+                                updateUI();
+                                alert('¡Datos importados con éxito!'); // simple 'alert' ok para feedback
+                                showView('dashboard-view');
+                            }
+                        );
+
+                    } else {
+                        alert('El archivo no tiene el formato correcto.');
+                    }
+                } catch (error) {
+                    alert('Error al leer el archivo. Asegúrate de que sea un JSON válido.');
+                    console.error('Error al importar:', error);
+                }
+                // Resetear el input para permitir importar el mismo archivo de nuevo
+                importFile.value = null; 
+            };
+            reader.readAsText(file);
+        });
+        
+        // Borrar datos
+        clearDataBtn.addEventListener('click', () => {
+            showConfirmModal(
+                '¡ADVERTENCIA!',
+                'Esto borrará permanentemente TODOS los datos. ¿Estás seguro?',
+                () => {
+                    state.transactions = [];
+                    saveState();
+                    updateUI();
+                    alert('Datos borrados.');
+                }
+            );
+        });
+
+        // --- LÓGICA DEL MODAL DE CONFIRMACIÓN ---
+        function showConfirmModal(title, text, onConfirm) {
+            modalTitle.textContent = title;
+            modalText.textContent = text;
+            confirmCallback = onConfirm;
+            confirmModal.style.display = 'flex';
+        }
+
+        function hideConfirmModal() {
+            confirmModal.style.display = 'none';
+            confirmCallback = null;
+        }
+
+        modalCancelBtn.addEventListener('click', hideConfirmModal);
+        
+        modalConfirmBtn.addEventListener('click', () => {
+            if (typeof confirmCallback === 'function') {
+                confirmCallback();
+            }
+            hideConfirmModal();
+        });
+
+
+        // --- UTILIDADES ---
+        function formatCurrency(amount, compact = false) {
+             // Manejar valores nulos o indefinidos
+            if (amount == null || isNaN(amount)) {
+                amount = 0;
+            }
+            
+            if (compact && amount >= 1000) {
+                 // Redondear k
+                if (amount >= 1000000) {
+                     return `$${(amount / 1000000).toFixed(1).replace('.0', '')}M`;
+                }
+                return `$${(amount / 1000).toFixed(0)}k`;
+            }
+            // Formato para Peso Colombiano (COP) sin decimales.
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount).replace(/\s/g, ''); // Quita espacios extra que añade Intl
+        }
+        
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[m];
+            });
+        }
+        
+        function showView(viewId) {
+            const button = navBar.querySelector(`[data-view="${viewId}"]`);
+            if (button) {
+                button.click();
+            }
+        }
+        
+        // --- INICIALIZACIÓN ---
+        function init() {
+            loadState();
+            typeSelect.dispatchEvent(new Event('change')); // Asegurar estado inicial del form
+            transactionForm.elements['date'].value = new Date().toISOString().split('T')[0]; // Poner fecha de hoy
+            updateUI();
+        }
+        
+        init();
+    });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor Interactivo con Efectos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .contenedor-principal {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        /* SECCIÓN DEL VIDEO */
+        .seccion-video {
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .area-video {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .area-video video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .zona-carga {
+            text-align: center;
+            color: #999;
+        }
+
+        .zona-carga svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .zona-carga p {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .input-archivo {
+            display: none;
+        }
+
+        .btn-cargar-video {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-cargar-video:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-cargar-video:active {
+            transform: translateY(-1px);
+        }
+
+        .nombre-video {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            max-width: 400px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* SECCIÓN DE CONTROLES */
+        .seccion-controles {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .seccion-controles h2 {
+            color: #667eea;
+            font-size: 22px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* CONTENEDOR DE GIFs */
+        .contenedor-gifs {
+            flex: 1;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            border: 2px dashed #667eea;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gif-mostrar {
+            max-width: 100%;
+            max-height: 100%;
+            animation: aparecer 0.5s ease-in-out;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* BOTONES */
+        .grid-botones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-efecto {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-aplausos {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e72);
+            color: white;
+        }
+
+        .btn-aplausos:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-risa {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-risa:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-campana {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: white;
+        }
+
+        .btn-campana:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(250, 112, 154, 0.4);
+        }
+
+        .btn-fuego {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            color: white;
+        }
+
+        .btn-fuego:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 126, 95, 0.4);
+        }
+
+        .btn-estrella {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-estrella:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-corazon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-corazon:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-limpiar {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #8e8e8e, #585858);
+            color: white;
+            font-size: 12px;
+        }
+
+        .btn-limpiar:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* AUDIO INVISIBLE */
+        audio {
+            display: none;
+        }
+
+        .estado-video {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .contenedor-principal {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 15px;
+            }
+
+            .seccion-video {
+                min-height: 300px;
+            }
+
+            .grid-botones {
+                grid-template-columns: 1fr;
+            }
+
+            .nombre-video {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-principal">
+        <!-- SECCIÓN DEL VIDEO -->
+        <div class="seccion-video">
+            <div id="nombre-video-mostrado" class="nombre-video" style="display: none;"></div>
+            
+            <div class="area-video">
+                <div id="zona-carga" class="zona-carga">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 7l-7 5 7 5V7z"></path>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                    <p>No hay video cargado</p>
+                    <button class="btn-cargar-video" onclick="document.getElementById('input-video').click()">
+                        📁 Cargar Video
+                    </button>
+                    <input 
+                        type="file" 
+                        id="input-video" 
+                        class="input-archivo" 
+                        accept="video/*"
+                        onchange="cargarVideo(event)"
+                    >
+                </div>
+                <video id="mi-video" controls style="display: none;"></video>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE CONTROLES -->
+        <div class="seccion-controles">
+            <h2>🎉 Efectos</h2>
+
+            <!-- ÁREA DE VISUALIZACIÓN DE GIFs -->
+            <div class="contenedor-gifs" id="area-gifs">
+                <p style="color: #999; text-align: center; font-size: 12px;">
+                    Haz clic en los botones para ver efectos
+                </p>
+            </div>
+
+            <!-- BOTONES DE EFECTOS -->
+            <div class="grid-botones">
+                <button class="btn-efecto btn-aplausos" onclick="mostrarEfecto('aplausos', '👏')">
+                    Aplausos 👏
+                </button>
+                <button class="btn-efecto btn-risa" onclick="mostrarEfecto('risa', '😂')">
+                    Risa 😂
+                </button>
+                <button class="btn-efecto btn-campana" onclick="mostrarEfecto('campana', '🔔')">
+                    Campana 🔔
+                </button>
+                <button class="btn-efecto btn-fuego" onclick="mostrarEfecto('fuego', '🔥')">
+                    Fuego 🔥
+                </button>
+                <button class="btn-efecto btn-estrella" onclick="mostrarEfecto('estrella', '⭐')">
+                    Estrella ⭐
+                </button>
+                <button class="btn-efecto btn-corazon" onclick="mostrarEfecto('corazon', '❤️')">
+                    Corazón ❤️
+                </button>
+                <button class="btn-efecto btn-limpiar" onclick="limpiarGifs()">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIOS INVISIBLES -->
+    <audio id="sonido-aplausos">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sonido-risa">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2674/2674-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sonido-campana">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sonido-fuego">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2100/2100-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sonido-estrella">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2875/2875-preview.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="sonido-corazon">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2799/2799-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const emojis = {
+            aplausos: '👏',
+            risa: '😂',
+            campana: '🔔',
+            fuego: '🔥',
+            estrella: '⭐',
+            corazon: '❤️'
+        };
+
+        function cargarVideo(event) {
+            const archivo = event.target.files[0];
+            
+            if (!archivo) return;
+
+            // Validar que sea un video
+            if (!archivo.type.startsWith('video/')) {
+                alert('Por favor selecciona un archivo de video válido');
+                return;
+            }
+
+            // Crear URL del archivo local
+            const urlVideo = URL.createObjectURL(archivo);
+            
+            // Obtener referencias a elementos
+            const video = document.getElementById('mi-video');
+            const zonaCarga = document.getElementById('zona-carga');
+            const nombreVideoMostrado = document.getElementById('nombre-video-mostrado');
+
+            // Configurar el video
+            video.src = urlVideo;
+            video.style.display = 'block';
+            zonaCarga.style.display = 'none';
+
+            // Mostrar nombre del archivo
+            nombreVideoMostrado.textContent = `📹 ${archivo.name}`;
+            nombreVideoMostrado.style.display = 'block';
+
+            console.log('Video cargado:', archivo.name);
+        }
+
+        function mostrarEfecto(tipo, emoji) {
+            // Reproducir sonido
+            const sonido = document.getElementById(`sonido-${tipo}`);
+            sonido.currentTime = 0;
+            sonido.play().catch(e => console.log('Sonido no disponible'));
+
+            // Mostrar emoji
+            const areaGifs = document.getElementById('area-gifs');
+            
+            // Limpiar el texto placeholder si existe
+            const placeholder = areaGifs.querySelector('p');
+            if (placeholder) {
+                placeholder.remove();
+            }
+
+            // Crear elemento del emoji
+            const gif = document.createElement('div');
+            gif.className = 'gif-mostrar';
+            gif.textContent = emoji;
+            gif.style.fontSize = '80px';
+            gif.style.animation = 'none';
+            
+            // Forzar reflow para reiniciar la animación
+            void gif.offsetWidth;
+            gif.style.animation = 'aparecer 0.5s ease-in-out';
+
+            areaGifs.appendChild(gif);
+
+            // Eliminar el emoji después de 2 segundos
+            setTimeout(() => {
+                gif.style.animation = 'aparecer 0.5s ease-in-out reverse';
+                setTimeout(() => gif.remove(), 500);
+            }, 2000);
+        }
+
+        function limpiarGifs() {
+            const areaGifs = document.getElementById('area-gifs');
+            areaGifs.innerHTML = '<p style="color: #999; text-align: center; font-size: 12px;">Haz clic en los botones para ver efectos</p>';
+        }
+    </script>
+
+</body>
+</html>

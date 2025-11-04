@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Contribuciones Docentes</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Phosphor Icons for a modern look -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles for the application */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Elegant gradient background */
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        /* Custom scrollbar for a better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        /* Style for the active navigation link */
+        .nav-link.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        /* Animation for modals */
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-leave {
+            animation: fadeOut 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 antialiased text-gray-800">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 bg-white shadow-lg flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30">
+            <div class="p-5 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-indigo-600 flex items-center">
+                    <i class="ph-fill ph-books text-2xl mr-2"></i>
+                    <span>DocentePRO</span>
+                </h1>
+            </div>
+            <nav class="mt-5 flex-1">
+                <a href="#dashboard" class="nav-link flex items-center py-3 px-5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200 active">
+                    <i class="ph-fill ph-gauge text-xl mr-3"></i> Dashboard
+                </a>
+                <a href="#anexo5" class="nav-link flex items-center py-3 px-5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
+                    <i class="ph-fill ph-person-simple-run text-xl mr-3"></i> Anexo 5: Contribuciones
+                </a>
+                <a href="#anexo2" class="nav-link flex items-center py-3 px-5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
+                    <i class="ph-fill ph-article text-xl mr-3"></i> Anexo 2: Evidencias
+                </a>
+                <a href="#ayuda" class="nav-link flex items-center py-3 px-5 text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 transition-colors duration-200">
+                    <i class="ph-fill ph-question text-xl mr-3"></i> Ayuda
+                </a>
+            </nav>
+
+            <!-- Social and Credits Section -->
+            <div class="p-5 border-t border-gray-200">
+                <h3 class="text-sm font-semibold text-gray-500 mb-3">CONECTA</h3>
+                <div class="flex justify-around items-center mb-4">
+                    <a href="https://www.youtube.com/@TecnoEducaTics?sub_confirmation=1" target="_blank" rel="noopener" class="text-gray-600 hover:text-red-600" title="YouTube: Comunidad TecnoEducaTics">
+                        <i class="ph-fill ph-youtube-logo text-3xl"></i>
+                    </a>
+                    <a href="https://whatsapp.com/channel/0029Va6FP4C6hENyzxtO8d0e" target="_blank" rel="noopener" class="text-gray-600 hover:text-green-600" title="Canal de WhatsApp">
+                        <i class="ph-fill ph-whatsapp-logo text-3xl"></i>
+                    </a>
+                    <a href="https://t.me/cursoseducativos" target="_blank" rel="noopener" class="text-gray-600 hover:text-sky-600" title="Canal de Telegram">
+                        <i class="ph-fill ph-telegram-logo text-3xl"></i>
+                    </a>
+                    <a href="https://www.spreaker.com/podcast/tecnoeducatics--6664603" target="_blank" rel="noopener" class="text-gray-600 hover:text-orange-500" title="Podcast TecnoEducaTics">
+                         <i class="ph-fill ph-microphone text-3xl"></i>
+                    </a>
+                </div>
+                <div class="text-xs text-center text-gray-400 space-y-1">
+                    <p>Desarrollado por Ing. Rubén Sierra</p>
+                    <p>Potenciado con IA de Gemini</p>
+                </div>
+            </div>
+        </aside>
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white shadow-md p-4 flex justify-between items-center z-20">
+                <button id="sidebar-toggle" class="md:hidden text-gray-600">
+                    <i class="ph-bold ph-list text-2xl"></i>
+                </button>
+                <h2 id="page-title" class="text-lg font-semibold text-gray-700">Dashboard</h2>
+                <div class="flex items-center space-x-4">
+                    <button id="import-btn" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center text-sm font-medium" title="Importar Datos">
+                        <i class="ph-bold ph-upload-simple text-xl mr-1"></i>
+                        <span class="hidden sm:inline">Importar</span>
+                    </button>
+                    <button id="export-btn" class="text-gray-600 hover:text-indigo-600 transition-colors flex items-center text-sm font-medium" title="Exportar Datos">
+                        <i class="ph-bold ph-download-simple text-xl mr-1"></i>
+                        <span class="hidden sm:inline">Exportar</span>
+                    </button>
+                    <input type="file" id="import-file-input" class="hidden" accept=".json">
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-8">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="page-content">
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Contribuciones Definidas</p>
+                                <p id="total-contribuciones" class="text-3xl font-bold text-indigo-600">0 / 8</p>
+                            </div>
+                            <div class="bg-indigo-100 p-3 rounded-full">
+                                <i class="ph-fill ph-target text-2xl text-indigo-600"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Evidencias Registradas</p>
+                                <p id="total-evidencias" class="text-3xl font-bold text-teal-600">0</p>
+                            </div>
+                            <div class="bg-teal-100 p-3 rounded-full">
+                                <i class="ph-fill ph-file-text text-2xl text-teal-600"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-lg flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Competencias Cubiertas</p>
+                                <p id="total-competencias" class="text-3xl font-bold text-amber-600">0 / 8</p>
+                            </div>
+                            <div class="bg-amber-100 p-3 rounded-full">
+                                <i class="ph-fill ph-check-circle text-2xl text-amber-600"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                        <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg">
+                            <h3 class="font-semibold mb-4">Evidencias por Competencia</h3>
+                            <canvas id="evidencias-chart"></canvas>
+                        </div>
+                        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                            <h3 class="font-semibold mb-4">Contribuciones por Área de Gestión</h3>
+                            <canvas id="contribuciones-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Anexo 5 Section: Contribuciones y Competencias -->
+                <section id="anexo5" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-700">Anexo 5: Contribuciones Individuales por Competencia</h2>
+                    </div>
+                    <div id="anexo5-container" class="space-y-8">
+                        <!-- Content generated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- Anexo 2 Section: Resumen de Evidencias -->
+                <section id="anexo2" class="page-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-700">Anexo 2: Tabla Resumen de Evidencias</h2>
+                        <button id="add-anexo2-btn" class="bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 transition-colors flex items-center">
+                            <i class="ph-bold ph-plus-circle mr-2"></i> Nueva Evidencia
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="border-b">
+                                        <th class="py-3 px-4 font-semibold">Fecha</th>
+                                        <th class="py-3 px-4 font-semibold">Nombre de la Evidencia</th>
+                                        <th class="py-3 px-4 font-semibold text-center">Enlace Drive</th>
+                                        <th class="py-3 px-4 font-semibold">Tipo</th>
+                                        <th class="py-3 px-4 font-semibold">Competencia(s) que soporta</th>
+                                        <th class="py-3 px-4 font-semibold text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="anexo2-table-body">
+                                    <!-- Rows will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ayuda Section -->
+                <section id="ayuda" class="page-content hidden">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold text-gray-700 mb-4">Guía de Usuario (Actualizada)</h2>
+                        <div class="prose max-w-none">
+                            <p>Bienvenido a <strong>DocentePRO</strong>, su asistente para la gestión de la Evaluación Anual de Desempeño Laboral.</p>
+                            
+                            <h3 class="font-semibold mt-6">Anexo 5: Contribuciones</h3>
+                            <p>Esta es la sección principal. Aquí podrá definir sus <strong>contribuciones individuales</strong> para cada una de las <strong>8 competencias funcionales</strong>, agrupadas por Área de Gestión. Haga clic en "Añadir Contribución" para cada competencia, y defina la contribución, sus criterios de evaluación y las evidencias asociadas.</p>
+                            
+                             <h3 class="font-semibold mt-6">Anexo 2: Evidencias</h3>
+                            <p>Utilice esta sección para llevar un registro detallado de todas las <strong>evidencias</strong> (documentales o testimoniales) que respaldan sus contribuciones. Cada evidencia puede soportar una o más competencias.</p>
+
+                            <h3 class="font-semibold mt-6">Dashboard</h3>
+                            <p>El dashboard ofrece una vista rápida de su progreso en la evaluación. Muestra el número de contribuciones definidas, las evidencias cargadas y un resumen gráfico de su distribución.</p>
+
+                            <h3 class="font-semibold mt-6">Gestión de Datos (Importar/Exportar)</h3>
+                            <p>En la esquina superior derecha encontrará los botones para <strong>Importar</strong> y <strong>Exportar</strong> sus datos. Use 'Exportar' para guardar una copia de seguridad de toda su información en un archivo. Use 'Importar' para cargar esa copia en este u otro navegador.</p>
+                            
+                            <h4 class="font-semibold mt-6">Almacenamiento de Datos</h4>
+                            <p>Toda la información se guarda de forma segura en el almacenamiento local de su navegador.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="modal-container" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+        <!-- Anexo 2 Modal -->
+        <div id="anexo2-modal" class="modal-content hidden bg-white rounded-lg shadow-2xl w-full max-w-lg modal-enter">
+            <form id="anexo2-form" class="p-8">
+                <h3 class="text-xl font-bold mb-6 text-gray-700">Añadir/Editar Evidencia (Anexo 2)</h3>
+                <input type="hidden" id="anexo2-id">
+                <div class="mb-4">
+                    <label for="anexo2-nombre" class="block text-sm font-medium text-gray-600 mb-1">Nombre de la Evidencia</label>
+                    <input type="text" id="anexo2-nombre" placeholder="Ej: Plan de trabajo, informe, material pedagógico..." class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="anexo2-fecha" class="block text-sm font-medium text-gray-600 mb-1">Fecha</label>
+                        <input type="date" id="anexo2-fecha" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                    </div>
+                    <div>
+                        <label for="anexo2-tipo" class="block text-sm font-medium text-gray-600 mb-1">Tipo de Evidencia</label>
+                        <select id="anexo2-tipo" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                            <option value="Documental">Documental</option>
+                            <option value="Testimonial">Testimonial</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="anexo2-competencias" class="block text-sm font-medium text-gray-600 mb-1">Competencia(s) que soporta</label>
+                    <input type="text" id="anexo2-competencias" placeholder="Ej: Dominio Curricular, Uso de recursos" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                     <p class="text-xs text-gray-500 mt-1">Separe múltiples competencias con comas.</p>
+                </div>
+                <div class="mb-6">
+                    <label for="anexo2-driveUrl" class="block text-sm font-medium text-gray-600 mb-1">URL de Evidencias (Drive, opcional)</label>
+                    <input type="url" id="anexo2-driveUrl" placeholder="https://drive.google.com/..." class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="btn-cancel px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Anexo 5 Modal -->
+        <div id="anexo5-modal" class="modal-content hidden bg-white rounded-lg shadow-2xl w-full max-w-2xl modal-enter">
+            <form id="anexo5-form" class="p-8">
+                <h3 id="anexo5-modal-title" class="text-xl font-bold mb-1 text-gray-700">Definir Contribución</h3>
+                <p id="anexo5-modal-subtitle" class="text-sm text-gray-500 mb-6"></p>
+                <input type="hidden" id="anexo5-id">
+                <input type="hidden" id="anexo5-competencia">
+                <input type="hidden" id="anexo5-area">
+
+                <div class="mb-4">
+                    <label for="anexo5-contribucion" class="block text-sm font-medium text-gray-600 mb-1">Contribución Individual</label>
+                    <textarea id="anexo5-contribucion" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Verbo + Objeto + Condición de calidad. Ej: Diseñar el plan anual de trabajo para su área basado en el PEI." required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="anexo5-criterios" class="block text-sm font-medium text-gray-600 mb-1">Criterios de Evaluación</label>
+                    <textarea id="anexo5-criterios" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-teal-500" placeholder="Criterios cuantitativos o cualitativos para medir el cumplimiento." required></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-4">
+                    <button type="button" class="btn-cancel px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors">Guardar Contribución</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 opacity-0">
+        <p id="toast-message"></p>
+    </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA STRUCTURES & STATE ---
+        const COMPETENCIAS_DOCENTE = {
+            "Gestión Académica": [
+                "Dominio Curricular",
+                "Planeación y Organización Académica",
+                "Pedagógica y Didáctica",
+                "Evaluación del aprendizaje"
+            ],
+            "Gestión Administrativa": [
+                "Uso de recursos",
+                "Seguimiento de procesos"
+            ],
+            "Gestión Comunitaria": [
+                "Comunicación Institucional",
+                "Interacción con la comunidad y el entorno"
+            ]
+        };
+
+        const state = {
+            anexo2: [], // Evidencias
+            anexo5: [], // Contribuciones
+            currentPage: 'dashboard',
+            charts: {
+                evidenciasChart: null,
+                contribucionesChart: null
+            }
+        };
+
+        // --- DOM ELEMENTS ---
+        const pageContents = document.querySelectorAll('.page-content');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pageTitle = document.getElementById('page-title');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const modalContainer = document.getElementById('modal-container');
+
+        // To make the sidebar layout work correctly, we need to adjust its structure slightly
+        // by wrapping nav and the new credits section in a flex container.
+        const aside = document.querySelector('aside');
+        aside.classList.add('flex', 'flex-col');
+
+
+        // Anexo 2 Elements
+        const anexo2Form = document.getElementById('anexo2-form');
+        const anexo2Modal = document.getElementById('anexo2-modal');
+        const anexo2TableBody = document.getElementById('anexo2-table-body');
+        
+        // Anexo 5 Elements
+        const anexo5Form = document.getElementById('anexo5-form');
+        const anexo5Modal = document.getElementById('anexo5-modal');
+        const anexo5Container = document.getElementById('anexo5-container');
+        
+        // Import/Export Elements
+        const importBtn = document.getElementById('import-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        // --- LOCALSTORAGE HELPERS ---
+        const storage = {
+            get: (key) => JSON.parse(localStorage.getItem(key) || '[]'),
+            set: (key, data) => localStorage.setItem(key, JSON.stringify(data)),
+        };
+        
+        // --- UI HELPERS ---
+         const showToast = (message, type = 'success') => {
+            toastMessage.textContent = message;
+            toast.className = `fixed bottom-5 right-5 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            toast.classList.remove('hidden', 'opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+                 setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 3000);
+        };
+
+        // --- MODAL HANDLING ---
+        const openModal = (modalElement) => {
+            modalContainer.classList.remove('hidden');
+            modalElement.classList.remove('hidden');
+            modalElement.classList.add('modal-enter');
+            modalElement.classList.remove('modal-leave');
+        };
+
+        const closeModal = () => {
+            const activeModal = modalContainer.querySelector('.modal-content:not(.hidden)');
+            if (activeModal) {
+                activeModal.classList.add('modal-leave');
+                activeModal.classList.remove('modal-enter');
+                setTimeout(() => {
+                    activeModal.classList.add('hidden');
+                    modalContainer.classList.add('hidden');
+                }, 300);
+            }
+        };
+        
+        // --- ROUTING / NAVIGATION ---
+        const navigate = (hash) => {
+            const pageId = hash.substring(1);
+            state.currentPage = pageId;
+
+            pageContents.forEach(content => content.classList.add('hidden'));
+            document.getElementById(pageId)?.classList.remove('hidden');
+
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.hash === hash);
+            });
+
+            const pageName = document.querySelector(`.nav-link[href="${hash}"]`).textContent.trim();
+            pageTitle.textContent = pageName;
+            
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        };
+
+        // --- RENDERING ---
+        const renderAnexo2Table = () => {
+            anexo2TableBody.innerHTML = '';
+            if (state.anexo2.length === 0) {
+                anexo2TableBody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-gray-500">No hay evidencias registradas.</td></tr>`;
+                return;
+            }
+            state.anexo2.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                const driveLink = item.driveUrl 
+                    ? `<a href="${item.driveUrl}" target="_blank" rel="noopener noreferrer" class="inline-block text-blue-600 hover:text-blue-800" title="Abrir enlace de Drive"><i class="ph-fill ph-link text-xl"></i></a>` 
+                    : `<span class="text-gray-400">-</span>`;
+
+                row.innerHTML = `
+                    <td class="py-3 px-4">${item.fecha}</td>
+                    <td class="py-3 px-4 font-medium text-gray-800">${item.nombre}</td>
+                    <td class="py-3 px-4 text-center">${driveLink}</td>
+                    <td class="py-3 px-4"><span class="bg-gray-100 text-gray-700 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${item.tipo}</span></td>
+                    <td class="py-3 px-4 text-sm">${item.competencias}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button class="edit-anexo2-btn text-blue-500 hover:text-blue-700 p-1" data-id="${item.id}"><i class="ph-bold ph-pencil-simple text-lg"></i></button>
+                        <button class="delete-anexo2-btn text-red-500 hover:text-red-700 p-1" data-id="${item.id}"><i class="ph-bold ph-trash-simple text-lg"></i></button>
+                    </td>
+                `;
+                anexo2TableBody.appendChild(row);
+            });
+        };
+
+        const renderAnexo5Contributions = () => {
+            anexo5Container.innerHTML = '';
+            for (const area in COMPETENCIAS_DOCENTE) {
+                const areaContainer = document.createElement('div');
+                areaContainer.innerHTML = `<h3 class="text-xl font-bold text-gray-600 pb-2 border-b-2 border-teal-500 mb-4">${area}</h3>`;
+                
+                const competencyGrid = document.createElement('div');
+                competencyGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-6';
+
+                COMPETENCIAS_DOCENTE[area].forEach(competencia => {
+                    const contribution = state.anexo5.find(c => c.competencia === competencia);
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-6 rounded-xl shadow-lg flex flex-col justify-between';
+                    
+                    if (contribution) {
+                        card.innerHTML = `
+                            <div>
+                                <h4 class="font-bold text-gray-800">${competencia}</h4>
+                                <div class="mt-4 space-y-3 text-sm">
+                                    <p><strong class="font-semibold text-gray-600">Contribución:</strong> ${contribution.contribucion}</p>
+                                    <p><strong class="font-semibold text-gray-600">Criterios:</strong> ${contribution.criterios}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-end space-x-2 mt-4">
+                                <button class="edit-anexo5-btn text-sm font-medium text-blue-600 hover:text-blue-800" data-id="${contribution.id}">Editar</button>
+                                <button class="delete-anexo5-btn text-sm font-medium text-red-600 hover:text-red-800" data-id="${contribution.id}">Eliminar</button>
+                            </div>
+                        `;
+                    } else {
+                         card.innerHTML = `
+                            <div>
+                                <h4 class="font-bold text-gray-800">${competencia}</h4>
+                                <p class="text-sm text-gray-500 mt-4">Aún no se ha definido una contribución para esta competencia.</p>
+                            </div>
+                            <div class="flex justify-end mt-4">
+                                <button class="add-anexo5-btn bg-teal-600 text-white text-sm font-semibold py-2 px-3 rounded-lg hover:bg-teal-700 transition-colors flex items-center" data-competencia="${competencia}" data-area="${area}">
+                                   <i class="ph-bold ph-plus-circle mr-2"></i> Añadir Contribución
+                                </button>
+                            </div>
+                        `;
+                    }
+                    competencyGrid.appendChild(card);
+                });
+                areaContainer.appendChild(competencyGrid);
+                anexo5Container.appendChild(areaContainer);
+            }
+        };
+
+        const renderDashboard = () => {
+            const totalContribuciones = state.anexo5.length;
+            const totalEvidencias = state.anexo2.length;
+            
+            document.getElementById('total-contribuciones').textContent = `${totalContribuciones} / 8`;
+            document.getElementById('total-evidencias').textContent = totalEvidencias;
+            document.getElementById('total-competencias').textContent = `${totalContribuciones} / 8`;
+
+            renderCharts();
+        };
+
+        const renderCharts = () => {
+            // Evidencias Chart Data
+            const evidenciasData = state.anexo2.reduce((acc, item) => {
+                const comps = item.competencias.split(',').map(c => c.trim());
+                comps.forEach(comp => {
+                    if (comp) acc[comp] = (acc[comp] || 0) + 1;
+                });
+                return acc;
+            }, {});
+            
+            // Contribuciones Chart Data
+            const contribucionesData = state.anexo5.reduce((acc, item) => {
+                acc[item.area] = (acc[item.area] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Destroy previous chart instances
+            if(state.charts.evidenciasChart) state.charts.evidenciasChart.destroy();
+            if(state.charts.contribucionesChart) state.charts.contribucionesChart.destroy();
+
+            // Render Evidencias Bar Chart
+            const evidenciasCtx = document.getElementById('evidencias-chart').getContext('2d');
+            state.charts.evidenciasChart = new Chart(evidenciasCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(evidenciasData),
+                    datasets: [{
+                        label: 'Nº de Evidencias',
+                        data: Object.values(evidenciasData),
+                        backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                        borderColor: 'rgba(79, 70, 229, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: { responsive: true, indexAxis: 'y', scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+
+            // Render Contribuciones Pie Chart
+            const contribucionesCtx = document.getElementById('contribuciones-chart').getContext('2d');
+            state.charts.contribucionesChart = new Chart(contribucionesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(contribucionesData),
+                    datasets: [{
+                        label: 'Nº de Contribuciones',
+                        data: Object.values(contribucionesData),
+                        backgroundColor: [
+                            'rgba(13, 148, 136, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(220, 38, 38, 0.7)',
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true }
+            });
+        };
+
+        const fullRender = () => {
+            renderAnexo2Table();
+            renderAnexo5Contributions();
+            renderDashboard();
+        };
+
+        // --- EVENT HANDLERS ---
+        const handleAnexo2Submit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('anexo2-id').value;
+            const newItem = {
+                id: id || Date.now(),
+                nombre: document.getElementById('anexo2-nombre').value,
+                fecha: document.getElementById('anexo2-fecha').value,
+                tipo: document.getElementById('anexo2-tipo').value,
+                competencias: document.getElementById('anexo2-competencias').value,
+                driveUrl: document.getElementById('anexo2-driveUrl').value,
+            };
+
+            if (id) {
+                state.anexo2 = state.anexo2.map(item => item.id == id ? newItem : item);
+            } else {
+                state.anexo2.push(newItem);
+            }
+            
+            storage.set('anexo2', state.anexo2);
+            fullRender();
+            closeModal();
+            anexo2Form.reset();
+        };
+
+        const handleAnexo5Submit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('anexo5-id').value;
+            const newItem = {
+                id: id || Date.now(),
+                competencia: document.getElementById('anexo5-competencia').value,
+                area: document.getElementById('anexo5-area').value,
+                contribucion: document.getElementById('anexo5-contribucion').value,
+                criterios: document.getElementById('anexo5-criterios').value,
+            };
+
+            if (id) {
+                state.anexo5 = state.anexo5.map(item => item.id == id ? newItem : item);
+            } else {
+                state.anexo5.push(newItem);
+            }
+            
+            storage.set('anexo5', state.anexo5);
+            fullRender();
+            closeModal();
+            anexo5Form.reset();
+        };
+
+        const handleExport = () => {
+            const dataToExport = {
+                anexo2: storage.get('anexo2'),
+                anexo5: storage.get('anexo5'),
+            };
+            const dataStr = JSON.stringify(dataToExport, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            const date = new Date().toISOString().slice(0, 10);
+            link.download = `docentepro_backup_${date}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('Datos exportados exitosamente.');
+        };
+
+        const handleFileImport = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data && data.hasOwnProperty('anexo2') && data.hasOwnProperty('anexo5')) {
+                        state.anexo2 = data.anexo2;
+                        state.anexo5 = data.anexo5;
+                        storage.set('anexo2', state.anexo2);
+                        storage.set('anexo5', state.anexo5);
+                        fullRender();
+                        showToast('Datos importados exitosamente.');
+                    } else {
+                        throw new Error('Archivo no válido o formato incorrecto.');
+                    }
+                } catch (error) {
+                    console.error('Error al importar:', error);
+                    showToast('Error: El archivo no es un backup válido.', 'error');
+                } finally {
+                    importFileInput.value = '';
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        const setupEventListeners = () => {
+            // Navigation
+            window.addEventListener('hashchange', () => navigate(window.location.hash || '#dashboard'));
+            navLinks.forEach(link => link.addEventListener('click', (e) => navigate(link.hash)));
+
+            // Sidebar
+            sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+            
+            // Modals
+            document.getElementById('add-anexo2-btn').addEventListener('click', () => {
+                anexo2Form.reset();
+                document.getElementById('anexo2-id').value = '';
+                openModal(anexo2Modal);
+            });
+            
+            modalContainer.addEventListener('click', (e) => {
+                if(e.target === modalContainer || e.target.closest('.btn-cancel')) closeModal();
+            });
+            
+            // Forms
+            anexo2Form.addEventListener('submit', handleAnexo2Submit);
+            anexo5Form.addEventListener('submit', handleAnexo5Submit);
+
+            // Import/Export
+            exportBtn.addEventListener('click', handleExport);
+            importBtn.addEventListener('click', () => importFileInput.click());
+            importFileInput.addEventListener('change', handleFileImport);
+
+            // Dynamic event listeners for Anexo 5
+            anexo5Container.addEventListener('click', (e) => {
+                 const addBtn = e.target.closest('.add-anexo5-btn');
+                 const editBtn = e.target.closest('.edit-anexo5-btn');
+                 const deleteBtn = e.target.closest('.delete-anexo5-btn');
+                 
+                 if (addBtn) {
+                    anexo5Form.reset();
+                    const competencia = addBtn.dataset.competencia;
+                    const area = addBtn.dataset.area;
+                    document.getElementById('anexo5-id').value = '';
+                    document.getElementById('anexo5-competencia').value = competencia;
+                    document.getElementById('anexo5-area').value = area;
+                    document.getElementById('anexo5-modal-title').textContent = `Definir Contribución`;
+                    document.getElementById('anexo5-modal-subtitle').textContent = `Para la competencia: ${competencia}`;
+                    openModal(anexo5Modal);
+                 }
+
+                 if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    const item = state.anexo5.find(c => c.id == id);
+                    if (item) {
+                        document.getElementById('anexo5-id').value = item.id;
+                        document.getElementById('anexo5-competencia').value = item.competencia;
+                        document.getElementById('anexo5-area').value = item.area;
+                        document.getElementById('anexo5-contribucion').value = item.contribucion;
+                        document.getElementById('anexo5-criterios').value = item.criterios;
+                        document.getElementById('anexo5-modal-title').textContent = `Editar Contribución`;
+                        document.getElementById('anexo5-modal-subtitle').textContent = `Para la competencia: ${item.competencia}`;
+                        openModal(anexo5Modal);
+                    }
+                 }
+
+                 if (deleteBtn) {
+                     const id = deleteBtn.dataset.id;
+                     if (confirm('¿Estás seguro de que quieres eliminar esta contribución?')) {
+                        state.anexo5 = state.anexo5.filter(c => c.id != id);
+                        storage.set('anexo5', state.anexo5);
+                        fullRender();
+                    }
+                 }
+            });
+
+            // Anexo 2 Table Actions
+            anexo2TableBody.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('.edit-anexo2-btn');
+                const deleteBtn = e.target.closest('.delete-anexo2-btn');
+
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    const item = state.anexo2.find(i => i.id == id);
+                    document.getElementById('anexo2-id').value = item.id;
+                    document.getElementById('anexo2-nombre').value = item.nombre;
+                    document.getElementById('anexo2-fecha').value = item.fecha;
+                    document.getElementById('anexo2-tipo').value = item.tipo;
+                    document.getElementById('anexo2-competencias').value = item.competencias;
+                    document.getElementById('anexo2-driveUrl').value = item.driveUrl || '';
+                    openModal(anexo2Modal);
+                }
+
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    if (confirm('¿Estás seguro de que quieres eliminar esta evidencia?')) {
+                        state.anexo2 = state.anexo2.filter(i => i.id != id);
+                        storage.set('anexo2', state.anexo2);
+                        fullRender();
+                    }
+                }
+            });
+        };
+
+        // --- INITIALIZATION ---
+        const init = () => {
+            state.anexo2 = storage.get('anexo2');
+            state.anexo5 = storage.get('anexo5');
+
+            setupEventListeners();
+            
+            const initialHash = window.location.hash || '#dashboard';
+            navigate(initialHash);
+            
+            fullRender();
+        };
+
+        init();
+    });
+    </script>
+</body>
+</html>
+
+
+
