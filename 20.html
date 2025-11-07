@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake Game 2D</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        #gameContainer {
+            position: relative;
+            background-color: #103010;
+        }
+        
+        #score {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            font-size: 24px;
+            color: #4CAF50;
+            z-index: 10;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff4444;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 20;
+        }
+        
+        canvas {
+            border: 4px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="score">Score: 0</div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div id="gameOver">Game Over!</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const scoreElement = document.getElementById('score');
+            const gameOverElement = document.getElementById('gameOver');
+
+            const GRID_SIZE = 20;
+            const GAME_SPEED = 150;
+
+            // Crear sprites SVG en tiempo real
+            function createSVGSprite(type) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("width", "20");
+                svg.setAttribute("height", "20");
+                svg.setAttribute("viewBox", "0 0 20 20");
+
+                let path = "";
+                let fill = "";
+                
+                switch(type) {
+                    case 'head':
+                        // Cabeza de serpiente con detalles
+                        path = `
+                            M 10 2 
+                            C 14 2, 18 6, 18 10 
+                            C 18 14, 14 18, 10 18
+                            C 6 18, 2 14, 2 10
+                            C 2 6, 6 2, 10 2
+                            Z
+                            M 6 8 A 1 1 0 1 1 6 10 A 1 1 0 1 1 6 8
+                            M 14 8 A 1 1 0 1 1 14 10 A 1 1 0 1 1 14 8
+                        `;
+                        fill = "#00FF00";
+                        break;
+                    case 'body':
+                        // Segmento de cuerpo con escamas
+                        path = `
+                            M 2 2
+                            C 2 2, 10 0, 18 2
+                            C 18 2, 20 10, 18 18
+                            C 18 18, 10 20, 2 18
+                            C 2 18, 0 10, 2 2
+                            Z
+                        `;
+                        fill = "#008800";
+                        break;
+                    case 'tail':
+                        // Cola puntiaguda
+                        path = `
+                            M 10 2
+                            L 18 10
+                            L 10 18
+                            L 2 10
+                            Z
+                        `;
+                        fill = "#006600";
+                        break;
+                    case 'food':
+                        // Manzana estilizada
+                        path = `
+                            M 10 2
+                            C 14 2, 18 6, 18 10
+                            C 18 14, 14 18, 10 18
+                            C 6 18, 2 14, 2 10
+                            C 2 6, 6 2, 10 2
+                            M 10 2 L 10 0
+                            M 12 2 C 12 4, 14 4, 14 2
+                        `;
+                        fill = "#FF0000";
+                        break;
+                }
+
+                const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathElement.setAttribute("d", path);
+                pathElement.setAttribute("fill", fill);
+                pathElement.setAttribute("stroke", "#000");
+                pathElement.setAttribute("stroke-width", "1");
+                svg.appendChild(pathElement);
+
+                // Convertir SVG a imagen
+                const svgString = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                img.src = 'data:image/svg+xml;base64,' + btoa(svgString);
+                return img;
+            }
+
+            // Crear sprites
+            const sprites = {
+                head: createSVGSprite('head'),
+                body: createSVGSprite('body'),
+                tail: createSVGSprite('tail'),
+                food: createSVGSprite('food')
+            };
+
+            let snake = [
+                {x: 15, y: 10, angle: 0},
+                {x: 14, y: 10, angle: 0},
+                {x: 13, y: 10, angle: 0}
+            ];
+            let direction = 'right';
+            let food = null;
+            let score = 0;
+            let gameRunning = true;
+            let animationFrame = 0;
+
+            function placeFood() {
+                do {
+                    food = {
+                        x: Math.floor(Math.random() * (canvas.width / GRID_SIZE)),
+                        y: Math.floor(Math.random() * (canvas.height / GRID_SIZE))
+                    };
+                } while (snake.some(segment => segment.x === food.x && segment.y === food.y));
+            }
+
+            function getAngle(direction) {
+                switch(direction) {
+                    case 'up': return -90;
+                    case 'down': return 90;
+                    case 'left': return 180;
+                    case 'right': return 0;
+                }
+            }
+
+            function drawRotatedSprite(sprite, x, y, angle) {
+                ctx.save();
+                ctx.translate(x * GRID_SIZE + GRID_SIZE/2, y * GRID_SIZE + GRID_SIZE/2);
+                ctx.rotate(angle * Math.PI / 180);
+                ctx.drawImage(sprite, -GRID_SIZE/2, -GRID_SIZE/2, GRID_SIZE, GRID_SIZE);
+                ctx.restore();
+            }
+
+            function checkCollision(x, y) {
+                if (x < 0 || x >= canvas.width / GRID_SIZE || 
+                    y < 0 || y >= canvas.height / GRID_SIZE) {
+                    return true;
+                }
+                return snake.slice(1).some(segment => segment.x === x && segment.y === y);
+            }
+
+            function gameLoop() {
+                if (!gameRunning) return;
+
+                const head = {
+                    x: snake[0].x,
+                    y: snake[0].y,
+                    angle: getAngle(direction)
+                };
+                
+                switch(direction) {
+                    case 'up': head.y--; break;
+                    case 'down': head.y++; break;
+                    case 'left': head.x--; break;
+                    case 'right': head.x++; break;
+                }
+
+                if (checkCollision(head.x, head.y)) {
+                    gameRunning = false;
+                    gameOverElement.style.display = 'block';
+                    return;
+                }
+
+                snake.unshift(head);
+
+                if (food && head.x === food.x && head.y === food.y) {
+                    score += 10;
+                    scoreElement.textContent = `Score: ${score}`;
+                    placeFood();
+                } else {
+                    snake.pop();
+                }
+
+                // Actualizar ángulos para curvas suaves
+                for (let i = 1; i < snake.length; i++) {
+                    const prev = snake[i-1];
+                    const curr = snake[i];
+                    curr.angle = Math.atan2(prev.y - curr.y, prev.x - curr.x) * 180 / Math.PI;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Dibujar comida con animación
+                if (food) {
+                    const bounceOffset = Math.sin(animationFrame * 0.1) * 2;
+                    ctx.drawImage(sprites.food, 
+                        food.x * GRID_SIZE,
+                        food.y * GRID_SIZE + bounceOffset,
+                        GRID_SIZE, GRID_SIZE);
+                }
+
+                // Dibujar serpiente
+                snake.forEach((segment, index) => {
+                    const sprite = index === 0 ? sprites.head :
+                                 index === snake.length - 1 ? sprites.tail :
+                                 sprites.body;
+                    
+                    drawRotatedSprite(sprite, segment.x, segment.y, segment.angle);
+                });
+
+                animationFrame++;
+                setTimeout(gameLoop, GAME_SPEED);
+            }
+
+            document.addEventListener('keydown', (event) => {
+                const newDirection = {
+                    'ArrowUp': 'up',
+                    'ArrowDown': 'down',
+                    'ArrowLeft': 'left',
+                    'ArrowRight': 'right'
+                }[event.key];
+
+                if (newDirection) {
+                    const opposites = {
+                        'up': 'down',
+                        'down': 'up',
+                        'left': 'right',
+                        'right': 'left'
+                    };
+                    
+                    if (opposites[newDirection] !== direction) {
+                        direction = newDirection;
+                    }
+                }
+            });
+
+            placeFood();
+            gameLoop();
+        });
+    </script>
+</body>
+</html>

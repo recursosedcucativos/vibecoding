@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- Escalado adecuado en móviles -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake: Multiplicaciones y Movimiento Ondulado</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    #gameCanvas {
+      background: #222;
+      border: 2px solid #fff;
+      max-width: 100%;
+      max-height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Configuración de la cuadrícula y canvas
+    const gridSize = 20;
+    let canvasSize;
+    function resizeCanvas() {
+      let size = Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.9);
+      size = size - (size % gridSize); // asegurar múltiplo de gridSize
+      canvas.width = size;
+      canvas.height = size;
+      canvasSize = size;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Variables del juego
+    let score = 0;
+    let snake = [{ x: gridSize * 5, y: gridSize * 5 }];
+    let direction = { x: 1, y: 0 }; // dirección inicial a la derecha
+    let nextDirection = { x: 1, y: 0 };
+
+    // Variables para el movimiento ondulado
+    let wavePhase = 0;
+    const amplitude = 4;   // amplitud de la oscilación (en píxeles)
+    const phaseShift = 0.5;  // desfase entre segmentos
+
+    // Variables para las multiplicaciones
+    let currentQuestion = { a: 2, b: 2 }; // inicial
+    let foods = [];  // Cada alimento: { x, y, value, isCorrect }
+
+    // Función que retorna una posición aleatoria en la cuadrícula que no choque con la serpiente
+    function randomFoodPosition() {
+      let pos, valid = false;
+      while (!valid) {
+        pos = {
+          x: Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize,
+          y: Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize
+        };
+        valid = true;
+        for (let segment of snake) {
+          if (segment.x === pos.x && segment.y === pos.y) {
+            valid = false;
+            break;
+          }
+        }
+      }
+      return pos;
+    }
+
+    // Genera una pregunta de multiplicar y coloca dos alimentos (opciones)
+    function generateQuestion() {
+      let a = Math.floor(Math.random() * 8) + 2; // entre 2 y 9
+      let b = Math.floor(Math.random() * 8) + 2;
+      let correctAnswer = a * b;
+      let wrongAnswer;
+      do {
+        wrongAnswer = Math.floor(Math.random() * (81 - 4 + 1)) + 4; // entre 4 y 81
+      } while (wrongAnswer === correctAnswer);
+
+      currentQuestion = { a, b };
+      // Posiciones aleatorias para cada alimento
+      let food1 = Object.assign(randomFoodPosition(), { value: correctAnswer, isCorrect: true });
+      let food2 = Object.assign(randomFoodPosition(), { value: wrongAnswer, isCorrect: false });
+      // Asegurar que no se solapen
+      while (food1.x === food2.x && food1.y === food2.y) {
+        food2 = Object.assign(randomFoodPosition(), { value: wrongAnswer, isCorrect: false });
+      }
+      foods = [food1, food2];
+    }
+    generateQuestion();
+
+    // Controles de teclado
+    document.addEventListener("keydown", function(e) {
+      switch (e.key) {
+        case "ArrowUp":
+          if (direction.y === 0) { nextDirection = { x: 0, y: -1 }; }
+          break;
+        case "ArrowDown":
+          if (direction.y === 0) { nextDirection = { x: 0, y: 1 }; }
+          break;
+        case "ArrowLeft":
+          if (direction.x === 0) { nextDirection = { x: -1, y: 0 }; }
+          break;
+        case "ArrowRight":
+          if (direction.x === 0) { nextDirection = { x: 1, y: 0 }; }
+          break;
+      }
+    });
+
+    // Controles táctiles para dispositivos móviles (swipes)
+    let touchStartX = null, touchStartY = null;
+    canvas.addEventListener("touchstart", function(e) {
+      const touch = e.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+    });
+    canvas.addEventListener("touchend", function(e) {
+      if (touchStartX === null || touchStartY === null) return;
+      const touch = e.changedTouches[0];
+      let dx = touch.clientX - touchStartX;
+      let dy = touch.clientY - touchStartY;
+      touchStartX = null;
+      touchStartY = null;
+      if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return; // movimiento muy corto
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0 && direction.x === 0) { nextDirection = { x: 1, y: 0 }; }
+        else if (dx < 0 && direction.x === 0) { nextDirection = { x: -1, y: 0 }; }
+      } else {
+        if (dy > 0 && direction.y === 0) { nextDirection = { x: 0, y: 1 }; }
+        else if (dy < 0 && direction.y === 0) { nextDirection = { x: 0, y: -1 }; }
+      }
+    });
+
+    // Reinicia el juego
+    function resetGame() {
+      alert("¡Juego terminado! Puntuación: " + score);
+      score = 0;
+      snake = [{ x: gridSize * 5, y: gridSize * 5 }];
+      direction = { x: 1, y: 0 };
+      nextDirection = { x: 1, y: 0 };
+      generateQuestion();
+    }
+
+    // Para cada segmento se intenta deducir la dirección (basada en el segmento previo)
+    function getSegmentDirection(i) {
+      if (i === 0) return direction;  // cabeza
+      let prev = snake[i - 1], current = snake[i];
+      let dx = prev.x - current.x, dy = prev.y - current.y;
+      if (Math.abs(dx) > Math.abs(dy)) return { x: dx, y: 0 };
+      else return { x: 0, y: dy };
+    }
+
+    // Actualiza la lógica del juego
+    function update() {
+      direction = nextDirection;
+      let head = { x: snake[0].x + direction.x * gridSize, y: snake[0].y + direction.y * gridSize };
+
+      // Colisión con bordes
+      if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize) {
+        resetGame();
+        return;
+      }
+      // Colisión con el cuerpo
+      for (let i = 0; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          resetGame();
+          return;
+        }
+      }
+      snake.unshift(head);
+
+      // Verificar colisión con alguno de los alimentos (opciones de respuesta)
+      let ateFood = false;
+      for (let i = 0; i < foods.length; i++) {
+        if (head.x === foods[i].x && head.y === foods[i].y) {
+          ateFood = true;
+          if (foods[i].isCorrect) {
+            // Respuesta correcta: suma puntos y crece (no se quita el último segmento)
+            score += 10;
+          } else {
+            // Respuesta incorrecta: si la serpiente tiene más de un segmento se elimina uno; de lo contrario, el juego se reinicia
+            if (snake.length > 1) {
+              snake.pop();
+            } else {
+              resetGame();
+              return;
+            }
+          }
+          generateQuestion();
+          break;
+        }
+      }
+      // Si no se comió ningún alimento, se elimina el último segmento para simular el movimiento
+      if (!ateFood) {
+        snake.pop();
+      }
+    }
+
+    // Dibuja la cabeza de la serpiente (con animación de boca)
+    function drawSnakeHead(x, y) {
+      ctx.fillStyle = "#0f0";
+      ctx.beginPath();
+      ctx.arc(x + gridSize / 2, y + gridSize / 2, gridSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+      // Ojos
+      ctx.fillStyle = "#000";
+      let eyeRadius = 2;
+      let eyeOffsetX = gridSize / 6;
+      let eyeOffsetY = gridSize / 6;
+      ctx.beginPath();
+      ctx.arc(x + gridSize / 2 - eyeOffsetX, y + gridSize / 2 - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + gridSize / 2 + eyeOffsetX, y + gridSize / 2 - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      // Boca animada
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 2;
+      if (spriteFrame === 0) {
+        ctx.beginPath();
+        ctx.moveTo(x + gridSize / 2 - 4, y + gridSize / 2 + 4);
+        ctx.lineTo(x + gridSize / 2 + 4, y + gridSize / 2 + 4);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(x + gridSize / 2, y + gridSize / 2 + 2, 4, 0, Math.PI, false);
+        ctx.stroke();
+      }
+    }
+
+    let spriteFrame = 0;
+    let spriteTimer = 0;
+    const spriteInterval = 200; // milisegundos
+
+    // Dibuja el juego (pregunta, alimentos y serpiente con efecto ondulado)
+    function draw() {
+      // Actualiza la fase de oscilación
+      wavePhase += 0.1;
+      ctx.fillStyle = "#222";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Dibujar la pregunta en la parte superior
+      ctx.fillStyle = "#fff";
+      ctx.font = "20px sans-serif";
+      let questionText = `¿Cuánto es ${currentQuestion.a} * ${currentQuestion.b}?`;
+      ctx.fillText(questionText, 10, 25);
+
+      // Dibujar los alimentos (opciones)
+      for (let food of foods) {
+        ctx.fillStyle = food.isCorrect ? "#0f0" : "#f00";
+        ctx.fillRect(food.x, food.y, gridSize, gridSize);
+        // Mostrar el valor en el centro del alimento
+        ctx.fillStyle = "#000";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(food.value, food.x + 3, food.y + gridSize - 3);
+      }
+
+      // Dibujar la serpiente con efecto ondulado
+      for (let i = 0; i < snake.length; i++) {
+        let seg = snake[i];
+        let offset = amplitude * Math.sin(wavePhase + i * phaseShift);
+        let segDir = getSegmentDirection(i);
+        let drawX = seg.x;
+        let drawY = seg.y;
+        // Si el tramo se mueve verticalmente, se aplica desplazamiento horizontal; si es horizontal, vertical
+        if (segDir.x === 0 && segDir.y !== 0) {
+          drawX += offset;
+        } else if (segDir.y === 0 && segDir.x !== 0) {
+          drawY += offset;
+        }
+        if (i === 0) {
+          drawSnakeHead(drawX, drawY);
+        } else {
+          ctx.fillStyle = "#0f0";
+          ctx.fillRect(drawX, drawY, gridSize, gridSize);
+        }
+      }
+
+      // Dibujar la puntuación en la parte inferior
+      ctx.fillStyle = "#fff";
+      ctx.font = "20px sans-serif";
+      ctx.fillText("Puntuación: " + score, 10, canvas.height - 10);
+    }
+
+    function gameLoop() {
+      update();
+      spriteTimer += gameSpeed;
+      if (spriteTimer >= spriteInterval) {
+        spriteFrame = (spriteFrame + 1) % 2;
+        spriteTimer = 0;
+      }
+      draw();
+    }
+
+    let gameSpeed = 100; // intervalo de 100 ms por frame
+    setInterval(gameLoop, gameSpeed);
+  </script>
+</body>
+</html>

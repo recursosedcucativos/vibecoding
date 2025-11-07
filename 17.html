@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serpiente de Vocales</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #74ebd5, #acb6e5);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #game-container {
+      text-align: center;
+    }
+
+    #game-canvas {
+      background-color: #f0f8ff;
+      border: 5px solid #333;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Serpiente de Vocales</h1>
+    <button id="start-button">Iniciar Juego</button>
+    <canvas id="game-canvas"></canvas>
+    <div id="game-over">
+      <h2>¡Game Over!</h2>
+      <p id="final-score"></p>
+      <button id="restart-button">Reiniciar</button>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById("game-canvas");
+    const ctx = canvas.getContext("2d");
+    const startButton = document.getElementById("start-button");
+    const gameOverScreen = document.getElementById("game-over");
+    const finalScoreText = document.getElementById("final-score");
+    const restartButton = document.getElementById("restart-button");
+
+    canvas.width = 400;
+    canvas.height = 400;
+
+    let snake = [{ x: 200, y: 200 }];
+    let direction = { x: 20, y: 0 }; // Dirección inicial
+    let food = generateFood();
+    let score = 0;
+    let gameInterval;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    // Efectos de sonido
+    const eatSound = new Audio("https://www.soundjay.com/button/beep-07.wav");
+    const gameOverSound = new Audio("https://www.soundjay.com/button/beep-10.wav");
+
+    function startGame() {
+      snake = [{ x: 200, y: 200 }];
+      direction = { x: 20, y: 0 };
+      score = 0;
+      food = generateFood();
+      clearInterval(gameInterval);
+      gameInterval = setInterval(updateGame, 100);
+      gameOverScreen.style.display = "none";
+    }
+
+    function generateFood() {
+      const vowels = "aeiou";
+      const consonants = "bcdfghjklmnpqrstvwxyz";
+      return {
+        vowel: {
+          x: Math.floor(Math.random() * (canvas.width / 20)) * 20,
+          y: Math.floor(Math.random() * (canvas.height / 20)) * 20,
+          letter: vowels[Math.floor(Math.random() * vowels.length)]
+        },
+        consonant: {
+          x: Math.floor(Math.random() * (canvas.width / 20)) * 20,
+          y: Math.floor(Math.random() * (canvas.height / 20)) * 20,
+          letter: consonants[Math.floor(Math.random() * consonants.length)]
+        }
+      };
+    }
+
+    function drawSnake() {
+      ctx.fillStyle = "#4caf50";
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x, segment.y, 20, 20);
+      });
+    }
+
+    function drawFood() {
+      // Vocal
+      ctx.fillStyle = "red";
+      ctx.font = "20px Arial";
+      ctx.fillText(food.vowel.letter, food.vowel.x + 5, food.vowel.y + 18);
+
+      // Consonante
+      ctx.fillStyle = "black";
+      ctx.fillText(food.consonant.letter, food.consonant.x + 5, food.consonant.y + 18);
+    }
+
+    function moveSnake() {
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+      snake.unshift(head);
+
+      // Si come la vocal
+      if (head.x === food.vowel.x && head.y === food.vowel.y) {
+        score++;
+        eatSound.play();
+        food = generateFood();
+      } 
+      // Si come la consonante
+      else if (head.x === food.consonant.x && head.y === food.consonant.y) {
+        snake.pop(); // Pierde tamaño
+        if (snake.length === 0) {
+          endGame();
+        } else {
+          food = generateFood();
+        }
+      } 
+      // Si no come nada
+      else {
+        snake.pop();
+      }
+    }
+
+    function checkCollision() {
+      const head = snake[0];
+
+      // Choque con paredes
+      if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+        endGame();
+      }
+
+      // Choque con su propio cuerpo
+      for (let i = 1; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+          endGame();
+        }
+      }
+    }
+
+    function updateGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawSnake();
+      drawFood();
+      moveSnake();
+      checkCollision();
+
+      // Indicador de puntuación
+      ctx.fillStyle = "black";
+      ctx.font = "16px Arial";
+      ctx.fillText("Puntuación: " + score, 10, 20);
+    }
+
+    function endGame() {
+      clearInterval(gameInterval);
+      gameOverSound.play();
+      gameOverScreen.style.display = "block";
+      finalScoreText.textContent = `Puntuación final: ${score}`;
+    }
+
+    function changeDirection(event) {
+      const { key } = event;
+
+      if (key === "ArrowUp" && direction.y === 0) direction = { x: 0, y: -20 };
+      if (key === "ArrowDown" && direction.y === 0) direction = { x: 0, y: 20 };
+      if (key === "ArrowLeft" && direction.x === 0) direction = { x: -20, y: 0 };
+      if (key === "ArrowRight" && direction.x === 0) direction = { x: 20, y: 0 };
+    }
+
+    function handleTouchStart(event) {
+      touchStartX = event.touches[0].clientX;
+      touchStartY = event.touches[0].clientY;
+    }
+
+    function handleTouchEnd(event) {
+      touchEndX = event.changedTouches[0].clientX;
+      touchEndY = event.changedTouches[0].clientY;
+
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = touchEndY - touchStartY;
+
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (deltaX > 0 && direction.x === 0) direction = { x: 20, y: 0 }; // Swipe right
+        if (deltaX < 0 && direction.x === 0) direction = { x: -20, y: 0 }; // Swipe left
+      } else {
+        if (deltaY > 0 && direction.y === 0) direction = { x: 0, y: 20 }; // Swipe down
+        if (deltaY < 0 && direction.y === 0) direction = { x: 0, y: -20 }; // Swipe up
+      }
+    }
+
+    startButton.addEventListener("click", startGame);
+    restartButton.addEventListener("click", startGame);
+    window.addEventListener("keydown", changeDirection);
+    canvas.addEventListener("touchstart", handleTouchStart);
+    canvas.addEventListener("touchend", handleTouchEnd);
+  </script>
+</body>
+</html>

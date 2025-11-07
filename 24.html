@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Snake Animado para Niños</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    #gameCanvas {
+      background: #222;
+      border: 2px solid #fff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Configuración del juego
+    const gridSize = 20;
+    const canvasSize = canvas.width; // asumimos canvas cuadrado
+    let score = 0;
+
+    // Serpiente: array de segmentos, iniciando con la cabeza
+    let snake = [{x: gridSize * 5, y: gridSize * 5}];
+    let direction = {x: 1, y: 0}; // Movimiento inicial a la derecha
+    let nextDirection = {x: 1, y: 0};
+
+    // Comida
+    let food = {x: 0, y: 0};
+    function placeFood() {
+      food.x = Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize;
+      food.y = Math.floor(Math.random() * (canvasSize / gridSize)) * gridSize;
+    }
+    placeFood();
+
+    // Animación del sprite de la cabeza de la serpiente:
+    // Se alterna entre dos estados (spriteFrame 0 y 1) para simular la apertura y cierre de la boca.
+    let spriteFrame = 0;
+    let spriteTimer = 0;
+    const spriteInterval = 200; // intervalo en milisegundos
+
+    // Velocidad del juego (tiempo entre actualizaciones)
+    let gameSpeed = 100; // ms por frame
+
+    // Función principal del juego: actualiza la lógica y dibuja
+    function gameLoop() {
+      update();
+      draw();
+    }
+
+    function update() {
+      // Actualiza la dirección según la tecla presionada
+      direction = nextDirection;
+
+      // Calcula la nueva posición de la cabeza
+      let head = { x: snake[0].x + direction.x * gridSize, y: snake[0].y + direction.y * gridSize };
+
+      // Colisión con los bordes
+      if(head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize) {
+        resetGame();
+        return;
+      }
+      // Colisión con el propio cuerpo
+      for(let i = 0; i < snake.length; i++){
+        if(head.x === snake[i].x && head.y === snake[i].y){
+          resetGame();
+          return;
+        }
+      }
+
+      // Agrega la nueva cabeza al inicio del array
+      snake.unshift(head);
+
+      // Si se come la comida, se aumenta la puntuación y se coloca nueva comida
+      if(head.x === food.x && head.y === food.y){
+        score++;
+        placeFood();
+      } else {
+        // Si no se come, se elimina el último segmento para simular el movimiento
+        snake.pop();
+      }
+    }
+
+    function resetGame() {
+      alert("¡Juego terminado! Puntuación: " + score);
+      score = 0;
+      snake = [{x: gridSize * 5, y: gridSize * 5}];
+      direction = {x: 1, y: 0};
+      nextDirection = {x: 1, y: 0};
+      placeFood();
+    }
+
+    function draw() {
+      // Limpia el canvas
+      ctx.fillStyle = "#222";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Dibuja la comida
+      ctx.fillStyle = "#ff0";
+      ctx.fillRect(food.x, food.y, gridSize, gridSize);
+
+      // Dibuja la serpiente
+      for(let i = 0; i < snake.length; i++){
+        if(i === 0){
+          // Dibuja la cabeza con animación de sprite
+          drawSnakeHead(snake[i].x, snake[i].y);
+        } else {
+          ctx.fillStyle = "#0f0";
+          ctx.fillRect(snake[i].x, snake[i].y, gridSize, gridSize);
+        }
+      }
+
+      // Dibuja la puntuación
+      ctx.fillStyle = "#fff";
+      ctx.font = "20px sans-serif";
+      ctx.fillText("Puntuación: " + score, 10, 20);
+    }
+
+    // Función para dibujar la cabeza de la serpiente con dos estados animados
+    function drawSnakeHead(x, y) {
+      // Dibuja la base de la cabeza (círculo verde)
+      ctx.fillStyle = "#0f0";
+      ctx.beginPath();
+      ctx.arc(x + gridSize/2, y + gridSize/2, gridSize/2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dibuja los ojos
+      ctx.fillStyle = "#000";
+      let eyeRadius = 2;
+      let eyeOffsetX = gridSize/6;
+      let eyeOffsetY = gridSize/6;
+      ctx.beginPath();
+      ctx.arc(x + gridSize/2 - eyeOffsetX, y + gridSize/2 - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x + gridSize/2 + eyeOffsetX, y + gridSize/2 - eyeOffsetY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dibuja la boca dependiendo del frame del sprite
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = 2;
+      if(spriteFrame === 0){
+        // Estado: boca cerrada (una línea simple)
+        ctx.beginPath();
+        ctx.moveTo(x + gridSize/2 - 4, y + gridSize/2 + 4);
+        ctx.lineTo(x + gridSize/2 + 4, y + gridSize/2 + 4);
+        ctx.stroke();
+      } else {
+        // Estado: boca abierta (una curva)
+        ctx.beginPath();
+        ctx.arc(x + gridSize/2, y + gridSize/2 + 2, 4, 0, Math.PI, false);
+        ctx.stroke();
+      }
+    }
+
+    // Manejo de entradas del teclado para cambiar la dirección
+    document.addEventListener("keydown", function(e){
+      switch(e.key){
+        case "ArrowUp":
+          if(direction.y === 0) { nextDirection = {x:0, y:-1}; }
+          break;
+        case "ArrowDown":
+          if(direction.y === 0) { nextDirection = {x:0, y:1}; }
+          break;
+        case "ArrowLeft":
+          if(direction.x === 0) { nextDirection = {x:-1, y:0}; }
+          break;
+        case "ArrowRight":
+          if(direction.x === 0) { nextDirection = {x:1, y:0}; }
+          break;
+      }
+    });
+
+    // Bucle principal del juego
+    setInterval(() => {
+      // Actualiza el temporizador del sprite y alterna el frame cada spriteInterval
+      spriteTimer += gameSpeed;
+      if(spriteTimer >= spriteInterval){
+        spriteFrame = (spriteFrame + 1) % 2;
+        spriteTimer = 0;
+      }
+      gameLoop();
+    }, gameSpeed);
+  </script>
+</body>
+</html>

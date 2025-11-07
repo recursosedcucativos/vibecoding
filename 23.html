@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🐉 Dragón Matemático - Aventura Numérica</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Nunito:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .game-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .level-indicator {
+            font-size: 16px;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .question-display {
+            font-family: 'Fredoka One', cursive;
+            font-size: 28px;
+            color: #ffd93d;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .game-canvas {
+            border: 4px solid #4ecdc4;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(78, 205, 196, 0.5);
+            position: relative;
+            background: linear-gradient(135deg, #0f4c75 0%, #3282b8 50%, #0f4c75 100%);
+        }
+
+        .lives-display {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .heart {
+            width: 25px;
+            height: 25px;
+            font-size: 20px;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .tutorial-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 15px;
+            z-index: 10;
+        }
+
+        .tutorial-content {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 400px;
+        }
+
+        .tutorial-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 32px;
+            color: #ffd93d;
+            margin-bottom: 20px;
+        }
+
+        .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            border-radius: 15px;
+            z-index: 20;
+        }
+
+        .game-over-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .medal {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            80% { transform: translateY(-10px); }
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            margin: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .difficulty-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-color: #4ecdc4;
+            transform: scale(1.05);
+        }
+
+        .particles {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffd93d;
+            border-radius: 50%;
+            animation: particle-float 1s ease-out forwards;
+        }
+
+        @keyframes particle-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px) scale(0);
+            }
+        }
+
+        .feedback-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Fredoka One', cursive;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 15;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .controls-hint {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .game-canvas {
+                width: 350px !important;
+                height: 250px !important;
+            }
+            
+            .question-display {
+                font-size: 20px;
+            }
+            
+            .game-stats {
+                font-size: 14px;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-stats">
+                <div class="stat-item">
+                    <span>🏆</span>
+                    <span id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>🔥</span>
+                    <span id="streak">0</span>
+                </div>
+                <div class="stat-item">
+                    <span>⭐</span>
+                    <span id="level">1</span>
+                </div>
+            </div>
+            <div class="level-indicator" id="operation-type">Suma Fácil</div>
+        </div>
+        
+        <div class="lives-display" id="lives">
+            <span class="heart">❤️</span>
+            <span class="heart">❤️</span>
+            <span class="heart">❤️</span>
+        </div>
+        
+        <div class="question-display" id="question">¡Presiona ESPACIO para empezar!</div>
+        
+        <div style="position: relative;">
+            <canvas id="gameCanvas" class="game-canvas" width="600" height="400"></canvas>
+            <div class="particles" id="particles"></div>
+            <div class="feedback-message" id="feedback"></div>
+            
+            <div class="tutorial-overlay" id="tutorial">
+                <div class="tutorial-content">
+                    <div class="tutorial-title">🐉 Dragón Matemático</div>
+                    <p>¡Ayuda al dragón a comer las respuestas correctas!</p>
+                    <br>
+                    <p>🎮 <strong>Controles:</strong></p>
+                    <p>Flechas o WASD para mover</p>
+                    <p>ESPACIO para pausar</p>
+                    <br>
+                    <p>⭐ Respuestas correctas = +10 puntos</p>
+                    <p>❌ Respuestas incorrectas = -1 vida</p>
+                    <br>
+                    <div class="difficulty-selector">
+                        <button class="difficulty-btn active" data-difficulty="easy">🟢 Fácil</button>
+                        <button class="difficulty-btn" data-difficulty="medium">🟡 Medio</button>
+                        <button class="difficulty-btn" data-difficulty="hard">🔴 Difícil</button>
+                    </div>
+                    <button class="btn" onclick="startGame()">🚀 ¡Empezar Aventura!</button>
+                </div>
+            </div>
+            
+            <div class="game-over-screen" id="gameOver">
+                <div class="game-over-content">
+                    <div class="medal" id="medal">🏆</div>
+                    <h2 style="font-family: 'Fredoka One', cursive; margin-bottom: 20px;" id="gameOverTitle">¡Aventura Completada!</h2>
+                    <div id="finalStats" style="font-size: 18px; margin-bottom: 20px;"></div>
+                    <div id="achievements" style="margin-bottom: 20px;"></div>
+                    <button class="btn" onclick="restartGame()">🔄 Jugar de Nuevo</button>
+                    <button class="btn" onclick="showTutorial()">⚙️ Cambiar Dificultad</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-hint">
+            Usa las flechas ⬅️➡️⬆️⬇️ o WASD para mover • ESPACIO para pausar
+        </div>
+    </div>
+
+    <script>
+        // Variables globales del juego
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const GRID_SIZE = 20;
+        
+        let gameState = {
+            running: false,
+            paused: false,
+            score: 0,
+            streak: 0,
+            lives: 3,
+            level: 1,
+            difficulty: 'easy',
+            speed: 200,
+            dragon: [],
+            direction: 'right',
+            nextDirection: 'right',
+            currentQuestion: null,
+            answers: [],
+            particles: []
+        };
+
+        const difficulties = {
+            easy: { name: 'Suma Fácil', range: [1, 5], operations: ['+'] },
+            medium: { name: 'Operaciones Mixtas', range: [1, 10], operations: ['+', '-', '×'] },
+            hard: { name: 'Matemática Avanzada', range: [1, 12], operations: ['+', '-', '×', '÷'] }
+        };
+
+        // Inicialización del juego
+        function initGame() {
+            createStars();
+            setupEventListeners();
+            resetGame();
+        }
+
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = Math.random() * 3 + 1 + 'px';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('keydown', handleKeyPress);
+            
+            // Botones de dificultad
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    gameState.difficulty = e.target.dataset.difficulty;
+                });
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (!gameState.running) return;
+
+            const key = event.key.toLowerCase();
+            
+            if (key === ' ') {
+                event.preventDefault();
+                togglePause();
+                return;
+            }
+
+            const keyMap = {
+                'arrowup': 'up', 'w': 'up',
+                'arrowdown': 'down', 's': 'down',
+                'arrowleft': 'left', 'a': 'left',
+                'arrowright': 'right', 'd': 'right'
+            };
+
+            const newDirection = keyMap[key];
+            if (newDirection && !gameState.paused) {
+                const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
+                if (opposites[newDirection] !== gameState.direction) {
+                    gameState.nextDirection = newDirection;
+                }
+            }
+        }
+
+        function startGame() {
+            document.getElementById('tutorial').style.display = 'none';
+            resetGame();
+            gameState.running = true;
+            gameLoop();
+        }
+
+        function resetGame() {
+            gameState.score = 0;
+            gameState.streak = 0;
+            gameState.lives = 3;
+            gameState.level = 1;
+            gameState.direction = 'right';
+            gameState.nextDirection = 'right';
+            gameState.speed = 200;
+            
+            // Inicializar dragón
+            gameState.dragon = [
+                {x: 15, y: 10}, {x: 14, y: 10}, {x: 13, y: 10}
+            ];
+            
+            updateUI();
+            createMathProblem();
+        }
+
+        function createMathProblem() {
+            const diff = difficulties[gameState.difficulty];
+            const [min, max] = diff.range;
+            const operation = diff.operations[Math.floor(Math.random() * diff.operations.length)];
+            
+            let num1, num2, correctAnswer, questionText;
+            
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * max) + min;
+                    num2 = Math.floor(Math.random() * max) + min;
+                    correctAnswer = num1 + num2;
+                    questionText = `${num1} + ${num2} = ?`;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * max) + min + 5;
+                    num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
+                    correctAnswer = num1 - num2;
+                    questionText = `${num1} - ${num2} = ?`;
+                    break;
+                case '×':
+                    num1 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    correctAnswer = num1 * num2;
+                    questionText = `${num1} × ${num2} = ?`;
+                    break;
+                case '÷':
+                    correctAnswer = Math.floor(Math.random() * max) + min;
+                    num2 = Math.floor(Math.random() * (max - min + 1)) + min;
+                    num1 = correctAnswer * num2;
+                    questionText = `${num1} ÷ ${num2} = ?`;
+                    break;
+            }
+            
+            // Generar respuesta incorrecta
+            let wrongAnswer;
+            do {
+                const variation = Math.floor(Math.random() * 8) + 1;
+                wrongAnswer = Math.random() < 0.5 ? 
+                    correctAnswer + variation : 
+                    Math.max(1, correctAnswer - variation);
+            } while (wrongAnswer === correctAnswer);
+
+            gameState.currentQuestion = {
+                text: questionText,
+                correct: correctAnswer,
+                wrong: wrongAnswer
+            };
+
+            document.getElementById('question').textContent = questionText;
+            placeAnswers();
+        }
+
+        function placeAnswers() {
+            gameState.answers = [];
+            const positions = [];
+            
+            // Generar posiciones alejadas entre sí
+            for (let i = 0; i < 2; i++) {
+                let pos;
+                let attempts = 0;
+                do {
+                    pos = {
+                        x: Math.floor(Math.random() * (canvas.width / GRID_SIZE - 4)) + 2,
+                        y: Math.floor(Math.random() * (canvas.height / GRID_SIZE - 4)) + 2
+                    };
+                    attempts++;
+                } while (attempts < 20 && positions.some(p => 
+                    Math.abs(p.x - pos.x) < 6 || Math.abs(p.y - pos.y) < 4
+                ));
+                positions.push(pos);
+            }
+            
+            // Asignar respuestas aleatoriamente
+            const answers = [gameState.currentQuestion.correct, gameState.currentQuestion.wrong];
+            const shuffled = Math.random() < 0.5;
+            
+            gameState.answers = [
+                { ...positions[0], value: answers[shuffled ? 1 : 0], isCorrect: !shuffled },
+                { ...positions[1], value: answers[shuffled ? 0 : 1], isCorrect: shuffled }
+            ];
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('streak').textContent = gameState.streak;
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('operation-type').textContent = difficulties[gameState.difficulty].name;
+            
+            // Actualizar vidas
+            const livesContainer = document.getElementById('lives');
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < gameState.lives; i++) {
+                const heart = document.createElement('span');
+                heart.className = 'heart';
+                heart.textContent = '❤️';
+                livesContainer.appendChild(heart);
+            }
+        }
+
+        function drawDragon() {
+            gameState.dragon.forEach((segment, index) => {
+                ctx.save();
+                
+                const x = segment.x * GRID_SIZE;
+                const y = segment.y * GRID_SIZE;
+                
+                if (index === 0) {
+                    // Cabeza del dragón
+                    const gradient = ctx.createRadialGradient(
+                        x + GRID_SIZE/2, y + GRID_SIZE/2, 0,
+                        x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2
+                    );
+                    gradient.addColorStop(0, '#4ecdc4');
+                    gradient.addColorStop(1, '#44a08d');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2 - 1, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Ojos
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath();
+                    ctx.arc(x + 6, y + 6, 3, 0, Math.PI * 2);
+                    ctx.arc(x + 14, y + 6, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'black';
+                    ctx.beginPath();
+                    ctx.arc(x + 6, y + 6, 1.5, 0, Math.PI * 2);
+                    ctx.arc(x + 14, y + 6, 1.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                } else {
+                    // Cuerpo del dragón
+                    const alpha = Math.max(0.3, 1 - (index * 0.1));
+                    const size = GRID_SIZE - index;
+                    
+                    const gradient = ctx.createRadialGradient(
+                        x + GRID_SIZE/2, y + GRID_SIZE/2, 0,
+                        x + GRID_SIZE/2, y + GRID_SIZE/2, size/2
+                    );
+                    gradient.addColorStop(0, `rgba(78, 205, 196, ${alpha})`);
+                    gradient.addColorStop(1, `rgba(68, 160, 141, ${alpha})`);
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.beginPath();
+                    ctx.arc(x + GRID_SIZE/2, y + GRID_SIZE/2, size/2 - 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        function drawAnswer(answer) {
+            const x = answer.x * GRID_SIZE;
+            const y = answer.y * GRID_SIZE;
+            
+            // Efecto de brillo
+            const time = Date.now() * 0.005;
+            const glowIntensity = (Math.sin(time) + 1) * 0.3 + 0.4;
+            
+            ctx.save();
+            ctx.shadowColor = answer.isCorrect ? '#4ecdc4' : '#ff6b6b';
+            ctx.shadowBlur = 10 * glowIntensity;
+            
+            // Círculo principal
+            const gradient = ctx.createRadialGradient(
+                x + GRID_SIZE/2, y + GRID_SIZE/2, 0,
+                x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2
+            );
+            gradient.addColorStop(0, '#ffd93d');
+            gradient.addColorStop(0.7, '#ff9f40');
+            gradient.addColorStop(1, '#ff6b6b');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x + GRID_SIZE/2, y + GRID_SIZE/2, GRID_SIZE/2 - 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Borde
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Número
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px Nunito';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+                answer.value.toString(),
+                x + GRID_SIZE/2,
+                y + GRID_SIZE/2
+            );
+            
+            ctx.restore();
+        }
+
+        function createParticles(x, y, color = '#ffd93d', count = 8) {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = (x * GRID_SIZE + GRID_SIZE/2) + 'px';
+                particle.style.top = (y * GRID_SIZE + GRID_SIZE/2) + 'px';
+                particle.style.background = color;
+                
+                const angle = (Math.PI * 2 * i) / count;
+                const velocity = 30 + Math.random() * 20;
+                particle.style.setProperty('--dx', Math.cos(angle) * velocity + 'px');
+                particle.style.setProperty('--dy', Math.sin(angle) * velocity + 'px');
+                
+                particlesContainer.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        function showFeedback(message, isCorrect) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.style.color = isCorrect ? '#4ecdc4' : '#ff6b6b';
+            feedback.style.opacity = '1';
+            feedback.style.animation = 'none';
+            
+            setTimeout(() => {
+                feedback.style.animation = 'fadeOut 0.5s ease-out forwards';
+            }, 100);
+            
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+            }, 1500);
+        }
+
+        function handleAnswer(isCorrect, answerPos) {
+            if (isCorrect) {
+                gameState.score += 10 + (gameState.streak * 2);
+                gameState.streak++;
+                
+                createParticles(answerPos.x, answerPos.y, '#4ecdc4', 12);
+                showFeedback(`¡Excelente! +${10 + (gameState.streak * 2)} puntos`, true);
+                
+                // Verificar nivel
+                if (gameState.streak % 5 === 0) {
+                    gameState.level++;
+                    gameState.speed = Math.max(100, gameState.speed - 15);
+                    showFeedback(`¡Nivel ${gameState.level}! 🌟`, true);
+                }
+                
+                // El dragón crece
+                gameState.dragon.push({...gameState.dragon[gameState.dragon.length - 1]});
+                
+            } else {
+                gameState.lives--;
+                gameState.streak = 0;
+                
+                createParticles(answerPos.x, answerPos.y, '#ff6b6b', 8);
+                showFeedback(`¡Ups! ${gameState.currentQuestion.text.replace('?', gameState.currentQuestion.correct)}`, false);
+                
+                // Shake effect
+                canvas.style.animation = 'shake 0.3s ease-in-out';
+                setTimeout(() => canvas.style.animation = '', 300);
+                
+                if (gameState.lives <= 0) {
+                    endGame();
+                    return;
+                }
+                
+                // El dragón se encoge
+                if (gameState.dragon.length > 3) {
+                    gameState.dragon.pop();
+                }
+            }
+            
+            updateUI();
+            createMathProblem();
+        }
+
+        function checkCollisions() {
+            const head = gameState.dragon[0];
+            
+            // Colisión con bordes
+            if (head.x < 0 || head.x >= canvas.width / GRID_SIZE || 
+                head.y < 0 || head.y >= canvas.height / GRID_SIZE) {
+                return 'wall';
+            }
+            
+            // Colisión consigo mismo
+            for (let i = 1; i < gameState.dragon.length; i++) {
+                if (gameState.dragon[i].x === head.x && gameState.dragon[i].y === head.y) {
+                    return 'self';
+                }
+            }
+            
+            // Colisión con respuestas
+            const answerHit = gameState.answers.find(a => a.x === head.x && a.y === head.y);
+            if (answerHit) {
+                handleAnswer(answerHit.isCorrect, answerHit);
+                return 'answer';
+            }
+            
+            return null;
+        }
+
+        function moveDragon() {
+            if (gameState.paused) return;
+            
+            gameState.direction = gameState.nextDirection;
+            const head = {...gameState.dragon[0]};
+            
+            switch(gameState.direction) {
+                case 'up': head.y--; break;
+                case 'down': head.y++; break;
+                case 'left': head.x--; break;
+                case 'right': head.x++; break;
+            }
+            
+            gameState.dragon.unshift(head);
+            
+            const collision = checkCollisions();
+            if (collision === 'wall' || collision === 'self') {
+                gameState.lives--;
+                updateUI();
+                
+                if (gameState.lives <= 0) {
+                    endGame();
+                    return;
+                }
+                
+                // Resetear posición del dragón
+                gameState.dragon = [
+                    {x: 15, y: 10}, {x: 14, y: 10}, {x: 13, y: 10}
+                ];
+                gameState.direction = 'right';
+                gameState.nextDirection = 'right';
+                
+                showFeedback('¡Cuidado con los bordes! -1 vida', false);
+                canvas.style.animation = 'shake 0.3s ease-in-out';
+                setTimeout(() => canvas.style.animation = '', 300);
+            } else if (collision !== 'answer') {
+                gameState.dragon.pop();
+            }
+        }
+
+        function render() {
+            // Limpiar canvas con gradiente de fondo
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#0f4c75');
+            gradient.addColorStop(0.5, '#3282b8');
+            gradient.addColorStop(1, '#0f4c75');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibujar estrellas de fondo en el canvas
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 20; i++) {
+                const x = (i * 137.5) % canvas.width;
+                const y = (i * 49.7) % canvas.height;
+                const size = Math.sin(Date.now() * 0.001 + i) * 2 + 2;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Dibujar respuestas
+            gameState.answers.forEach(answer => drawAnswer(answer));
+            
+            // Dibujar dragón
+            drawDragon();
+            
+            // Dibujar trail del dragón
+            if (gameState.dragon.length > 1) {
+                ctx.strokeStyle = 'rgba(78, 205, 196, 0.3)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(
+                    gameState.dragon[0].x * GRID_SIZE + GRID_SIZE/2,
+                    gameState.dragon[0].y * GRID_SIZE + GRID_SIZE/2
+                );
+                
+                for (let i = 1; i < Math.min(gameState.dragon.length, 5); i++) {
+                    ctx.lineTo(
+                        gameState.dragon[i].x * GRID_SIZE + GRID_SIZE/2,
+                        gameState.dragon[i].y * GRID_SIZE + GRID_SIZE/2
+                    );
+                }
+                ctx.stroke();
+            }
+            
+            // Mostrar pausa
+            if (gameState.paused) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 48px Fredoka One';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('PAUSA', canvas.width/2, canvas.height/2);
+                
+                ctx.font = '18px Nunito';
+                ctx.fillText('Presiona ESPACIO para continuar', canvas.width/2, canvas.height/2 + 40);
+            }
+        }
+
+        function gameLoop() {
+            if (!gameState.running) return;
+            
+            moveDragon();
+            render();
+            
+            setTimeout(gameLoop, gameState.speed);
+        }
+
+        function togglePause() {
+            gameState.paused = !gameState.paused;
+        }
+
+        function endGame() {
+            gameState.running = false;
+            
+            // Calcular medalla
+            let medal = '🥉';
+            let title = '¡Buen intento!';
+            
+            if (gameState.score >= 200) {
+                medal = '🏆';
+                title = '¡Increíble Matemático!';
+            } else if (gameState.score >= 100) {
+                medal = '🥇';
+                title = '¡Excelente Trabajo!';
+            } else if (gameState.score >= 50) {
+                medal = '🥈';
+                title = '¡Muy Bien!';
+            }
+            
+            // Calcular logros
+            const achievements = [];
+            if (gameState.streak >= 10) achievements.push('🔥 Racha de Fuego');
+            if (gameState.level >= 5) achievements.push('⭐ Maestro de Niveles');
+            if (gameState.score >= 150) achievements.push('💎 Puntuador Experto');
+            if (gameState.dragon.length >= 20) achievements.push('🐉 Dragón Gigante');
+            
+            document.getElementById('medal').textContent = medal;
+            document.getElementById('gameOverTitle').textContent = title;
+            document.getElementById('finalStats').innerHTML = `
+                <div>🏆 Puntuación Final: <strong>${gameState.score}</strong></div>
+                <div>🔥 Mejor Racha: <strong>${gameState.streak}</strong></div>
+                <div>⭐ Nivel Alcanzado: <strong>${gameState.level}</strong></div>
+                <div>🐉 Tamaño del Dragón: <strong>${gameState.dragon.length}</strong></div>
+            `;
+            
+            document.getElementById('achievements').innerHTML = achievements.length > 0 ? 
+                '<div style="font-size: 16px; margin-top: 10px;"><strong>🎉 Logros Desbloqueados:</strong><br>' + 
+                achievements.join('<br>') + '</div>' : '';
+            
+            document.getElementById('gameOver').style.display = 'flex';
+        }
+
+        function restartGame() {
+            document.getElementById('gameOver').style.display = 'none';
+            resetGame();
+            gameState.running = true;
+            gameLoop();
+        }
+
+        function showTutorial() {
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('tutorial').style.display = 'flex';
+            gameState.running = false;
+        }
+
+        // Agregar animación shake al CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+                to { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Iniciar el juego cuando se carga la página
+        document.addEventListener('DOMContentLoaded', initGame);
+
+        // Funciones adicionales para mejorar la experiencia
+        function createFloatingNumbers(x, y, points, color) {
+            const floatingNumber = document.createElement('div');
+            floatingNumber.textContent = `+${points}`;
+            floatingNumber.style.position = 'absolute';
+            floatingNumber.style.left = (x * GRID_SIZE) + 'px';
+            floatingNumber.style.top = (y * GRID_SIZE) + 'px';
+            floatingNumber.style.color = color;
+            floatingNumber.style.fontWeight = 'bold';
+            floatingNumber.style.fontSize = '18px';
+            floatingNumber.style.pointerEvents = 'none';
+            floatingNumber.style.zIndex = '10';
+            floatingNumber.style.animation = 'floatUp 1s ease-out forwards';
+            
+            document.querySelector('.game-container').appendChild(floatingNumber);
+            
+            setTimeout(() => floatingNumber.remove(), 1000);
+        }
+
+        // Agregar más animaciones
+        const additionalStyles = document.createElement('style');
+        additionalStyles.textContent = `
+            @keyframes floatUp {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-30px);
+                }
+            }
+            
+            .game-canvas {
+                transition: all 0.3s ease;
+            }
+            
+            .game-canvas:hover {
+                box-shadow: 0 0 40px rgba(78, 205, 196, 0.7);
+            }
+            
+            .particle {
+                box-shadow: 0 0 10px currentColor;
+            }
+        `;
+        document.head.appendChild(additionalStyles);
+
+        // Mejorar responsive design
+        function adjustCanvasSize() {
+            if (window.innerWidth < 768) {
+                canvas.width = 350;
+                canvas.height = 250;
+                canvas.style.width = '350px';
+                canvas.style.height = '250px';
+            } else {
+                canvas.width = 600;
+                canvas.height = 400;
+                canvas.style.width = '600px';
+                canvas.style.height = '400px';
+            }
+        }
+
+        window.addEventListener('resize', adjustCanvasSize);
+        adjustCanvasSize();
+
+        // Sistema de sonidos (usando Web Audio API de forma simple)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(frequency, duration, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // Agregar sonidos a las acciones
+        function playCorrectSound() {
+            playSound(523.25, 0.2); // Do
+            setTimeout(() => playSound(659.25, 0.2), 100); // Mi
+        }
+
+        function playWrongSound() {
+            playSound(220, 0.3, 'sawtooth');
+        }
+
+        function playLevelUpSound() {
+            playSound(523.25, 0.1);
+            setTimeout(() => playSound(659.25, 0.1), 100);
+            setTimeout(() => playSound(783.99, 0.2), 200);
+        }
+
+        // Integrar sonidos en el juego (modificar handleAnswer)
+        const originalHandleAnswer = handleAnswer;
+        handleAnswer = function(isCorrect, answerPos) {
+            if (isCorrect) {
+                playCorrectSound();
+                if (gameState.streak > 0 && gameState.streak % 5 === 0) {
+                    setTimeout(playLevelUpSound, 300);
+                }
+            } else {
+                playWrongSound();
+            }
+            originalHandleAnswer(isCorrect, answerPos);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snake Math Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        
+        #gameContainer {
+            position: relative;
+            background-color: #103010;
+        }
+        
+        #stats {
+            position: absolute;
+            top: -80px;
+            left: 0;
+            font-size: 24px;
+            color: #4CAF50;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #question {
+            position: absolute;
+            top: -80px;
+            right: 0;
+            font-size: 32px;
+            color: #FFD700;
+            z-index: 10;
+            font-weight: bold;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ff4444;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 20;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        canvas {
+            border: 4px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="stats">
+            <div id="score">Score: 0</div>
+            <div id="streak">Streak: 0</div>
+        </div>
+        <div id="question">5 × 6 = ?</div>
+        <canvas id="gameCanvas" width="600" height="400"></canvas>
+        <div id="gameOver">Game Over!<br><span id="finalScore"></span></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const scoreElement = document.getElementById('score');
+            const streakElement = document.getElementById('streak');
+            const questionElement = document.getElementById('question');
+            const gameOverElement = document.getElementById('gameOver');
+            const finalScoreElement = document.getElementById('finalScore');
+
+            const GRID_SIZE = 20;
+            const GAME_SPEED = 150;
+            let score = 0;
+            let streak = 0;
+            let currentQuestion = null;
+            let answers = [];
+
+            function createSVGSprite(type) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("width", "20");
+                svg.setAttribute("height", "20");
+                svg.setAttribute("viewBox", "0 0 20 20");
+
+                let path = "";
+                let fill = "";
+                
+                switch(type) {
+                    case 'head':
+                        path = `M 10 2 C 14 2, 18 6, 18 10 C 18 14, 14 18, 10 18 C 6 18, 2 14, 2 10 C 2 6, 6 2, 10 2 Z M 6 8 A 1 1 0 1 1 6 10 A 1 1 0 1 1 6 8 M 14 8 A 1 1 0 1 1 14 10 A 1 1 0 1 1 14 8`;
+                        fill = "#00FF00";
+                        break;
+                    case 'body':
+                        path = `M 2 2 C 2 2, 10 0, 18 2 C 18 2, 20 10, 18 18 C 18 18, 10 20, 2 18 C 2 18, 0 10, 2 2 Z`;
+                        fill = "#008800";
+                        break;
+                    case 'tail':
+                        path = `M 10 2 L 18 10 L 10 18 L 2 10 Z`;
+                        fill = "#006600";
+                        break;
+                }
+
+                const pathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathElement.setAttribute("d", path);
+                pathElement.setAttribute("fill", fill);
+                pathElement.setAttribute("stroke", "#000");
+                pathElement.setAttribute("stroke-width", "1");
+                svg.appendChild(pathElement);
+
+                const svgString = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                img.src = 'data:image/svg+xml;base64,' + btoa(svgString);
+                return img;
+            }
+
+            const sprites = {
+                head: createSVGSprite('head'),
+                body: createSVGSprite('body'),
+                tail: createSVGSprite('tail')
+            };
+
+            let snake = [
+                {x: 15, y: 10, angle: 0},
+                {x: 14, y: 10, angle: 0},
+                {x: 13, y: 10, angle: 0}
+            ];
+            let direction = 'right';
+            let gameRunning = true;
+
+            function createMathProblem() {
+                const num1 = Math.floor(Math.random() * 10) + 1;
+                const num2 = Math.floor(Math.random() * 10) + 1;
+                const correctAnswer = num1 * num2;
+                
+                let wrongAnswer;
+                do {
+                    const variation = Math.floor(Math.random() * 5) + 1;
+                    wrongAnswer = Math.random() < 0.5 ? 
+                        correctAnswer + variation : 
+                        correctAnswer - variation;
+                } while (wrongAnswer <= 0 || wrongAnswer === correctAnswer);
+
+                currentQuestion = {
+                    text: `${num1} × ${num2} = ?`,
+                    correct: correctAnswer,
+                    wrong: wrongAnswer
+                };
+
+                questionElement.textContent = currentQuestion.text;
+                placeAnswers();
+            }
+
+            function placeAnswers() {
+                answers = [];
+                let pos1 = {
+                    x: Math.floor(Math.random() * (canvas.width / GRID_SIZE - 2)) + 1,
+                    y: Math.floor(Math.random() * (canvas.height / GRID_SIZE - 2)) + 1
+                };
+
+                let pos2;
+                do {
+                    pos2 = {
+                        x: Math.floor(Math.random() * (canvas.width / GRID_SIZE - 2)) + 1,
+                        y: Math.floor(Math.random() * (canvas.height / GRID_SIZE - 2)) + 1
+                    };
+                } while (Math.abs(pos1.x - pos2.x) < 5 || Math.abs(pos1.y - pos2.y) < 5);
+
+                if (Math.random() < 0.5) {
+                    answers = [
+                        { ...pos1, value: currentQuestion.correct, isCorrect: true },
+                        { ...pos2, value: currentQuestion.wrong, isCorrect: false }
+                    ];
+                } else {
+                    answers = [
+                        { ...pos1, value: currentQuestion.wrong, isCorrect: false },
+                        { ...pos2, value: currentQuestion.correct, isCorrect: true }
+                    ];
+                }
+            }
+
+            function getAngle(direction) {
+                switch(direction) {
+                    case 'up': return -90;
+                    case 'down': return 90;
+                    case 'left': return 180;
+                    case 'right': return 0;
+                }
+            }
+
+            function drawRotatedSprite(sprite, x, y, angle) {
+                ctx.save();
+                ctx.translate(x * GRID_SIZE + GRID_SIZE/2, y * GRID_SIZE + GRID_SIZE/2);
+                ctx.rotate(angle * Math.PI / 180);
+                ctx.drawImage(sprite, -GRID_SIZE/2, -GRID_SIZE/2, GRID_SIZE, GRID_SIZE);
+                ctx.restore();
+            }
+
+            function drawAnswer(answer) {
+                // Dibujar círculo azul neutral
+                ctx.beginPath();
+                ctx.arc(
+                    answer.x * GRID_SIZE + GRID_SIZE/2,
+                    answer.y * GRID_SIZE + GRID_SIZE/2,
+                    GRID_SIZE/2,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fillStyle = '#3498db';
+                ctx.fill();
+                ctx.strokeStyle = '#2980b9';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Dibujar número
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(
+                    answer.value,
+                    answer.x * GRID_SIZE + GRID_SIZE/2,
+                    answer.y * GRID_SIZE + GRID_SIZE/2
+                );
+            }
+
+            function checkCollision(x, y) {
+                if (x < 0 || x >= canvas.width / GRID_SIZE || 
+                    y < 0 || y >= canvas.height / GRID_SIZE) {
+                    return true;
+                }
+                return snake.slice(1).some(segment => segment.x === x && segment.y === y);
+            }
+
+            function handleAnswer(isCorrect) {
+                if (isCorrect) {
+                    score += 10;
+                    streak++;
+                } else {
+                    streak = 0;
+                    if (snake.length > 3) {
+                        snake.pop();
+                        snake.pop();
+                    } else {
+                        gameRunning = false;
+                        gameOverElement.style.display = 'block';
+                        finalScoreElement.textContent = `Final Score: ${score}\nBest Streak: ${streak}`;
+                        return;
+                    }
+                }
+                scoreElement.textContent = `Score: ${score}`;
+                streakElement.textContent = `Streak: ${streak}`;
+                createMathProblem();
+            }
+
+            function gameLoop() {
+                if (!gameRunning) return;
+
+                const head = {
+                    x: snake[0].x,
+                    y: snake[0].y,
+                    angle: getAngle(direction)
+                };
+                
+                switch(direction) {
+                    case 'up': head.y--; break;
+                    case 'down': head.y++; break;
+                    case 'left': head.x--; break;
+                    case 'right': head.x++; break;
+                }
+
+                if (checkCollision(head.x, head.y)) {
+                    gameRunning = false;
+                    gameOverElement.style.display = 'block';
+                    finalScoreElement.textContent = `Final Score: ${score}\nBest Streak: ${streak}`;
+                    return;
+                }
+
+                snake.unshift(head);
+
+                const answerHit = answers.find(a => a.x === head.x && a.y === head.y);
+                if (answerHit) {
+                    handleAnswer(answerHit.isCorrect);
+                } else {
+                    snake.pop();
+                }
+
+                for (let i = 1; i < snake.length; i++) {
+                    const prev = snake[i-1];
+                    const curr = snake[i];
+                    curr.angle = Math.atan2(prev.y - curr.y, prev.x - curr.x) * 180 / Math.PI;
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                answers.forEach(answer => drawAnswer(answer));
+
+                snake.forEach((segment, index) => {
+                    const sprite = index === 0 ? sprites.head :
+                                 index === snake.length - 1 ? sprites.tail :
+                                 sprites.body;
+                    drawRotatedSprite(sprite, segment.x, segment.y, segment.angle);
+                });
+
+                setTimeout(gameLoop, GAME_SPEED);
+            }
+
+            document.addEventListener('keydown', (event) => {
+                const newDirection = {
+                    'ArrowUp': 'up',
+                    'ArrowDown': 'down',
+                    'ArrowLeft': 'left',
+                    'ArrowRight': 'right'
+                }[event.key];
+
+                if (newDirection) {
+                    const opposites = {
+                        'up': 'down',
+                        'down': 'up',
+                        'left': 'right',
+                        'right': 'left'
+                    };
+                    
+                    if (opposites[newDirection] !== direction) {
+                        direction = newDirection;
+                    }
+                }
+            });
+
+            createMathProblem();
+            gameLoop();
+        });
+    </script>
+</body>
+</html>
