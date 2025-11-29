@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de la Deserción Escolar - Publicación Digital</title>
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes Académicas -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f1f5f9; /* Gris azulado muy suave de fondo para contraste */
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Estilos para asegurar que la imagen se vea perfecta */
+        .infographic-container {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <nav class="bg-slate-900 text-white p-4 shadow-md">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="text-sm uppercase tracking-widest font-bold text-slate-400">Actividad 2 • Reflexión Educativa</div>
+            <div class="text-sm font-light">Yeison • Estudiante</div>
+        </div>
+    </nav>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-6xl mx-auto my-10 p-4 sm:p-6 lg:p-8">
+
+        <!-- 1. ENCABEZADO DE LA PUBLICACIÓN -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4 leading-tight">
+                Análisis de la Deserción Escolar: <br>
+                <span class="text-blue-700">Tensiones y Relaciones</span>
+            </h1>
+            <p class="text-xl text-slate-600 max-w-3xl mx-auto font-light leading-relaxed">
+                Una mirada profunda a las causas estructurales, las tensiones normativas y las estrategias de transformación pedagógica para una educación inclusiva.
+            </p>
+        </header>
+
+        <!-- 2. INTRODUCCIÓN CONTEXTUAL (Texto extraído de tu trabajo para dar cuerpo a la página) -->
+        <section class="bg-white rounded-xl p-8 mb-10 shadow-sm border-l-4 border-amber-600 max-w-4xl mx-auto">
+            <h3 class="text-xl font-bold text-amber-800 mb-3 uppercase tracking-wide">Contexto del Problema</h3>
+            <p class="mb-4 leading-relaxed text-justify text-slate-700">
+                Analizar la deserción escolar implica asomarse con sensibilidad a una de las heridas más profundas del sistema educativo actual. No se trata solamente de revisar cifras frías, sino de comprender que existen proyectos de vida que quedan a mitad de camino. 
+            </p>
+            <p class="leading-relaxed text-justify text-slate-700">
+                Al observar el contexto educativo contemporáneo, resulta evidente que existen múltiples tensiones que tiran del estudiante en direcciones opuestas. Frecuentemente, el currículo parece viajar por una ruta teórica inmaculada mientras que los estudiantes transitan por un sendero de necesidades urgentes, generando un abismo profundo que termina por desmotivar incluso a quienes desean aprender.
+            </p>
+        </section>
+
+        <!-- 3. LA INFOGRAFÍA (EL NÚCLEO) -->
+        <!-- Aquí es donde se muestra tu imagen -->
+        <div class="bg-white p-4 md:p-6 rounded-2xl infographic-container border border-slate-200">
+            <div class="text-center mb-6">
+                <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Visualización Gráfica</span>
+                <h2 class="text-3xl font-bold mt-3 text-slate-900">Mapa Visual de la Problemática</h2>
+            </div>
+
+            <!-- CONTENEDOR DE IMAGEN -->
+            <div class="image-wrapper rounded-lg overflow-hidden border-2 border-slate-100">
+                <!-- 
+                     IMPORTANTE:
+                     Asegúrate de que tu archivo de imagen se llame 'unnamed.png' 
+                     y esté en la misma carpeta que este archivo HTML.
+                -->
+                <img src="unnamed.png" alt="Infografía completa sobre Deserción Escolar: Causas, Consecuencias y Soluciones" loading="lazy">
+                
+                <!-- Mensaje de respaldo por si la imagen no carga -->
+                <div class="bg-red-50 text-red-600 p-4 text-center text-sm" onerror="this.style.display='block';">
+                    <p class="font-bold">⚠️ Si no ves la imagen aquí:</p>
+                    <p>Asegúrate de que el archivo de imagen se llame exactamente <strong>unnamed.png</strong> y esté guardado en la misma carpeta que este archivo HTML.</p>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center text-sm text-slate-500 italic">
+                Figura 1. Árbol de problemas, tensiones y estrategias (ABP + DUA) para combatir la deserción. Fuente: Elaboración propia basada en MEN (2021) y Lenis-Mejía (2014).
+            </div>
+        </div>
+
+        <!-- 4. REFERENCIAS Y CRÉDITOS -->
+        <footer class="mt-12 border-t border-slate-300 pt-8 text-center md:text-left max-w-4xl mx-auto">
+            <h4 class="text-sm font-bold text-slate-900 uppercase mb-4">Referencias Bibliográficas</h4>
+            <ul class="text-sm text-slate-600 space-y-2 font-mono">
+                <li>Coral, E. (2018). <em>Aprendizaje basado en proyectos y diseño universal para el aprendizaje. Tendiendo puentes a la inclusión.</em> Revista de Educación Inclusiva.</li>
+                <li>Lenis-Mejía, J. D. (2014). <em>Estrategias y mediaciones pedagógicas. Tensiones y relaciones con el saber escolar.</em> Revista Educación y Pedagogía.</li>
+                <li>Ministerio de Educación Nacional-MEN. (2021). <em>Educación para todas las personas sin excepción.</em> Lineamientos de política para la inclusión y la equidad en educación. Bogotá.</li>
+            </ul>
+            <div class="mt-8 text-center text-xs text-slate-400">
+                &copy; 2024 - Publicación Académica Digital
+            </div>
+        </footer>
+
+    </main>
+
+</body>
+</html>
