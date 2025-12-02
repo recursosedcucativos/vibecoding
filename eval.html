@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Gestión Académica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .user-section {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .user-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .user-input-group label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .user-input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .user-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .current-user {
+            font-weight: 600;
+            color: #667eea;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+        }
+
+        .stats-bar {
+            background: #ecf0f1;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .process-section {
+            margin-bottom: 30px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .process-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .process-total {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .component-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #ecf0f1;
+            display: block;
+        }
+
+        .component-item:hover {
+            background: #f8f9fa;
+        }
+
+        .component-item:last-child {
+            border-bottom: none;
+        }
+
+        .component-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .component-name {
+            flex: 1;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .description-toggle {
+            margin-left: 10px;
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .description-toggle:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .description-panel {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+
+        .scale-description {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .scale-description .scale-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scale-description .scale-text {
+            color: #555;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rating-btn {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+
+        .rating-btn:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        .rating-btn.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.15);
+        }
+
+        .rating-btn[data-rating="1"].selected {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-color: #e74c3c;
+        }
+
+        .rating-btn[data-rating="2"].selected {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            border-color: #f39c12;
+        }
+
+        .rating-btn[data-rating="3"].selected {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border-color: #3498db;
+        }
+
+        .rating-btn[data-rating="4"].selected {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            border-color: #2ecc71;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+            color: white;
+            font-size: 1.1em;
+            padding: 18px 40px;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .btn-whatsapp:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-preview {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+        }
+
+        .btn-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .notification.info {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .modal-header h2 {
+            color: #2c3e50;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 2em;
+            cursor: pointer;
+            color: #95a5a6;
+            line-height: 0.8;
+        }
+
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+
+        .preview-text {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        @media (max-width: 768px) {
+            .component-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .rating-group {
+                width: 100%;
+                justify-content: space-around;
+            }
+        }
+
+        .whatsapp-icon {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Evaluación de Gestión Académica</h1>
+            <p>Sistema de Autoevaluación Institucional - Semana Institucional</p>
+        </div>
+
+        <div class="user-section">
+            <div class="user-input-group">
+                <label for="userName">Tu nombre:</label>
+                <input type="text" id="userName" placeholder="Ingresa tu nombre completo">
+                <div class="current-user" id="currentUser" style="display: none;">
+                    👤 <span id="displayName"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="totalComponents">19</span>
+                <span class="stat-label">Componentes</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="completedComponents">0</span>
+                <span class="stat-label">Calificados</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="progressPercentage">0%</span>
+                <span class="stat-label">Progreso</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="averageRating">0.0</span>
+                <span class="stat-label">Promedio</span>
+            </div>
+        </div>
+
+        <div class="content" id="evaluationContent">
+            <!-- Se generará dinámicamente -->
+        </div>
+
+        <div class="info-box">
+            <p><strong>📱 Instrucciones:</strong></p>
+            <p>1. Completa tu evaluación calificando cada componente</p>
+            <p>2. Haz clic en "Enviar por WhatsApp" para enviar tus resultados</p>
+            <p>3. Tus respuestas llegarán automáticamente al coordinador</p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-preview" onclick="previewMessage()">👁️ Vista Previa</button>
+            <button class="btn btn-whatsapp" id="sendBtn" onclick="sendToWhatsApp()" disabled>
+                <span class="whatsapp-icon">📱</span> Enviar por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para vista previa -->
+    <div class="modal" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <h2>👁️ Vista Previa del Mensaje</h2>
+            </div>
+            <div id="previewBody">
+                <div class="preview-text" id="previewText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de WhatsApp
+        const WHATSAPP_NUMBER = '573008460327'; // Tu número de WhatsApp
+
+        // Estructura de datos de Gestión Académica con descripciones por escala
+        const gestionAcademica = {
+            "DISEÑO PEDAGOGICO CURRICULAR": {
+                components: [
+                    {
+                        id: "1",
+                        name: "1. Plan de estudios.",
+                        scales: {
+                            1: "El Plan de estudios es un agregado de planes de área elaborados de forma aislada e individual y sin coherencia con lo estipulado al respecto en el PEI.",
+                            2: "Hay un plan de estudios institucional que cuenta con proyectos pedagógicos y contenidos transversales, y en su elaboración se tuvieron en cuenta las características del entorno, la diversidad de la población, el PEI, los lineamientos curriculares y los estándares básicos de competencias establecidos por el MEN.",
+                            3: "Se cuenta con un plan de estudios para toda la institución que, además de responder a las políticas trazadas en el PEI, los lineamientos y los estándares básicos de competencias, fundamenta los planes de aula de los docentes de todas las áreas, grados y sedes. Otorga especial importancia a la enseñanza y el aprendizaje de contenidos actitudinales, de valores y normas relacionados con las diferencias individuales, raciales, culturales, familiares, que le permitan valorar, aceptar y comprender la diversidad y la interdependencia humana.",
+                            4: "El plan de estudios es articulado y coherente. Además, cuenta con mecanismos de seguimiento y retroalimentación, a partir de los cuales se mantienen su pertinencia, relevancia y calidad."
+                        }
+                    },
+                    {
+                        id: "2",
+                        name: "2. Enfoque metodológico.",
+                        scales: {
+                            1: "La institución ha definido parcialmente un enfoque metodológico que hace explícitos los métodos de enseñanza por áreas o grados.",
+                            2: "La institución cuenta con un enfoque metodológico que hacen explícitos los acuerdos básicos relativos a métodos de enseñanza, relación pedagógica y usos de recursos que responde a las características de la diversidad de la población.",
+                            3: "Las prácticas pedagógicas de aula de los docentes de todas las áreas, grados y sedes desarrollan el enfoque metodológico común en cuanto a métodos de enseñanza flexibles, relación pedagógica y uso de recursos que respondan a la diversidad de la población.",
+                            4: "La institución evalúa periódicamente la coherencia y la articulación del enfoque metodológico con el PEI, el plan de mejoramiento y las prácticas de aula de sus docentes. Esta información es usada como base para la realización de ajustes."
+                        }
+                    },
+                    {
+                        id: "3",
+                        name: "3. Recursos para el aprendizaje.",
+                        scales: {
+                            1: "Ocasionalmente se han establecido procesos administrativos para la dotación, el uso y el mantenimiento de los recursos para el aprendizaje. Cuando existen, se aplican esporádicamente.",
+                            2: "La institución cuenta con una política de dotación, uso y mantenimiento de los recursos para el aprendizaje y hay una conexión clara entre el enfoque metodológico y los criterios administrativos.",
+                            3: "La política institucional de dotación, uso y mantenimiento de los recursos para el aprendizaje permite apoyar el trabajo académico de la diversidad de sus estudiantes y docentes.",
+                            4: "La institución evalúa periódicamente la pertinencia y funcionalidad de los procedimientos establecidos para la dotación, uso y mantenimiento de los recursos para el aprendizaje y las ajusta en función de los nuevos requerimientos."
+                        }
+                    },
+                    {
+                        id: "4",
+                        name: "4. Jornada escolar.",
+                        scales: {
+                            1: "La institución posee mecanismos aislados para ejecutar el control de las horas efectivas de clase recibidas por los estudiantes.",
+                            2: "La institución cuenta con mecanismos claros, articulados y sistemáticos para realizar el seguimiento de las horas efectivas de clase recibidas por los estudiantes.",
+                            3: "Los mecanismos para el seguimiento a las horas efectivas de clase recibidas por los estudiantes hacen parte de un sistema de mejoramiento institucional que se implementa en todas las sedes y es aplicado por los docentes.",
+                            4: "La información producida por el sistema de seguimiento al tiempo efectivo de clase retroalimenta el ciclo de mejoramiento institucional y la evaluación del desempeño de los docentes."
+                        }
+                    },
+                    {
+                        id: "5",
+                        name: "5. Evaluación.",
+                        scales: {
+                            1: "La evaluación del desempeño académico de los estudiantes responde a criterios individuales o de áreas.",
+                            2: "La institución cuenta con una política de evaluación de los desempeños académicos de los estudiantes que contempla los elementos del plan de estudios, los criterios de los docentes e integra la legislación vigente.",
+                            3: "La institución tiene una política de evaluación fundamentada en los lineamientos curriculares, los estándares básicos de competencias y el Decreto 1290 de 2009, la cual se refleja en las prácticas de los docentes.",
+                            4: "La institución revisa periódicamente la implementación de su política de evaluación tanto en cuanto a su aplicación por parte de los docentes, como en su efecto sobre la diversidad de los estudiantes, e introduce los ajustes pertinentes."
+                        }
+                    }
+                ]
+            },
+            "PRACTICAS PEDAGOGICAS": {
+                components: [
+                    {
+                        id: "6",
+                        name: "6. Opciones didácticas para las áreas, asignaturas y proyectos transversales.",
+                        scales: {
+                            1: "La institución ha definido parcialmente cuáles son las opciones didácticas que emplea. Éstas son usadas individualmente por los docentes.",
+                            2: "La institución cuenta con un enfoque metodológico y estrategias de divulgación accesibles para todos que hacen explícitos los acuerdos básicos relativos a las opciones didácticas que se emplean para las áreas, asignaturas y proyectos transversales, así como de los usos de recursos.",
+                            3: "Las prácticas pedagógicas de aula de los docentes de todas las áreas, grados y sedes se apoyan en opciones didácticas comunes y específicas para cada grupo poblacional, las que son conocidas y compartidas por los diferentes estamentos de la comunidad educativa, en concordancia con el PEI y el plan de estudios.",
+                            4: "La institución evalúa periódicamente la coherencia y la articulación de las opciones didácticas que utiliza en función del enfoque metodológico, las prácticas de aula de sus docentes, el PEI y el plan de estudios. Esta información es usada como base para la elaboración de estrategias de mejoramiento."
+                        }
+                    },
+                    {
+                        id: "7",
+                        name: "7. Estrategias para las tareas escolares.",
+                        scales: {
+                            1: "La institución reconoce que las tareas escolares tienen una gran importancia pedagógica; sin embargo, los docentes las manejan bajo criterios individuales.",
+                            2: "En algunas sedes hay algunos acuerdos básicos entre docentes y estudiantes acerca de la intencionalidad de las tareas escolares para algunos grados, niveles o áreas.",
+                            3: "La institución cuenta con una política clara sobre la intencionalidad de las tareas escolares en el afianzamiento de los aprendizajes de los estudiantes y ésta es aplicada por todos los docentes, conocida y comprendida por los estudiantes y las familias.",
+                            4: "La institución revisa y evalúa periódicamente el impacto de las tareas escolares en los aprendizajes de los estudiantes y ajusta su política en este tema."
+                        }
+                    },
+                    {
+                        id: "8",
+                        name: "8. Uso articulado de los recursos para el aprendizaje.",
+                        scales: {
+                            1: "La institución tiene una política sobre el uso de los recursos para el aprendizaje, pero ésta no está articulada con la propuesta pedagógica.",
+                            2: "La institución cuenta con una política sobre el uso de los recursos para el aprendizaje que está articulada a su propuesta pedagógica, pero ésta se aplica solamente en algunas sedes, niveles o grados.",
+                            3: "La institución tiene una política sobre el uso de los recursos para el aprendizaje que está articulada con su propuesta pedagógica. Además, ésta es aplicada por todos.",
+                            4: "La institución revisa y evalúa periódicamente la articulación entre la política sobre el uso de los recursos para el aprendizaje y su propuesta pedagógica, y realiza ajustes a la misma con base en los resultados de los estudiantes."
+                        }
+                    },
+                    {
+                        id: "9",
+                        name: "9. Uso de los tiempos para el aprendizaje.",
+                        scales: {
+                            1: "La institución tiene una política sobre el uso apropiado de los tiempos destinados a los aprendizajes, pero ésta no está articulada con las actividades pedagógicas. La organización y división del tiempo es deficiente, lo que se traduce en frecuentes improvisaciones.",
+                            2: "La institución cuenta con una política sobre el uso apropiado de los tiempos destinados a los aprendizajes, pero ésta se aplica solamente en algunas sedes, niveles o grados.",
+                            3: "La institución cuenta con una política sobre el uso apropiado de los tiempos destinados a los aprendizajes, la cual es implementada de manera flexible de acuerdo con las características y necesidades de los estudiantes. No obstante, hay pocas oportunidades para complementarlo con actividades extracurriculares y de refuerzo.",
+                            4: "La política de distribución del tiempo curricular y extracurricular es apropiada y se utiliza efectivamente. Además, la institución revisa y evalúa periódicamente el uso de los tiempos destinados a los aprendizajes, y realiza los ajustes pertinentes para que éstos sean aprovechados apropiadamente."
+                        }
+                    }
+                ]
+            },
+            "GESTION DE AULA": {
+                components: [
+                    {
+                        id: "10",
+                        name: "10. Relación pedagógica.",
+                        scales: {
+                            1: "Hay un reconocimiento de la importancia de la interacción pedagógica como un pilar del proceso educativo; sin embargo, la organización del trabajo de aula privilegia la relación unilateral con el docente.",
+                            2: "Los equipos docentes han realizado esfuerzos coordinados para apoyar el proceso de enseñanza-aprendizaje en la comunicación recíproca, las relaciones horizontales y la negociación con los estudiantes.",
+                            3: "Las prácticas pedagógicas se basan en la comunicación, la cogestión del aprendizaje y la relación afectiva y la valoración de la diversidad de los estudiantes, como elementos facilitadores del proceso de enseñanza-aprendizaje, y esto se evidencia en la organización del aula, en las relaciones recíprocas y en las estrategias de aprendizaje utilizadas.",
+                            4: "La institución hace seguimiento a las relaciones de aula, y diseña e implementa acciones de mejoramiento para contrarrestar las debilidades evidenciadas."
+                        }
+                    },
+                    {
+                        id: "11",
+                        name: "11. Planeación de clases.",
+                        scales: {
+                            1: "Los docentes cuentan con una herramienta de planeación muy general en la que se explicitan: (1) los contenidos del aprendizaje; (2) los logros; y (3) los recursos didácticos.",
+                            2: "Los planes de clases desarrollan el plan de estudios y allí se definen: (1) los contenidos del aprendizaje; (2) los logros; (3) el rol del docente y del estudiante; (4) la elección y uso de los recursos didácticos; (5) los medios, momentos y criterios para la evaluación; y (6) los estándares de referencia. Sin embargo, éstos no son aplicados en todas las sedes, niveles, áreas o grados.",
+                            3: "La planeación de clases es reconocida como la estrategia institucional que posibilita establecer y aplicar el conjunto ordenado y articulado de actividades para: (1) la consecución de un objetivo relacionado con un contenido concreto; (2) la elección de los recursos didácticos; (3) el establecimiento de unos procesos evaluativos; y (4) la definición de unos estándares de referencia. Los planes de aula establecen sistemas didácticos accesibles a todo el estudiantado, que minimizan barreras al aprendizaje y están relacionados con el diseño curricular y el enfoque metodológico.",
+                            4: "La institución revisa y evalúa periódicamente su estrategia de planeación de clases, y utiliza los resultados para implementar medidas de ajuste y mejoramiento que contribuyen a la consolidación de conjuntos articulados y ordenados de actividades para desarrollar las competencias de los estudiantes."
+                        }
+                    },
+                    {
+                        id: "12",
+                        name: "12. Estilo pedagógico.",
+                        scales: {
+                            1: "El trabajo de clase privilegia lo disciplinar como fuente exclusiva de estructuración de contenidos de enseñanza y la exposición magistral del conocimiento.",
+                            2: "En la institución se presentan esfuerzos colectivos por trabajar con estrategias alternativas a la clase magistral. Además, se tienen en cuenta los intereses, ideas y experiencias de los estudiantes como base para estructurar las actividades pedagógicas.",
+                            3: "En los estilos pedagógicos de aula se privilegian las perspectivas de docentes y estudiantes en la elección de contenidos y en las estrategias de enseñanza (proyectos, problemas, investigación en el aula, etc.) que favorecen el desarrollo de las competencias. Se caracteriza por dar a cada estudiante la oportunidad de participar en la elección de temas y estrategias de enseñanza incluyendo a quienes utilizan sistemas de comunicación alternativos.",
+                            4: "La institución realiza un seguimiento sistemático de las prácticas de aula, verifica su impacto en los aprendizajes de los estudiantes y en el desempeño de los docentes, y promueve estrategias para fortalecerlas."
+                        }
+                    },
+                    {
+                        id: "13",
+                        name: "13. Evaluación en el aula.",
+                        scales: {
+                            1: "La institución cuenta con un sistema de evaluación del rendimiento académico incompleto, que no es conocido por todos los docentes, estudiantes y padres de familia.",
+                            2: "Los mecanismos de evaluación del rendimiento académico son conocidos por la comunidad educativa, se eligen estrategias de evaluación de acuerdo con las características de la población, pero sólo se aplican ocasionalmente.",
+                            3: "El sistema de evaluación del rendimiento académico se aplica permanentemente. Se hace seguimiento a los estudiantes de bajo rendimiento, pero este no es conocido por los padres de familia.",
+                            4: "El sistema de evaluación del rendimiento académico de la institución se aplica permanentemente. Se hace seguimiento y se cuenta con un buen sistema de información. Además, la institución evalúa periódicamente este sistema y lo ajusta de acuerdo con las necesidades de la diversidad de los estudiantes."
+                        }
+                    }
+                ]
+            },
+            "SEGUIMIENTO ACADEMICO": {
+                components: [
+                    {
+                        id: "14",
+                        name: "14. Seguimiento de resultados académicos.",
+                        scales: {
+                            1: "El seguimiento que se hace a los resultados académicos de los estudiantes es aislado e individual, y no se generan acciones remediales para el logro de los objetivos.",
+                            2: "El cuerpo docente hace un seguimiento periódico y sistemático del desempeño académico de los estudiantes para diseñar acciones de apoyo a los mismos.",
+                            3: "El seguimiento sistemático de los resultados académicos cuenta con indicadores y mecanismos claros de retroalimentación para estudiantes, padres de familia y prácticas docentes.",
+                            4: "La institución revisa periódicamente su sistema de seguimiento académico y realiza los ajustes correspondientes, con el propósito de mejorarlo."
+                        }
+                    },
+                    {
+                        id: "15",
+                        name: "15. Uso pedagógico de la evaluación externa.",
+                        scales: {
+                            1: "Los resultados de las evaluaciones externas (pruebas SABER y exámenes de Estado) son conocidos por los docentes, pero éstos no se utilizan para diseñar e implementar acciones de mejoramiento.",
+                            2: "El análisis de los resultados de los estudiantes en las evaluaciones externas (pruebas SABER y exámenes de Estado) origina acciones para fortalecer los aprendizajes de los estudiantes.",
+                            3: "Las conclusiones del análisis de resultados de las pruebas censales son fuente de mejoramiento de las prácticas de aula en el marco del Plan de mejoramiento institucional.",
+                            4: "La institución hace seguimiento a la incidencia de los resultados de las evaluaciones externas en las prácticas de aula y realiza acciones correctivas para su ajuste, las cuales son establecidas en el plan de mejoramiento."
+                        }
+                    },
+                    {
+                        id: "16",
+                        name: "16. Seguimiento a la asistencia.",
+                        scales: {
+                            1: "La institución tiene algunas estrategias para controlar el ausentismo, pero éstas se aplican esporádicamente en algunas sedes, y sin indagar sus causas.",
+                            2: "La institución cuenta con una política clara para el control, análisis y tratamiento de las causas de ausentismo.",
+                            3: "La política institucional de control, análisis y tratamiento del ausentismo contempla la participación activa de padres, docentes y estudiantes.",
+                            4: "La institución revisa y evalúa periódicamente su política de control y tratamiento del ausentismo en función de los resultados de la misma, e implementa los ajustes pertinentes."
+                        }
+                    },
+                    {
+                        id: "17",
+                        name: "17. Actividades de recuperación.",
+                        scales: {
+                            1: "La institución cuenta con actividades de recuperación de los estudiantes, pero éstas han sido diseñadas a partir de criterios individuales que no garantizan el mejoramiento de los resultados.",
+                            2: "Algunas áreas o sedes han diseñado actividades articuladas de recuperación de los estudiantes y su aplicación incide parcialmente en sus resultados.",
+                            3: "Las prácticas de los docentes incorporan actividades de recuperación basadas en estrategias que tienen como finalidad ofrecer un apoyo real al desarrollo de las competencias básicas de los estudiantes y al mejoramiento de sus resultados.",
+                            4: "La institución revisa y evalúa periódicamente los efectos de las actividades de recuperación y sus mecanismos de implementación, y realiza los ajustes pertinentes, con el fin de mejorar los resultados de los estudiantes."
+                        }
+                    },
+                    {
+                        id: "18",
+                        name: "18. Apoyo pedagógico para estudiantes con dificultades de aprendizaje.",
+                        scales: {
+                            1: "Por iniciativa individual, algunos docentes se ocupan de los casos de bajo rendimiento y problemas de aprendizaje de los estudiantes.",
+                            2: "La institución cuenta con políticas y mecanismos para abordar los casos de bajo rendimiento y problemas de aprendizaje, pero no se hace seguimiento a los mismos, ni se acude a recursos externos.",
+                            3: "La institución cuenta con programas de apoyo pedagógico a los casos de bajo rendimiento académico, así como con mecanismos de seguimiento, actividades institucionales y soporte interinstitucional.",
+                            4: "La institución revisa y evalúa periódicamente los resultados de los programas de apoyo pedagógico que realiza e implementa acciones correctivas, tendientes a mejorar los resultados de los estudiantes."
+                        }
+                    },
+                    {
+                        id: "19",
+                        name: "19. Seguimiento a los egresados.",
+                        scales: {
+                            1: "La institución tiene un contacto escaso y esporádico con sus egresados y la información sobre ellos es anecdótica.",
+                            2: "La institución tiene un plan para realizar el seguimiento a sus egresados, pero la información no es sistemática, ni permite el análisis para aportar al mejoramiento institucional.",
+                            3: "La institución hace seguimiento a los egresados de manera regular, y utiliza indicadores para orientar sus acciones pedagógicas. Además, promueve su participación y organización, y cuenta con una base de datos que le permite tener información sobre su destino (estudios postsecundarios y/o vinculación al mercado laboral).",
+                            4: "La institución revisa y evalúa periódicamente su plan de seguimiento a egresados y la información que éste arroja para adecuar y mejorar la pertinencia de sus acciones, así como su capacidad de respuesta ante las necesidades y expectativas del estudiantado y su entorno."
+                        }
+                    }
+                ]
+            }
+        };
+
+        // Estado de la aplicación
+        let currentUser = '';
+        let evaluations = {};
+
+        // Inicializar la aplicación
+        function init() {
+            renderEvaluationForm();
+            loadFromLocalStorage();
+            setupUserInput();
+        }
+
+        // Configurar entrada de usuario
+        function setupUserInput() {
+            const userInput = document.getElementById('userName');
+            userInput.addEventListener('change', function() {
+                const name = this.value.trim();
+                if (name) {
+                    currentUser = name;
+                    document.getElementById('displayName').textContent = name;
+                    document.getElementById('currentUser').style.display = 'inline-block';
+                    this.style.display = 'none';
+                    updateSendButton();
+                }
+            });
+        }
+
+        // Renderizar formulario de evaluación
+        function renderEvaluationForm() {
+            const content = document.getElementById('evaluationContent');
+            let html = '';
+
+            for (const [process, data] of Object.entries(gestionAcademica)) {
+                const components = data.components;
+                html += `
+                    <div class="process-section">
+                        <div class="process-header">
+                            <span>${process}</span>
+                            <span class="process-total" id="total-${process.replace(/\s+/g, '-')}">0/${components.length}</span>
+                        </div>
+                `;
+
+                components.forEach(component => {
+                    html += `
+                        <div class="component-item">
+                            <div class="component-header">
+                                <div class="component-name">
+                                    ${component.name}
+                                    <button onclick="toggleDescription('desc-${component.id}')" class="description-toggle">
+                                        ℹ️ Ver descripciones
+                                    </button>
+                                </div>
+                                <div class="rating-group" data-component="${component.id}">
+                                    ${[1, 2, 3, 4].map(rating => `
+                                        <button class="rating-btn" data-rating="${rating}" 
+                                                onclick="selectRating('${component.id}', ${rating}, event)"
+                                                title="Escala ${rating}">
+                                            ${rating}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div id="desc-${component.id}" style="display: none;" class="description-panel">
+                                ${[1, 2, 3, 4].map(rating => `
+                                    <div class="scale-description" style="border-left: 4px solid ${getRatingColor(rating)};">
+                                        <div class="scale-title" style="color: ${getRatingColor(rating)};">
+                                            <strong>Escala ${rating}:</strong>
+                                        </div>
+                                        <div class="scale-text">
+                                            ${component.scales[rating]}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            content.innerHTML = html;
+        }
+
+        // Obtener color por rating
+        function getRatingColor(rating) {
+            const colors = {
+                1: '#e74c3c',
+                2: '#f39c12',
+                3: '#3498db',
+                4: '#2ecc71'
+            };
+            return colors[rating];
+        }
+
+        // Toggle descripción
+        function toggleDescription(id) {
+            const desc = document.getElementById(id);
+            if (desc.style.display === 'none') {
+                desc.style.display = 'block';
+            } else {
+                desc.style.display = 'none';
+            }
+        }
+
+        // Seleccionar calificación
+        function selectRating(componentId, rating, event) {
+            if (event) event.stopPropagation();
+            
+            const buttons = document.querySelectorAll(`[data-component="${componentId}"] .rating-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+
+            const selectedBtn = document.querySelector(`[data-component="${componentId}"] [data-rating="${rating}"]`);
+            selectedBtn.classList.add('selected');
+
+            evaluations[componentId] = rating;
+
+            updateStats();
+            saveToLocalStorage();
+            updateSendButton();
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const totalComponents = 19;
+            const completedComponents = Object.keys(evaluations).length;
+            const percentage = Math.round((completedComponents / totalComponents) * 100);
+            
+            let sum = 0;
+            for (const rating of Object.values(evaluations)) {
+                sum += rating;
+            }
+            const average = completedComponents > 0 ? (sum / completedComponents).toFixed(1) : 0;
+
+            document.getElementById('completedComponents').textContent = completedComponents;
+            document.getElementById('progressPercentage').textContent = percentage + '%';
+            document.getElementById('averageRating').textContent = average;
+
+            for (const [process, data] of Object.entries(gestionAcademica)) {
+                const components = data.components;
+                let completed = 0;
+                components.forEach(component => {
+                    if (evaluations[component.id]) completed++;
+                });
+                
+                const totalElement = document.getElementById(`total-${process.replace(/\s+/g, '-')}`);
+                if (totalElement) {
+                    totalElement.textContent = `${completed}/${components.length}`;
+                }
+            }
+        }
+
+        // Actualizar botón de envío
+        function updateSendButton() {
+            const sendBtn = document.getElementById('sendBtn');
+            const hasUser = currentUser.trim() !== '';
+            const hasEvaluations = Object.keys(evaluations).length > 0;
+            
+            sendBtn.disabled = !(hasUser && hasEvaluations);
+        }
+
+        // Generar mensaje comprimido para WhatsApp
+        function generateCompressedMessage() {
+            const timestamp = new Date().toISOString();
+            const date = new Date().toLocaleString('es-CO');
+            
+            // Formato comprimido: EVAL|Nombre|Fecha|Calificaciones
+            let message = `📊 EVALUACIÓN GESTIÓN ACADÉMICA\n\n`;
+            message += `👤 Evaluador: ${currentUser}\n`;
+            message += `📅 Fecha: ${date}\n\n`;
+            
+            // Agregar resumen por proceso
+            message += `📈 RESUMEN POR PROCESO:\n`;
+            for (const [process, data] of Object.entries(gestionAcademica)) {
+                const components = data.components;
+                let total = 0;
+                let count = 0;
+                
+                components.forEach(component => {
+                    if (evaluations[component.id]) {
+                        total += evaluations[component.id];
+                        count++;
+                    }
+                });
+                
+                const avg = count > 0 ? (total / count).toFixed(1) : 'N/A';
+                const processShort = process.split(' ').map(w => w[0]).join('');
+                message += `${processShort}: ${count}/${components.length} (Prom: ${avg})\n`;
+            }
+            
+            // Agregar calificaciones comprimidas
+            message += `\n🔢 CALIFICACIONES:\n`;
+            const ratings = [];
+            for (let i = 1; i <= 19; i++) {
+                ratings.push(evaluations[i.toString()] || 0);
+            }
+            message += ratings.join(',');
+            
+            // Agregar estadísticas generales
+            const completedComponents = Object.keys(evaluations).length;
+            let sum = 0;
+            for (const rating of Object.values(evaluations)) {
+                sum += rating;
+            }
+            const average = completedComponents > 0 ? (sum / completedComponents).toFixed(2) : 0;
+            
+            message += `\n\n📊 ESTADÍSTICAS:\n`;
+            message += `Total evaluado: ${completedComponents}/19\n`;
+            message += `Promedio general: ${average}\n`;
+            
+            // Agregar timestamp para identificación única
+            message += `\n🔑 ID: ${timestamp}`;
+            
+            return message;
+        }
+
+        // Vista previa del mensaje
+        function previewMessage() {
+            if (!currentUser) {
+                showNotification('Por favor ingresa tu nombre primero', 'error');
+                return;
+            }
+
+            if (Object.keys(evaluations).length === 0) {
+                showNotification('Por favor califica al menos un componente', 'error');
+                return;
+            }
+
+            const message = generateCompressedMessage();
+            document.getElementById('previewText').textContent = message;
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        // Enviar por WhatsApp
+        function sendToWhatsApp() {
+            if (!currentUser) {
+                showNotification('Por favor ingresa tu nombre primero', 'error');
+                return;
+            }
+
+            if (Object.keys(evaluations).length === 0) {
+                showNotification('Por favor califica al menos un componente', 'error');
+                return;
+            }
+
+            const message = generateCompressedMessage();
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+            
+            showNotification('Abriendo WhatsApp...', 'info');
+            
+            // Abrir WhatsApp
+            window.open(whatsappUrl, '_blank');
+            
+            // Guardar en localStorage
+            saveToLocalStorage();
+            
+            setTimeout(() => {
+                showNotification('✓ Mensaje preparado. Envíalo desde WhatsApp', 'success');
+            }, 1000);
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+
+        // Guardar en localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('currentUser', currentUser);
+            localStorage.setItem('evaluations', JSON.stringify(evaluations));
+        }
+
+        // Cargar desde localStorage
+        function loadFromLocalStorage() {
+            const savedUser = localStorage.getItem('currentUser');
+            const savedEvaluations = localStorage.getItem('evaluations');
+            
+            if (savedUser) {
+                currentUser = savedUser;
+                document.getElementById('userName').value = savedUser;
+                document.getElementById('displayName').textContent = savedUser;
+                document.getElementById('currentUser').style.display = 'inline-block';
+                document.getElementById('userName').style.display = 'none';
+            }
+
+            if (savedEvaluations) {
+                evaluations = JSON.parse(savedEvaluations);
+                
+                for (const [componentId, rating] of Object.entries(evaluations)) {
+                    const btn = document.querySelector(`[data-component="${componentId}"] [data-rating="${rating}"]`);
+                    if (btn) {
+                        btn.classList.add('selected');
+                    }
+                }
+                
+                updateStats();
+            }
+            
+            updateSendButton();
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Inicializar al cargar la página
+        window.onload = init;
+    </script>
+</body>
+</html>
