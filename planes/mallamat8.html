@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Matemáticas 8° - 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-app: #eef2f6;
+            --primary: #4338ca;
+            --font-main: 'Outfit', sans-serif;
+            
+            /* Colores */
+            --col-std: #1e40af; 
+            --col-dba: #7e22ce; 
+            --col-evi: #be185d; 
+            --col-math: #0e7490; 
+            --col-geo:  #047857; 
+            --col-stat: #c2410c; 
+            --col-gral: #334155; 
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-app);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #1e293b;
+        }
+
+        /* --- NAVEGACIÓN --- */
+        .nav-tabs {
+            position: sticky; top: 10px; z-index: 1000;
+            background: white; padding: 8px; border-radius: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; gap: 5px; margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            border: none; background: transparent; padding: 8px 20px;
+            border-radius: 25px; font-weight: 700; color: #64748b; cursor: pointer;
+            transition: all 0.2s; font-family: var(--font-main); font-size: 0.9rem;
+        }
+
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3); }
+
+        /* --- CONTENEDOR VISUAL --- */
+        .planner-container { width: 100%; max-width: 1400px; }
+
+        .planner-sheet {
+            display: none; 
+            background: white; 
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            border-radius: 12px;
+        }
+        .planner-sheet.active { display: block; }
+
+        /* --- ESTILOS INTERNOS --- */
+        .header-section {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .header-title h1 { margin: 0; font-size: 1.4rem; color: #0f172a; font-weight: 800; text-transform: uppercase; }
+        .header-title p { margin: 2px 0 0; color: #64748b; font-size: 0.85rem; }
+        
+        .meta-badges { display: flex; gap: 8px; }
+        .badge { 
+            background: #f1f5f9; color: #334155; padding: 4px 10px; 
+            border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid #cbd5e1;
+        }
+
+        .editable-name {
+            border-bottom: 1px dashed #94a3b8;
+            min-width: 150px;
+            display: inline-block;
+            color: var(--primary);
+            cursor: text;
+        }
+        .editable-name:focus { outline: none; border-bottom: 2px solid var(--primary); background: #e0e7ff; }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 35px 1fr 1fr 1fr; 
+            gap: 12px; 
+            align-items: stretch;
+        }
+
+        .sidebar-period {
+            grid-column: 1; grid-row: 1 / span 10;
+            background: linear-gradient(180deg, var(--primary) 0%, #312e81 100%);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        }
+        .sidebar-text {
+            writing-mode: vertical-rl; transform: rotate(180deg); color: white;
+            font-weight: 800; letter-spacing: 3px; font-size: 1.1rem; white-space: nowrap;
+        }
+
+        .card {
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 8px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .card-header {
+            padding: 6px 10px; color: white; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .card-body {
+            padding: 8px 10px; font-size: 0.8rem; line-height: 1.3; color: #334155;
+            flex-grow: 1; text-align: justify;
+        }
+
+        ul { margin: 0; padding-left: 14px; }
+        li { margin-bottom: 2px; }
+
+        /* Colores */
+        .bg-std { background: var(--col-std); }
+        .bg-dba { background: var(--col-dba); }
+        .bg-evi { background: var(--col-evi); }
+        .bg-math { background: var(--col-math); }
+        .bg-geo { background: var(--col-geo); }
+        .bg-stat { background: var(--col-stat); }
+        .bg-gral { background: var(--col-gral); }
+
+        /* Areas */
+        .area-std { grid-column: 2; }
+        .area-dba { grid-column: 3 / span 2; }
+        .area-evi { grid-column: 2 / span 3; }
+        .area-math { grid-column: 2; min-height: 160px; } 
+        .area-geo  { grid-column: 3; min-height: 160px; }
+        .area-stat { grid-column: 4; min-height: 160px; }
+        .area-ind { grid-column: 2; }
+        .area-act { grid-column: 3; }
+        .area-eval { grid-column: 4; }
+
+        /* Botón */
+        .float-btn {
+            position: fixed; bottom: 30px; right: 30px; background: #0f172a; color: white;
+            padding: 12px 24px; border-radius: 50px; font-weight: bold; border: none; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); display: flex; gap: 8px; align-items: center;
+            transition: transform 0.2s; z-index: 2000;
+        }
+        .float-btn:hover { transform: scale(1.05); }
+
+        /* --- ESTILOS DE IMPRESIÓN / PDF --- */
+        body.pdf-mode {
+            padding: 0;
+            background: white;
+        }
+        
+        body.pdf-mode .nav-tabs, 
+        body.pdf-mode .float-btn { display: none; }
+
+        body.pdf-mode .planner-sheet {
+            display: block !important;
+            margin: 0;
+            padding: 15px 20px; 
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            height: 195mm; 
+            overflow: hidden; 
+            page-break-after: always;
+        }
+
+        body.pdf-mode .planner-sheet:last-child {
+            page-break-after: avoid;
+        }
+
+        body.pdf-mode .header-title h1 { font-size: 1.1rem; margin-bottom: 2px; }
+        body.pdf-mode .card-body { font-size: 0.7rem; padding: 4px 6px; line-height: 1.2; }
+        body.pdf-mode .card-header { font-size: 0.6rem; padding: 3px 6px; }
+        body.pdf-mode .grid-layout { gap: 8px; }
+        body.pdf-mode .area-math, 
+        body.pdf-mode .area-geo, 
+        body.pdf-mode .area-stat { min-height: 140px; }
+        
+        body.pdf-mode .editable-name { border-bottom: none; }
+
+    </style>
+</head>
+<body>
+
+    <div class="nav-tabs" data-html2canvas-ignore="true">
+        <button class="tab-btn active" onclick="switchTab(1)">Periodo 1</button>
+        <button class="tab-btn" onclick="switchTab(2)">Periodo 2</button>
+        <button class="tab-btn" onclick="switchTab(3)">Periodo 3</button>
+        <button class="tab-btn" onclick="switchTab(4)">Periodo 4</button>
+    </div>
+
+    <button class="float-btn" onclick="downloadPDF()" data-html2canvas-ignore="true">
+        <i class="fas fa-file-pdf"></i> Descargar PDF
+    </button>
+
+    <div id="planner-container" class="planner-container">
+
+        <div class="planner-sheet active" id="sheet1">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 8° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 1</div>
+                    <div class="badge">DOCENTE: <span class="editable-name" contenteditable="true">Escribe tu nombre</span></div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period"><div class="sidebar-text">PERIODO 1</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Utilizo números reales en sus diferentes representaciones y en diversos contextos.</li>
+                            <li>Construyo expresiones algebraicas equivalentes a una expresión dada.</li>
+                            <li>Uso procesos inductivos y lenguaje algebraico para formular conjeturas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 1:</strong> Reconoce la existencia de los números irracionales y los describe de acuerdo con sus propiedades.</li>
+                            <li><strong>DBA 2:</strong> Construye representaciones, argumentos y ejemplos de propiedades de los números racionales y no racionales.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Identifica representaciones decimales y no decimales para argumentar si un número es racional o irracional.</li>
+                            <li>Ubica números irracionales en la recta numérica.</li>
+                            <li>Reconoce patrones numéricos y los describe verbalmente.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Numérico / Algebraico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 1:</strong>
+                        <ul>
+                            <li>Números Reales (R): Racionales e Irracionales.</li>
+                            <li>Operaciones en R y Notación Científica.</li>
+                            <li>Expresiones Algebraicas: Clasificación y Grado.</li>
+                            <li>Operaciones con Polinomios: Adición y Sustracción.</li>
+                            <li>Multiplicación de Polinomios.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Espacial / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Razonamiento Inductivo.</li>
+                            <li>Elementos básicos de la geometría.</li>
+                            <li>Proposiciones lógicas (Si..., entonces...).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Variacional</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Lenguaje Algebraico: De lenguaje común a simbólico.</li>
+                            <li>Valor numérico de expresiones algebraicas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Clasifica números reales.<br>
+                        - Suma y resta polinomios.<br>
+                        - Traduce enunciados a lenguaje algebraico.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Espiral de Teodoro (Irracionales).<br>
+                        - Lotería de términos semejantes.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Ubicación en recta numérica.<br>
+                        - Operaciones con polinomios.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet2">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 8° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 2</div>
+                    <div class="badge">DOCENTE: <span class="editable-name" contenteditable="true">Escribe tu nombre</span></div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #059669 0%, #064e3b 100%);"><div class="sidebar-text">PERIODO 2</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Identifico relaciones entre propiedades de las gráficas y propiedades de las ecuaciones algebraicas.</li>
+                            <li>Construyo expresiones algebraicas equivalentes (productos notables y factorización).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 9:</strong> Propone, compara y usa procedimientos inductivos y lenguaje algebraico para formular conjeturas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Reconoce patrones numéricos y los describe.</li>
+                            <li>Utiliza propiedades de los números para resolver ecuaciones.</li>
+                            <li>Opera con formas simbólicas que representan números.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Algebraico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 2:</strong>
+                        <ul>
+                            <li>Productos Notables (Cuadrado de binomio, etc.).</li>
+                            <li>Triángulo de Pascal.</li>
+                            <li>División de Polinomios.</li>
+                            <li>División Sintética.</li>
+                            <li>Cocientes Notables.</li>
+                            <li>Factorización I: Factor Común.</li>
+                            <li>Factorización II: Trinomios.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Espacial / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Ángulos y Rectas Perpendiculares.</li>
+                            <li>Rectas Paralelas y Transversales.</li>
+                            <li>Ángulos internos y externos de un triángulo.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Interpretación de tablas y gráficas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Aplica productos notables.<br>
+                        - Factoriza trinomios cuadrados perfectos.<br>
+                        - Identifica ángulos entre paralelas.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Algeblocks (Factorización geométrica).<br>
+                        - Medición de ángulos en el entorno.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Quiz de productos notables.<br>
+                        - Taller de factorización.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet3">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 8° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 3</div>
+                    <div class="badge">DOCENTE: <span class="editable-name" contenteditable="true">Escribe tu nombre</span></div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #d97706 0%, #92400e 100%);"><div class="sidebar-text">PERIODO 3</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Reconozco el uso del signo igual como relación de equivalencia.</li>
+                            <li>Aplico criterios de congruencia y semejanza entre triángulos.</li>
+                            <li>Reconozco propiedades geométricas en la demostración de teoremas básicos (Pitágoras, Tales).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 3:</strong> Reconoce los diferentes usos del signo igual y los utiliza para resolver ecuaciones.</li>
+                            <li><strong>DBA 6:</strong> Identifica relaciones de congruencia y semejanza entre formas geométricas.</li>
+                            <li><strong>DBA 7:</strong> Identifica regularidades y argumenta propiedades a partir de teoremas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Propone procedimientos para resolver una ecuación lineal.</li>
+                            <li>Utiliza criterios para argumentar la congruencia de triángulos.</li>
+                            <li>Aplica el teorema de Pitágoras y Tales en problemas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Algebraico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 3:</strong>
+                        <ul>
+                            <li>Factorización III: Diferencia de cuadrados, Cubos perfectos.</li>
+                            <li>Fracciones Algebraicas: Simplificación y Operaciones.</li>
+                            <li>Ecuaciones Lineales con una incógnita.</li>
+                            <li>Ecuaciones con fracciones algebraicas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Espacial / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Congruencia de Triángulos (LAL, ALA, LLL).</li>
+                            <li>Semejanza de Triángulos.</li>
+                            <li>Teorema de Pitágoras.</li>
+                            <li>Teorema de Tales.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Medidas de tendencia central para datos agrupados (Intro).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Factoriza completamente polinomios.<br>
+                        - Resuelve ecuaciones lineales.<br>
+                        - Aplica Pitágoras en situaciones reales.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Medición de alturas usando sombras (Tales).<br>
+                        - Rompecabezas algebraico.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Resolución de problemas de ecuaciones.<br>
+                        - Prueba de geometría.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet4">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 8° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 4</div>
+                    <div class="badge">DOCENTE: <span class="editable-name" contenteditable="true">Escribe tu nombre</span></div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #db2777 0%, #831843 100%);"><div class="sidebar-text">PERIODO 4</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Generalizo procedimientos de cálculo para hallar el área y volumen de sólidos.</li>
+                            <li>Interpreto analítica y críticamente información estadística.</li>
+                            <li>Calculo probabilidad de eventos simples.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 4:</strong> Describe atributos medibles de sólidos y explica relaciones (Volumen).</li>
+                            <li><strong>DBA 5:</strong> Utiliza estrategias para encontrar el volumen de objetos regulares e irregulares.</li>
+                            <li><strong>DBA 11:</strong> Interpreta información presentada en tablas y gráficos (datos agrupados).</li>
+                            <li><strong>DBA 12:</strong> Hace predicciones sobre eventos compuestos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Usa lenguaje algebraico para representar volumen.</li>
+                            <li>Estima y calcula volúmenes de prismas.</li>
+                            <li>Encuentra medidas de tendencia central en datos agrupados.</li>
+                            <li>Identifica el espacio muestral de un experimento.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Métrico / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 4:</strong>
+                        <ul>
+                            <li>Área y Volumen de Poliedros (Prismas, Pirámides).</li>
+                            <li>Área y Volumen de Cuerpos Redondos.</li>
+                            <li>Volumen de cuerpos irregulares.</li>
+                            <li>Relación Capacidad - Volumen.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Variacional</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Modelación de fórmulas de volumen con álgebra.</li>
+                            <li>Problemas de aplicación geométrica.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio / Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Tablas de frecuencia (Datos Agrupados).</li>
+                            <li>Medidas de Tendencia Central (Agrupados).</li>
+                            <li>Técnicas de Conteo.</li>
+                            <li>Probabilidad: Eventos simples y excluyentes.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Calcula volumen de sólidos complejos.<br>
+                        - Halla la media en datos agrupados.<br>
+                        - Usa técnicas de conteo.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Laboratorio de volumen (agua y sólidos).<br>
+                        - Encuesta final y análisis estadístico completo.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Problemas de volumen y capacidad.<br>
+                        - Proyecto estadístico.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(sheetId) {
+            document.querySelectorAll('.planner-sheet').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('sheet' + sheetId).classList.add('active');
+            document.querySelectorAll('.tab-btn')[sheetId - 1].classList.add('active');
+        }
+
+        function downloadPDF() {
+            const container = document.getElementById('planner-container');
+            const body = document.body;
+            const btn = document.querySelector('.float-btn');
+            const originalText = btn.innerHTML;
+            
+            body.classList.add('pdf-mode');
+            const sheets = document.querySelectorAll('.planner-sheet');
+            sheets.forEach(s => s.classList.add('active'));
+
+            btn.innerHTML = 'Generando...';
+
+            const opt = {
+                margin:       [5, 5, 5, 5], 
+                filename:     'Plan_Matematicas_8vo_2026.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+                jsPDF:        { unit: 'mm', format: 'legal', orientation: 'landscape' },
+                pagebreak:    { mode: 'css' } 
+            };
+
+            html2pdf().set(opt).from(container).save().then(() => {
+                body.classList.remove('pdf-mode');
+                sheets.forEach(s => s.classList.remove('active'));
+                document.getElementById('sheet1').classList.add('active');
+                btn.innerHTML = originalText;
+            });
+        }
+        
+        const nameFields = document.querySelectorAll('.editable-name');
+        nameFields.forEach(field => {
+            field.addEventListener('input', function() {
+                const val = this.innerText;
+                nameFields.forEach(f => {
+                    if(f !== this) f.innerText = val;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

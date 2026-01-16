@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner Matemáticas 1° - 2026 (Optimizado PDF)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --bg-app: #eef2f6;
+            --primary: #4338ca;
+            --font-main: 'Outfit', sans-serif;
+            
+            /* Colores */
+            --col-std: #2563eb; 
+            --col-dba: #7c3aed; 
+            --col-evi: #db2777; 
+            --col-math: #0891b2; 
+            --col-geo:  #059669; 
+            --col-stat: #d97706; 
+            --col-gral: #334155; 
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-app);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #1e293b;
+        }
+
+        /* --- NAVEGACIÓN --- */
+        .nav-tabs {
+            position: sticky; top: 10px; z-index: 1000;
+            background: white; padding: 8px; border-radius: 50px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; gap: 5px; margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            border: none; background: transparent; padding: 8px 20px;
+            border-radius: 25px; font-weight: 700; color: #64748b; cursor: pointer;
+            transition: all 0.2s; font-family: var(--font-main); font-size: 0.9rem;
+        }
+
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(67, 56, 202, 0.3); }
+
+        /* --- CONTENEDOR VISUAL --- */
+        .planner-container { width: 100%; max-width: 1400px; }
+
+        .planner-sheet {
+            display: none; 
+            background: white; 
+            width: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+            border-radius: 12px;
+        }
+        .planner-sheet.active { display: block; }
+
+        /* --- ESTILOS INTERNOS --- */
+        .header-section {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .header-title h1 { margin: 0; font-size: 1.4rem; color: #0f172a; font-weight: 800; text-transform: uppercase; }
+        .header-title p { margin: 2px 0 0; color: #64748b; font-size: 0.85rem; }
+        
+        .meta-badges { display: flex; gap: 8px; }
+        .badge { 
+            background: #f1f5f9; color: #334155; padding: 4px 10px; 
+            border-radius: 6px; font-size: 0.75rem; font-weight: 700; border: 1px solid #cbd5e1;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 35px 1fr 1fr 1fr; 
+            gap: 12px; 
+            align-items: stretch;
+        }
+
+        .sidebar-period {
+            grid-column: 1; grid-row: 1 / span 10;
+            background: linear-gradient(180deg, var(--primary) 0%, #312e81 100%);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+        }
+        .sidebar-text {
+            writing-mode: vertical-rl; transform: rotate(180deg); color: white;
+            font-weight: 800; letter-spacing: 3px; font-size: 1.1rem; white-space: nowrap;
+        }
+
+        .card {
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 8px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .card-header {
+            padding: 6px 10px; color: white; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .card-body {
+            padding: 8px 10px; font-size: 0.8rem; line-height: 1.3; color: #334155;
+            flex-grow: 1; text-align: justify;
+        }
+
+        ul { margin: 0; padding-left: 14px; }
+        li { margin-bottom: 2px; }
+
+        /* Colores */
+        .bg-std { background: var(--col-std); }
+        .bg-dba { background: var(--col-dba); }
+        .bg-evi { background: var(--col-evi); }
+        .bg-math { background: var(--col-math); }
+        .bg-geo { background: var(--col-geo); }
+        .bg-stat { background: var(--col-stat); }
+        .bg-gral { background: var(--col-gral); }
+
+        /* Areas */
+        .area-std { grid-column: 2; }
+        .area-dba { grid-column: 3 / span 2; }
+        .area-evi { grid-column: 2 / span 3; }
+        .area-math { grid-column: 2; min-height: 160px; } 
+        .area-geo  { grid-column: 3; min-height: 160px; }
+        .area-stat { grid-column: 4; min-height: 160px; }
+        .area-ind { grid-column: 2; }
+        .area-act { grid-column: 3; }
+        .area-eval { grid-column: 4; }
+
+        /* Botón */
+        .float-btn {
+            position: fixed; bottom: 30px; right: 30px; background: #0f172a; color: white;
+            padding: 12px 24px; border-radius: 50px; font-weight: bold; border: none; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); display: flex; gap: 8px; align-items: center;
+            transition: transform 0.2s; z-index: 2000;
+        }
+        .float-btn:hover { transform: scale(1.05); }
+
+        /* --- ESTILOS DE IMPRESIÓN / PDF (LÓGICA MEJORADA) --- */
+        body.pdf-mode {
+            padding: 0;
+            background: white;
+        }
+        
+        body.pdf-mode .nav-tabs, 
+        body.pdf-mode .float-btn { display: none; }
+
+        body.pdf-mode .planner-sheet {
+            display: block !important;
+            margin: 0;
+            padding: 15px 20px; 
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            height: 195mm; /* Altura controlada para Oficio sin desborde */
+            overflow: hidden; 
+            page-break-after: always;
+        }
+
+        /* Evitar hoja blanca al final */
+        body.pdf-mode .planner-sheet:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Compactar textos en PDF */
+        body.pdf-mode .header-title h1 { font-size: 1.1rem; margin-bottom: 2px; }
+        body.pdf-mode .card-body { font-size: 0.7rem; padding: 4px 6px; line-height: 1.2; }
+        body.pdf-mode .card-header { font-size: 0.6rem; padding: 3px 6px; }
+        body.pdf-mode .grid-layout { gap: 8px; }
+        body.pdf-mode .area-math, 
+        body.pdf-mode .area-geo, 
+        body.pdf-mode .area-stat { min-height: 140px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="nav-tabs" data-html2canvas-ignore="true">
+        <button class="tab-btn active" onclick="switchTab(1)">Periodo 1</button>
+        <button class="tab-btn" onclick="switchTab(2)">Periodo 2</button>
+        <button class="tab-btn" onclick="switchTab(3)">Periodo 3</button>
+        <button class="tab-btn" onclick="switchTab(4)">Periodo 4</button>
+    </div>
+
+    <button class="float-btn" onclick="downloadPDF()" data-html2canvas-ignore="true">
+        <i class="fas fa-file-pdf"></i> Descargar PDF (Corregido)
+    </button>
+
+    <div id="planner-container" class="planner-container">
+
+        <div class="planner-sheet active" id="sheet1">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 1° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 1</div>
+                    <div class="badge">DOCENTE: [Nombre]</div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period"><div class="sidebar-text">PERIODO 1</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Reconozco significados del número en diferentes contextos (medición, conteo, comparación, codificación).</li>
+                            <li>Diferencio atributos y propiedades de objetos tridimensionales.</li>
+                            <li>Clasifico y organizo datos de acuerdo a cualidades y atributos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 2:</strong> Utiliza diferentes estrategias para contar, realizar operaciones (suma y resta) y resolver problemas aditivos.</li>
+                            <li><strong>DBA 1:</strong> Identifica los usos de los números (como código, cardinal, medida) y las operaciones en contextos de juego.</li>
+                            <li><strong>DBA 10:</strong> Clasifica y organiza datos, los representa utilizando tablas de conteo y pictogramas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Realiza conteos (de 1 en 1, de 2 en 2) iniciando en cualquier número.</li>
+                            <li>Determina la cantidad de elementos agrupándolos.</li>
+                            <li>Interpreta problemas de juntar, quitar y completar.</li>
+                            <li>Organiza los datos en tablas de conteo y responde preguntas sencillas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Numérico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 1:</strong>
+                        <ul>
+                            <li>Noción de conjunto y pertenencia.</li>
+                            <li>Números del 0 al 9.</li>
+                            <li>La Decena: Números del 10 al 19.</li>
+                            <li>Orden en los números hasta 19.</li>
+                            <li>Adición y sustracción hasta 19.</li>
+                            <li>Números hasta 50 (Decenas exactas).</li>
+                            <li>Comparación de números hasta 50.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Espacial / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Relaciones espaciales: Arriba-abajo, encima-debajo.</li>
+                            <li>Lateralidad: Izquierda-derecha, delante-detrás.</li>
+                            <li>Sólidos geométricos (introducción).</li>
+                            <li>Figuras planas básicas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio / Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Recolección de datos sencillos.</li>
+                            <li>Tablas de conteo.</li>
+                            <li>Diagramas de barras horizontales.</li>
+                            <li>Pictogramas sin escala.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Reconoce números hasta 50.<br>
+                        - Realiza conteos y sumas sencillas.<br>
+                        - Participa en conteos grupales.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Juegos de tienda escolar.<br>
+                        - Uso de material concreto (tapas).<br>
+                        - Encuestas sencillas de gustos.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Participación en conteo.<br>
+                        - Escritura de números y sumas.<br>
+                        - Orden en el cuaderno.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet2">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 1° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 2</div>
+                    <div class="badge">DOCENTE: [Nombre]</div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #059669 0%, #064e3b 100%);"><div class="sidebar-text">PERIODO 2</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Describo, comparo y cuantifico situaciones con números en diferentes contextos.</li>
+                            <li>Represento el espacio circundante para establecer relaciones espaciales.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 3:</strong> Utiliza el sistema decimal para comparar y ordenar números.</li>
+                            <li><strong>DBA 6:</strong> Compara objetos del entorno (formas bidimensionales y tridimensionales).</li>
+                            <li><strong>DBA 7:</strong> Describe trayectorias y posiciones de objetos y personas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Descompone números en decenas y unidades.</li>
+                            <li>Agrupa objetos por forma y tamaño.</li>
+                            <li>Dibuja recorridos usando giros y lateralidad.</li>
+                            <li>Emplea estrategias de cálculo como 'el paso por el diez'.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Numérico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 2:</strong>
+                        <ul>
+                            <li>Números del 51 al 99.</li>
+                            <li>Comparación de números hasta 99.</li>
+                            <li>Adición hasta 99 (con y sin reagrupación).</li>
+                            <li>Sustracción hasta 99 (con y sin desagrupación).</li>
+                            <li>Patrones numéricos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Espacial / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Líneas rectas y curvas.</li>
+                            <li>Líneas horizontales y verticales.</li>
+                            <li>Desplazamientos y ubicación espacial.</li>
+                            <li>Patrones geométricos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio / Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Diagramas de barras verticales.</li>
+                            <li>Interpretación de gráficas sencillas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Maneja números hasta 99.<br>
+                        - Reconoce tipos de líneas.<br>
+                        - Realiza sumas llevando.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Laberintos y recorridos en el patio.<br>
+                        - Ábaco para decenas y unidades.<br>
+                        - Dibujo de líneas con reglas.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Sumas y restas de dos cifras.<br>
+                        - Ubicación en el plano.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet3">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 1° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 3</div>
+                    <div class="badge">DOCENTE: [Nombre]</div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #d97706 0%, #92400e 100%);"><div class="sidebar-text">PERIODO 3</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Describo situaciones de medición (duración, longitud).</li>
+                            <li>Resuelvo y formulo problemas aditivos de transformación.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 4:</strong> Reconoce atributos medibles (longitud, duración).</li>
+                            <li><strong>DBA 5:</strong> Realiza medición con unidades no estandarizadas y estandarizadas.</li>
+                            <li><strong>DBA 8:</strong> Describe situaciones de cambio y variación.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Mide longitudes con instrumentos (regla, pasos).</li>
+                            <li>Compara eventos según su duración.</li>
+                            <li>Identifica diferencias entre grupos de objetos.</li>
+                            <li>Describe secuencias numéricas y geométricas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Numérico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 3:</strong>
+                        <ul>
+                            <li>La Centena. Números hasta 999.</li>
+                            <li>Adición y sustracción hasta 999.</li>
+                            <li>Estimación de resultados.</li>
+                            <li>Resolución de problemas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Métrico / Geométrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>El Metro y el Centímetro.</li>
+                            <li>Medidas arbitrarias (pasos, cuartas).</li>
+                            <li>El Reloj y el Calendario (Días semana).</li>
+                            <li>Secuencias temporales (antes, después).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio / Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Descripción cualitativa de cambios.</li>
+                            <li>Recolección de datos sobre tiempo.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Lee la hora en reloj sencillo.<br>
+                        - Maneja números hasta 999.<br>
+                        - Usa el calendario.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Medición del salón.<br>
+                        - Elaboración de reloj de cartón.<br>
+                        - Problemas con centenas.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Práctica de medición.<br>
+                        - Lectura de hora.<br>
+                        - Operaciones con centenas.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="planner-sheet" id="sheet4">
+            <div class="header-section">
+                <div class="header-title">
+                    <h1 contenteditable="true">INSTITUCIÓN EDUCATIVA PABLO VI</h1>
+                    <p contenteditable="true">PLAN DE ÁREA: MATEMÁTICAS - GRADO 1° - 2026</p>
+                </div>
+                <div class="meta-badges">
+                    <div class="badge">PERIODO 4</div>
+                    <div class="badge">DOCENTE: [Nombre]</div>
+                </div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="sidebar-period" style="background: linear-gradient(180deg, #db2777 0%, #831843 100%);"><div class="sidebar-text">PERIODO 4</div></div>
+
+                <div class="card area-std">
+                    <div class="card-header bg-std">Estándares Básicos</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Reconozco propiedades de los números (mayor, menor) y relaciones.</li>
+                            <li>Reconozco atributos como capacidad y masa.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-dba">
+                    <div class="card-header bg-dba">Derechos Básicos (DBA)</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li><strong>DBA 9:</strong> Reconoce el signo igual como equivalencia.</li>
+                            <li><strong>DBA 1:</strong> (Refuerzo) Usos de números en contextos económicos.</li>
+                            <li><strong>DBA 5:</strong> Medición de masa y capacidad.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-evi">
+                    <div class="card-header bg-evi">Evidencias de Aprendizaje</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Propone números que satisfacen una igualdad.</li>
+                            <li>Compara objetos por peso y capacidad.</li>
+                            <li>Resuelve problemas de compra y venta sencilla.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-math">
+                    <div class="card-header bg-math">Numérico</div>
+                    <div class="card-body" contenteditable="true">
+                        <strong>Bloque 4:</strong>
+                        <ul>
+                            <li>Números hasta 10.000 (Introducción Unidad de Mil).</li>
+                            <li>Comparación de números grandes.</li>
+                            <li>Adición y sustracción complejas (repaso).</li>
+                            <li>Resolución de problemas variados.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-geo">
+                    <div class="card-header bg-geo">Métrico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Concepto de Masa (Peso).</li>
+                            <li>Concepto de Capacidad (Líquidos).</li>
+                            <li>Comparación de recipientes.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-stat">
+                    <div class="card-header bg-stat">Aleatorio / Estadístico</div>
+                    <div class="card-body" contenteditable="true">
+                        <ul>
+                            <li>Estrategia de resolución de problemas.</li>
+                            <li>Probabilidad intuitiva (seguro, posible, imposible).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card area-ind">
+                    <div class="card-header bg-gral">Indicadores</div>
+                    <div class="card-body" contenteditable="true">
+                        - Diferencia peso y volumen.<br>
+                        - Maneja miles sencillos.<br>
+                        - Resuelve igualdades simples.
+                    </div>
+                </div>
+                <div class="card area-act">
+                    <div class="card-header bg-gral">Actividades</div>
+                    <div class="card-body" contenteditable="true">
+                        - Mercadito (uso de billetes).<br>
+                        - Experimentos de llenado con agua.<br>
+                        - Uso de balanza.
+                    </div>
+                </div>
+                <div class="card area-eval">
+                    <div class="card-header bg-gral">Evaluación</div>
+                    <div class="card-body" contenteditable="true">
+                        - Resolución de problemas cotidianos.<br>
+                        - Comparación de pesos y capacidades.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchTab(sheetId) {
+            document.querySelectorAll('.planner-sheet').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('sheet' + sheetId).classList.add('active');
+            document.querySelectorAll('.tab-btn')[sheetId - 1].classList.add('active');
+        }
+
+        function downloadPDF() {
+            const container = document.getElementById('planner-container');
+            const body = document.body;
+            const btn = document.querySelector('.float-btn');
+            const originalText = btn.innerHTML;
+            
+            // 1. Activar MODO PDF
+            body.classList.add('pdf-mode');
+            
+            // Forzar que todas las hojas sean visibles
+            const sheets = document.querySelectorAll('.planner-sheet');
+            sheets.forEach(s => s.classList.add('active'));
+
+            btn.innerHTML = 'Generando...';
+
+            // 2. Configuración optimizada
+            const opt = {
+                margin:       [5, 5, 5, 5], 
+                filename:     'Plan_Matematicas_1ro_2026.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'legal', orientation: 'landscape' },
+                pagebreak:    { mode: 'css' } 
+            };
+
+            // 3. Generar
+            html2pdf().set(opt).from(container).save().then(() => {
+                // 4. Restaurar estado
+                body.classList.remove('pdf-mode');
+                sheets.forEach(s => s.classList.remove('active'));
+                document.getElementById('sheet1').classList.add('active');
+                btn.innerHTML = originalText;
+            });
+        }
+    </script>
+</body>
+</html>
