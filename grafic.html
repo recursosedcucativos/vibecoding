@@ -5,20 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tablero de Impacto - Pasantía I.E. El Cedro</title>
     
-    <!-- 1. Estilos Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 2. React y ReactDOM (Motor de la UI) - Versiones 18.2.0 -->
     <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     
-    <!-- 3. Prop-types (CRÍTICO: Debe cargarse ANTES de Recharts) -->
     <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
 
-    <!-- 4. Recharts (Librería de Gráficos) - Versión 2.12.0 (Estable para UMD) -->
     <script crossorigin src="https://unpkg.com/recharts@2.12.0/umd/Recharts.js"></script>
 
-    <!-- 5. Babel (Para entender JSX) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
@@ -28,10 +23,8 @@
 </head>
 <body>
 
-    <!-- Contenedor Raíz -->
     <div id="root"></div>
 
-    <!-- CÓDIGO REACT -->
     <script type="text/babel">
         
         // --- VALIDACIÓN DE DEPENDENCIAS ---
@@ -212,8 +205,22 @@
                             <strong>Logro clave:</strong> El mayor impacto se dio en la "Validación de Saberes", pasando de un currículo excluyente a uno que integra la memoria local.
                             </div>
                         </div>
-
                     </div>
+
+                    {/* --- NUEVA SECCIÓN: IMAGEN PNG --- */}
+                    {/* Corrección: Se usa la etiqueta img en lugar de iframe para el archivo .png */}
+                    <div className="w-full bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-8">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Análisis de Categorías (Imagen Externa)</h3>
+                        <div className="w-full h-96 flex justify-center items-center bg-gray-50 rounded-xl overflow-hidden border border-gray-200">
+                            <img 
+                                src="https://recursosedcucativos.github.io/vibecoding/categorias.png" 
+                                alt="Gráfico de Categorías"
+                                className="max-w-full max-h-full object-contain"
+                            />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-2 text-center">Fuente: recursosedcucativos.github.io</p>
+                    </div>
+                    {/* --- FIN NUEVA SECCIÓN --- */}
 
                     {/* SECCIÓN INFERIOR: GRÁFICO PIE Y LISTA DE LOGROS */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-10">
@@ -281,4 +288,5 @@
         root.render(<Dashboard />);
     </script>
 </body>
+
 </html>
