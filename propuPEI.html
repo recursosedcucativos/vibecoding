@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Institucionalización PEI 2026 - I.E. El Cedro</title>
+    
+    <!-- Tailwind CSS (Estilos) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fuentes y Estilos de Impresión -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif; /* Interfaz */
+        }
+        
+        .document-font {
+            font-family: 'Merriweather', serif; /* Simula Times New Roman / Fuente de documento */
+        }
+
+        /* Estilos específicos para impresión */
+        @media print {
+            body {
+                background: white;
+            }
+            #toolbar {
+                display: none !important;
+            }
+            #spacer {
+                display: none !important;
+            }
+            #document-container {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            /* Asegurar que los fondos y colores se impriman */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            footer {
+                position: fixed;
+                bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#f3f2f1] flex flex-col items-center py-8">
+
+    <!-- BARRA DE HERRAMIENTAS TIPO WORD -->
+    <div id="toolbar" class="fixed top-0 left-0 w-full bg-[#2b579a] text-white p-3 shadow-md z-50 flex justify-between items-center px-6">
+        <div class="flex items-center gap-3">
+            <div class="bg-white text-[#2b579a] p-1 rounded font-bold text-xs">W</div>
+            <span class="font-medium text-sm hidden sm:inline">Propuesta_Institucionalizacion_PEI_2026.docx</span>
+            <span class="bg-white/20 text-xs px-2 py-0.5 rounded ml-2">Guardado</span>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="window.print()" class="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-colors text-sm cursor-pointer">
+                <i data-lucide="printer" class="w-4 h-4"></i> Imprimir / PDF
+            </button>
+            <button class="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-colors text-sm cursor-pointer">
+                <i data-lucide="download" class="w-4 h-4"></i> Descargar
+            </button>
+        </div>
+    </div>
+
+    <!-- ESPACIO PARA LA BARRA SUPERIOR -->
+    <div id="spacer" class="h-12 w-full"></div>
+
+    <!-- PÁGINA A4 SIMULADA -->
+    <div id="document-container" class="bg-white w-full max-w-[21cm] min-h-[29.7cm] shadow-2xl my-8 px-[2.5cm] py-[2.5cm] text-black relative mx-auto box-border">
+        
+        <!-- --- ENCABEZADO / MEMBRETE --- -->
+        <header class="flex justify-between items-start mb-12 border-b-2 border-gray-200 pb-6">
+            <!-- Logo Universidad (Izquierda) -->
+            <div class="w-24 text-center">
+                 <!-- SVG Recreado del Logo Iberoamericana para nitidez -->
+                 <svg viewBox="0 0 100 100" class="w-full h-auto mb-1">
+                    <path d="M10,10 L40,10 L40,90 L10,90 Z" fill="#F4B513" />
+                    <path d="M45,10 L75,10 L75,60 L45,60 Z" fill="#333" />
+                    <circle cx="75" cy="75" r="15" fill="#333" />
+                 </svg>
+                 <p class="text-[0.55rem] font-bold leading-tight text-gray-600 uppercase font-sans">
+                   Corporación Universitaria Iberoamericana
+                 </p>
+            </div>
+
+            <!-- Título Central del Membrete -->
+            <div class="flex-1 text-center px-4 pt-2">
+                <!-- Escudo del Colegio Creado en SVG (Siempre visible) -->
+                <div class="w-16 h-16 mx-auto mb-2">
+                    <svg viewBox="0 0 100 120" class="w-full h-full drop-shadow-md">
+                        <!-- Base del escudo -->
+                        <path d="M10,10 L90,10 L90,70 C90,95 50,115 50,115 C50,115 10,95 10,70 Z" fill="#1e40af" stroke="#1e3a8a" stroke-width="2" />
+                        <!-- Borde interno -->
+                        <path d="M15,15 L85,15 L85,68 C85,90 50,108 50,108 C50,108 15,90 15,68 Z" fill="white" />
+                        <!-- Libro -->
+                        <path d="M25,50 Q50,60 75,50 L75,80 Q50,90 25,80 Z" fill="#fbbf24" stroke="#d97706" stroke-width="1" />
+                        <!-- Sol/Luz del saber -->
+                        <circle cx="50" cy="35" r="10" fill="#fbbf24" />
+                        <path d="M50,20 L50,10 M50,60 L50,50 M20,35 L10,35 M90,35 L80,35" stroke="#fbbf24" stroke-width="2" />
+                        <text x="50" y="100" font-size="8" text-anchor="middle" fill="#1e40af" font-weight="bold" font-family="sans-serif">EL CEDRO</text>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 uppercase leading-snug font-sans">
+                  INSTITUCIÓN EDUCATIVA EL CEDRO
+                </h2>
+                <p class="text-sm text-gray-600 font-semibold tracking-wide font-sans">Ayapel - Córdoba</p>
+                <p class="text-xs text-gray-500 italic mt-1 font-sans">"Ciencia, Cultura y Progreso"</p>
+            </div>
+
+            <!-- Escudo Ayapel (Derecha) -->
+            <div class="w-20 text-center flex flex-col items-center">
+                <div id="ayapel-shield-container">
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Escudo_de_Ayapel.svg/200px-Escudo_de_Ayapel.svg.png" 
+                      alt="Escudo de Ayapel" 
+                      class="w-16 h-auto object-contain drop-shadow-sm opacity-90 mb-1"
+                      onerror="handleImageError(this)"
+                    />
+                </div>
+                <p class="text-[0.55rem] font-bold text-gray-500 uppercase font-sans">Municipio de Ayapel</p>
+            </div>
+        </header>
+
+        <!-- --- CONTENIDO DEL DOCUMENTO --- -->
+        <main class="text-[11pt] leading-relaxed text-justify document-font text-gray-900">
+          
+            <!-- TÍTULO DEL DOCUMENTO -->
+            <div class="text-center mb-8">
+                <h1 class="text-xl font-bold uppercase underline decoration-2 underline-offset-4">
+                  PROPUESTA TÉCNICA DE AJUSTE AL PROYECTO EDUCATIVO INSTITUCIONAL (PEI)
+                </h1>
+            </div>
+
+            <!-- DATOS DE RADICACIÓN -->
+            <div class="mb-6 bg-gray-50 p-4 border border-gray-100 rounded-sm text-sm font-sans">
+                <div class="grid grid-cols-[120px_1fr] gap-y-2">
+                    <span class="font-bold text-gray-700">FECHA:</span>
+                    <span>Enero de 2026</span>
+                  
+                    <span class="font-bold text-gray-700">DE:</span>
+                    <span>Pasantía Maestría en Educación (Ever de Jesús Reyes Sánchez)</span>
+                  
+                    <span class="font-bold text-gray-700">PARA:</span>
+                    <span>Consejo Directivo y Comité de Convivencia Escolar</span>
+                  
+                    <span class="font-bold text-gray-700">ASUNTO:</span>
+                    <span class="font-semibold">Ruta de Institucionalización de la Estrategia "Círculos de Diálogo Intercultural" en el Cronograma Escolar 2026.</span>
+                </div>
+            </div>
+
+            <!-- SECCIONES DE TEXTO -->
+            <section class="mb-6">
+                <h3 class="font-bold text-[12pt] mb-2 uppercase text-[#2b579a] font-sans">1. Justificación del Ajuste</h3>
+                <p class="mb-4">
+                  Tras el diagnóstico y la intervención realizada durante el periodo 2025, se evidenció que las tensiones convivenciales en la I.E. El Cedro no derivan exclusivamente de problemas conductuales, sino de <strong>"cortocircuitos comunicativos"</strong> asociados a la diversidad cultural (población afrodescendiente, indígena Zenú y campesina).
+                </p>
+                <p>
+                  La estrategia piloto "Círculos de Diálogo" demostró reducir la violencia simbólica y mejorar el clima de aula. Para garantizar que estos resultados se sostengan sin la presencia permanente del pasante, es imperativo transitar de una <strong>actividad ocasional</strong> a una <strong>política institucional</strong> transversal.
+                </p>
+            </section>
+
+            <section class="mb-6">
+                <h3 class="font-bold text-[12pt] mb-2 uppercase text-[#2b579a] font-sans">2. Objetivo de la Propuesta</h3>
+                <p>
+                  Integrar formalmente la metodología de los Círculos de Diálogo Intercultural dentro del componente de <strong>Gestión de la Comunidad</strong> y el <strong>Manual de Convivencia</strong>, estableciendo una ruta operativa clara para el año lectivo 2026.
+                </p>
+            </section>
+
+            <section class="mb-6">
+                <h3 class="font-bold text-[12pt] mb-2 uppercase text-[#2b579a] font-sans">3. Alineación con el PEI Existente</h3>
+                <ul class="list-disc ml-8 space-y-1">
+                  <li><strong>Misión:</strong> Formación integral y respeto a la diversidad.</li>
+                  <li><strong>Gestión de la Comunidad:</strong> Prevención y resolución pacífica de conflictos.</li>
+                  <li><strong>Enfoque Pedagógico:</strong> Aprendizaje significativo y contextualizado.</li>
+                </ul>
+            </section>
+
+            <section class="mb-6">
+                <h3 class="font-bold text-[12pt] mb-2 uppercase text-[#2b579a] font-sans">4. Ruta Operativa de Institucionalización (2026)</h3>
+                <p class="mb-4">Para asegurar la sostenibilidad, se propone la siguiente ruta de implementación escalonada:</p>
+                
+                <div class="space-y-4 ml-2">
+                    <div class="border-l-4 border-[#2b579a] pl-4">
+                        <h4 class="font-bold text-gray-800 font-sans">FASE 1: Formalización Normativa (Enero - Semana Institucional)</h4>
+                        <p class="text-sm mt-1"><strong>Acción:</strong> Inclusión en el Manual de Convivencia como mecanismo Tipo I.</p>
+                    </div>
+                    
+                    <div class="border-l-4 border-[#2b579a] pl-4">
+                        <h4 class="font-bold text-gray-800 font-sans">FASE 2: Transferencia Metodológica (Febrero)</h4>
+                        <p class="text-sm mt-1"><strong>Acción:</strong> Socialización de la "Caja de Herramientas Interculturales" (Cartilla Digital).</p>
+                    </div>
+
+                    <div class="mt-4 overflow-hidden border border-gray-300 rounded">
+                        <table class="min-w-full text-sm text-left">
+                            <thead class="bg-[#e8ebf3] font-bold text-gray-700 font-sans">
+                                <tr>
+                                    <th class="px-4 py-2 border-r border-white">Espacio Académico</th>
+                                    <th class="px-4 py-2 border-r border-white">Frecuencia</th>
+                                    <th class="px-4 py-2 border-r border-white">Responsable</th>
+                                    <th class="px-4 py-2">Temática</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-2 border-r">Dirección de Grupo</td>
+                                    <td class="px-4 py-2 border-r">Quincenal (Viernes)</td>
+                                    <td class="px-4 py-2 border-r">Director de Grupo</td>
+                                    <td class="px-4 py-2">Convivencia y gestión emocional.</td>
+                                </tr>
+                                <tr class="bg-gray-50">
+                                    <td class="px-4 py-2 border-r">Ciencias Sociales</td>
+                                    <td class="px-4 py-2 border-r">Mensual</td>
+                                    <td class="px-4 py-2 border-r">Docentes de Área</td>
+                                    <td class="px-4 py-2">Memoria histórica, identidad cultural.</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2 border-r">Escuela de Padres</td>
+                                    <td class="px-4 py-2 border-r">Bimestral</td>
+                                    <td class="px-4 py-2 border-r">Orientación Escolar</td>
+                                    <td class="px-4 py-2">Pautas de crianza y diálogo.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-12">
+                <h3 class="font-bold text-[12pt] mb-2 uppercase text-[#2b579a] font-sans">5. Acuerdos de Compromiso</h3>
+                <p>Al aprobar esta propuesta, la <strong>Institución Educativa El Cedro</strong> se compromete a:</p>
+                <ol class="list-decimal ml-8 mt-2 space-y-1">
+                    <li>Respetar los tiempos asignados en el cronograma para los Círculos.</li>
+                    <li>Velar por el uso del material didáctico entregado.</li>
+                    <li>Mantener el enfoque restaurativo y no punitivo durante las sesiones.</li>
+                </ol>
+            </section>
+
+            <!-- FIRMAS -->
+            <div class="mt-16 grid grid-cols-2 gap-12 pt-8 font-sans">
+                <div class="text-center">
+                    <div class="border-t border-black w-3/4 mx-auto pt-2"></div>
+                    <p class="font-bold">Ever de Jesús Reyes Sánchez</p>
+                    <p class="text-sm text-gray-600">Maestrante en Educación - Pasantía</p>
+                    <p class="text-xs text-gray-500">Corporación Universitaria Iberoamericana</p>
+                </div>
+                <div class="text-center">
+                    <div class="border-t border-black w-3/4 mx-auto pt-2"></div>
+                    <p class="font-bold">Cristian Guerrero Villadiego</p>
+                    <p class="text-sm text-gray-600">Rector I.E. El Cedro</p>
+                    <p class="text-xs text-gray-500">Recibido</p>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- PIE DE PÁGINA -->
+        <footer class="absolute bottom-10 left-0 w-full px-[2.5cm] text-center text-xs text-gray-400 border-t mx-[2.5cm] pt-2 font-sans" style="width: calc(100% - 5cm);">
+          <p>Documento generado para la Socialización de Pasantía - Maestría en Educación 2026</p>
+        </footer>
+
+    </div>
+
+    <!-- Script para lógica de fallback de imagen y iconos -->
+    <script>
+        // Inicializar iconos
+        lucide.createIcons();
+
+        // Función de error para la imagen
+        function handleImageError(img) {
+            img.style.display = 'none';
+            // Crear el elemento de fallback
+            const fallback = document.createElement('span');
+            fallback.className = 'text-xs text-red-500 font-bold border border-red-300 p-1 block mt-1';
+            fallback.innerText = 'Escudo Ayapel';
+            
+            // Insertar después de la imagen oculta
+            img.parentNode.appendChild(fallback);
+        }
+    </script>
+</body>
+</html>
