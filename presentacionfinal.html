@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tesis Interactiva: Teatro e Identidad - IBERO</title>
+    
+    <!-- FUENTES -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- ICONOS -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- TAILWIND -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* --- VARIABLES Y RESET --- */
+        :root {
+            --primary: #ea580c;
+            --secondary: #0d9488;
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-dark: rgba(255, 255, 255, 0.5);
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #e2e8f0;
+            height: 100vh; width: 100vw;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; }
+
+        /* --- FONDO ANIMADO AURORA (MEJORADO: MÁS MOVIMIENTO) --- */
+        .aurora-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(45deg, #ffedd5 0%, #ffdecb 100%); /* Fondo base más cálido */
+            z-index: -2; overflow: hidden;
+        }
+        .aurora-blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.7; /* Más opacidad para más color */
+            mix-blend-mode: multiply; /* Mezcla de colores más rica */
+            animation: floatBlob 15s infinite alternate ease-in-out; /* Animación más fluida */
+        }
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #fb923c; animation-duration: 25s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #2dd4bf; animation-delay: -5s; animation-duration: 20s; }
+        .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #a78bfa; animation-delay: -10s; animation-duration: 22s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(30px, 20px) scale(1.1) rotate(10deg); }
+            100% { transform: translate(-20px, -30px) scale(0.95) rotate(-5deg); }
+        }
+
+        /* --- CONTENEDOR PRINCIPAL --- */
+        .main-container {
+            width: 95%; height: 95%; max-width: 1600px;
+            background: var(--glass);
+            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); /* Más blur */
+            border-radius: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            display: flex; overflow: hidden; position: relative;
+        }
+
+        /* --- SIDEBAR MEJORADO --- */
+        .sidebar {
+            width: 90px; height: 100%;
+            background: rgba(255,255,255,0.95);
+            border-right: 1px solid rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px 0;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .sidebar:hover { width: 260px; }
+        
+        .logo-box {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            border-radius: 16px; color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 24px; margin-bottom: 10px;
+            flex-shrink: 0; box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.3);
+            animation: pulseLogo 3s infinite;
+        }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        .menu-label {
+            font-size: 10px; font-weight: 800; color: #94a3b8;
+            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .expand-hint {
+            position: absolute; top: 50%; right: -12px;
+            width: 24px; height: 24px;
+            background: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: #ea580c;
+            animation: bounceRight 2s infinite; cursor: pointer;
+        }
+        @keyframes bounceRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(5px); }
+        }
+        .sidebar:hover .expand-hint { opacity: 0; pointer-events: none; }
+
+        .nav-btn {
+            width: 90%; padding: 12px; margin: 4px 0;
+            border-radius: 12px; display: flex; align-items: center;
+            color: #64748b; cursor: pointer; transition: all 0.3s ease;
+            border: none; background: transparent; overflow: hidden; white-space: nowrap; position: relative;
+        }
+        .nav-btn:hover, .nav-btn.active { background: #fff7ed; color: #ea580c; transform: translateX(5px); }
+        .nav-btn i { min-width: 24px; margin: 0 14px; transition: transform 0.2s; }
+        .nav-btn:hover i { transform: scale(1.1); }
+        .nav-text { opacity: 0; transition: opacity 0.2s; font-weight: 600; font-size: 14px; }
+        .sidebar:hover .nav-text { opacity: 1; }
+        
+        .active-indicator {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 4px; height: 0; background: #ea580c;
+            border-radius: 0 4px 4px 0; transition: height 0.3s;
+        }
+        .nav-btn.active .active-indicator { height: 70%; }
+
+        /* --- SLIDES & ANIMACIONES AVANZADAS --- */
+        .content-area { flex: 1; position: relative; overflow: hidden; background: rgba(255,255,255,0.4); }
+
+        .slide {
+            display: none; width: 100%; height: 100%;
+            flex-direction: column; overflow-y: auto; padding: 0;
+        }
+        
+        /* TRANSICIÓN ENTRE SLIDES */
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .slide.active { 
+            display: flex; 
+            animation: slideFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Clases de animación interna */
+        .anim-pop { opacity: 0; transform: scale(0.9) translateY(20px); transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .active .anim-pop { opacity: 1; transform: scale(1) translateY(0); }
+
+        .anim-slide-r { opacity: 0; transform: translateX(-50px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .active .anim-slide-r { opacity: 1; transform: translateX(0); }
+
+        .d-1 { transition-delay: 0.1s; }
+        .d-2 { transition-delay: 0.2s; }
+        .d-3 { transition-delay: 0.3s; }
+        .d-4 { transition-delay: 0.4s; }
+        .d-5 { transition-delay: 0.5s; }
+
+        .chart-bar { width: 0%; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
+
+        .float-img { animation: floatImage 6s ease-in-out infinite; }
+        @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- COMPONENTES --- */
+        .hero-title { font-size: 4rem; line-height: 1.1; font-weight: 900; color: #1e293b; margin-bottom: 20px; }
+        @media (min-width: 1024px) { .hero-title { font-size: 5rem; } }
+        
+        .gradient-text { 
+            background: linear-gradient(to right, #ea580c, #db2777); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-size: 200% auto;
+            animation: shineText 5s linear infinite;
+        }
+        @keyframes shineText { to { background-position: 200% center; } }
+
+        .ref-card {
+            background: white; padding: 2rem; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; border-bottom: 5px solid transparent;
+            position: relative; overflow: hidden;
+        }
+        .ref-card:hover { transform: translateY(-15px) scale(1.03); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+        
+        /* Efecto de brillo en cards */
+        .ref-card::after {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: 0.5s;
+        }
+        .ref-card:hover::after { left: 100%; }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: white; padding: 2.5rem; border-radius: 24px;
+            width: 90%; max-width: 700px;
+            max-height: 90vh; overflow-y: auto;
+            transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
+
+        /* --- NAVEGACIÓN FLOTANTE --- */
+        .nav-controls {
+            position: absolute; bottom: 30px; right: 30px; z-index: 60;
+            display: flex; gap: 10px;
+        }
+        .control-btn {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: white; color: #64748b;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .control-btn:hover { background: #ea580c; color: white; transform: scale(1.15) rotate(5deg); box-shadow: 0 10px 25px rgba(234, 88, 12, 0.4); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+    <!-- FONDO AURORA -->
+    <div class="aurora-bg">
+        <div class="aurora-blob blob-1"></div>
+        <div class="aurora-blob blob-2"></div>
+        <div class="aurora-blob blob-3"></div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="logo-box">IB</div>
+            <div class="menu-label">MENÚ</div>
+            
+            <div class="expand-hint">
+                <i data-lucide="chevron-right"></i>
+            </div>
+
+            <button onclick="goToSlide(0)" class="nav-btn active" data-id="0">
+                <div class="active-indicator"></div>
+                <i data-lucide="home"></i> <span class="nav-text">Portada</span>
+            </button>
+            <button onclick="goToSlide(1)" class="nav-btn" data-id="1">
+                <div class="active-indicator"></div>
+                <i data-lucide="alert-triangle"></i> <span class="nav-text">Conflicto</span>
+            </button>
+            <button onclick="goToSlide(2)" class="nav-btn" data-id="2">
+                <div class="active-indicator"></div>
+                <i data-lucide="book-open"></i> <span class="nav-text">Teoría</span>
+            </button>
+            <button onclick="goToSlide(3)" class="nav-btn" data-id="3">
+                <div class="active-indicator"></div>
+                <i data-lucide="git-branch"></i> <span class="nav-text">Ruta IAP</span>
+            </button>
+            <button onclick="goToSlide(4)" class="nav-btn" data-id="4">
+                <div class="active-indicator"></div>
+                <i data-lucide="bar-chart-2"></i> <span class="nav-text">Hallazgos</span>
+            </button>
+            <button onclick="goToSlide(5)" class="nav-btn" data-id="5">
+                <div class="active-indicator"></div>
+                <i data-lucide="image"></i> <span class="nav-text">Evidencias</span>
+            </button>
+            <button onclick="goToSlide(6)" class="nav-btn" data-id="6">
+                <div class="active-indicator"></div>
+                <i data-lucide="map"></i> <span class="nav-text">Hoja de Ruta</span>
+            </button>
+            <button onclick="goToSlide(7)" class="nav-btn" data-id="7">
+                <div class="active-indicator"></div>
+                <i data-lucide="list"></i> <span class="nav-text">Referentes</span>
+            </button>
+
+            <div style="margin-top: auto; padding: 20px; text-align: center; opacity: 0.5;">
+                <small style="font-weight: bold; text-transform: uppercase; font-size: 10px;">Maestría Educación</small>
+            </div>
+        </nav>
+
+        <!-- ÁREA DE CONTENIDO -->
+        <main class="content-area">
+            
+            <!-- Barra de Progreso -->
+            <div style="position: absolute; top: 0; left: 0; height: 6px; width: 100%; z-index: 100;">
+                <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #ea580c, #db2777); width: 12%; transition: width 0.5s; box-shadow: 0 0 10px rgba(234, 88, 12, 0.5);"></div>
+            </div>
+
+            <!-- CONTROLES FLOTANTES DE NAVEGACIÓN -->
+            <div class="nav-controls">
+                <button onclick="prevSlide()" class="control-btn" title="Anterior">
+                    <i data-lucide="chevron-left"></i>
+                </button>
+                <button onclick="nextSlide()" class="control-btn" title="Siguiente">
+                    <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- SLIDE 0: PORTADA -->
+            <div id="slide-0" class="slide active">
+                <div class="w-full h-full flex flex-col items-center justify-center text-center p-8 relative">
+                    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ea580c 1px, transparent 1px); background-size: 30px 30px;"></div>
+                    
+                    <div class="anim-pop d-1 mb-8">
+                        <div class="bg-white/90 p-6 rounded-2xl shadow-xl inline-block backdrop-blur-sm border border-white/50 hover:scale-110 transition-transform duration-500">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYLWHh-TE6EEvELClXilNNWBNTED2V2DP-DkeDHbF9aDTp4Fc5QQ&s&ec=121507574" alt="Logo IBERO" style="height: 80px; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <!-- AUDITORÍA: Subtítulo específico añadido del PDF -->
+                    <h1 class="hero-title anim-pop d-2">
+                        Teatro e <br>
+                        <span class="gradient-text">Identidad Cultural</span>
+                    </h1>
+
+                    <p class="text-xl md:text-2xl text-slate-600 font-light max-w-3xl mx-auto mb-10 anim-pop d-3 leading-relaxed">
+                        Fortalecimiento de la identidad cultural caribe y reducción de la <strong>exclusión simbólica</strong> en la I.E. El Cedro.
+                    </p>
+
+                    <div class="anim-pop d-4 bg-white/70 p-6 md:p-8 rounded-3xl shadow-xl border border-white max-w-2xl w-full flex items-center gap-6 hover:bg-white/90 transition-all cursor-default hover:shadow-2xl hover:-translate-y-1">
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white flex items-center justify-center font-bold text-2xl shadow-lg shrink-0 border-4 border-slate-100">Inv</div>
+                        <div class="text-left flex-1">
+                            <h3 class="font-bold text-slate-800 text-lg leading-tight mb-1">Lic. Elías Mercado</h3>
+                            <h3 class="font-bold text-slate-800 text-lg leading-tight mb-2 opacity-70">Investigador Principal</h3>
+                            <p class="text-slate-500 text-sm m-0 border-t border-slate-200 pt-2 mt-1">Ayapel, Córdoba</p>
+                        </div>
+                        <button onclick="nextSlide()" class="w-14 h-14 bg-orange-500 rounded-full text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform shrink-0 animate-pulse">
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 1: PROBLEMA (CONTENIDO ACTUALIZADO) -->
+            <div id="slide-1" class="slide">
+                <div class="flex flex-col md:flex-row h-full">
+                    <div class="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white/60 backdrop-blur-md">
+                        <div class="anim-slide-r d-1">
+                            <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm border border-orange-200">El Conflicto</span>
+                            
+                            <!-- AUDITORÍA: Texto exacto del PDF -->
+                            <h2 class="text-4xl font-bold text-slate-800 mt-4 mb-6">Tensión Contexto vs. Aula</h2>
+                            <p class="text-lg text-slate-600 leading-relaxed mb-6 text-justify">
+                                Existe una desconexión crítica entre la <strong>riqueza cultural del entorno</strong> (tradición oral, pesca, folclor) y la <strong>pobreza de recursos educativos</strong>. 
+                                <br><br>
+                                Los estudiantes de 7° y 8° experimentan "vergüenza" de su herencia campesina, generando prácticas de <strong>exclusión simbólica</strong>.
+                            </p>
+                        </div>
+                        
+                        <div class="anim-pop d-2 bg-gradient-to-r from-orange-50 to-white p-6 rounded-xl border-l-4 border-orange-500 shadow-md hover:translate-x-2 transition-transform cursor-pointer" onclick="openModal('diagnostico')">
+                            <h3 class="text-orange-800 font-bold text-sm uppercase mb-2 flex items-center gap-2">
+                                <i data-lucide="search" size="16"></i> Diagnóstico Situacional
+                            </h3>
+                            <p class="text-xl font-serif italic text-slate-800">
+                                "¿Cómo combatir el desarraigo cultural desde el teatro pedagógico?"
+                            </p>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 relative overflow-hidden group">
+                        <!-- Imagen flotante con efecto -->
+                        <img src="https://ieelcedro.com/wp-content/uploads/2024/12/20240221_071804-1536x1152.jpg" class="w-full h-full object-cover float-img anim-pop d-3 group-hover:scale-110 transition-transform duration-1000">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                        
+                        <div class="absolute bottom-10 left-10 text-white anim-pop d-4">
+                            <p class="font-bold text-lg mb-1"><i data-lucide="map-pin" class="inline mr-1" size="18"></i> I.E. El Cedro</p>
+                            <p class="text-sm opacity-80">Zona rural de difícil acceso fluvial.</p>
+                        </div>
+
+                        <button onclick="openModal('video')" class="absolute bottom-10 right-10 bg-white/20 backdrop-blur-md text-white border border-white/50 px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2 hover:bg-orange-500 hover:border-orange-500 transition-all transform hover:scale-105">
+                            <i data-lucide="eye"></i> Ver Contexto
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: TEORÍA -->
+            <div id="slide-2" class="slide">
+                <div class="p-12 h-full flex flex-col">
+                    <h2 class="text-4xl font-bold text-slate-800 mb-2 anim-pop text-center">Cimientos Teóricos</h2>
+                    <p class="text-center text-slate-500 mb-10 anim-pop d-1">Articulación de cuerpo, emoción y memoria (Haz clic para explorar)</p>
+                    
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto w-full">
+                        
+                        <!-- Card 1: Boal -->
+                        <div class="ref-card anim-pop d-2 border-orange-500 hover:bg-orange-50 group" onclick="openModal('teoria_boal')">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i data-lucide="mic" size="120"></i>
+                            </div>
+                            <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 mb-6 transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-sm">
+                                <i data-lucide="masks" size="32"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Teatro del Oprimido</h3>
+                            <p class="text-sm font-bold text-orange-600 mb-4 uppercase tracking-wider">Augusto Boal</p>
+                            <p class="text-slate-600 text-sm leading-relaxed relative z-10">El teatro como ensayo para la revolución. El espectador se vuelve protagonista.</p>
+                            <div class="mt-4 flex items-center text-orange-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                Leer más <i data-lucide="arrow-right" size="14" class="ml-1"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Hall -->
+                        <div class="ref-card anim-pop d-3 border-teal-500 hover:bg-teal-50 group" onclick="openModal('teoria_hall')">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i data-lucide="globe" size="120"></i>
+                            </div>
+                            <div class="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center text-teal-600 mb-6 transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-sm">
+                                <i data-lucide="fingerprint" size="32"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Identidad Dinámica</h3>
+                            <p class="text-sm font-bold text-teal-600 mb-4 uppercase tracking-wider">Stuart Hall</p>
+                            <p class="text-slate-600 text-sm leading-relaxed relative z-10">La identidad no es un museo, es una producción constante. Es un "llegar a ser".</p>
+                            <div class="mt-4 flex items-center text-teal-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                Leer más <i data-lucide="arrow-right" size="14" class="ml-1"></i>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: IAP -->
+                        <div class="ref-card anim-pop d-4 border-purple-500 hover:bg-purple-50 group" onclick="openModal('teoria_iap')">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <i data-lucide="users" size="120"></i>
+                            </div>
+                            <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6 transition-transform group-hover:rotate-12 group-hover:scale-110 shadow-sm">
+                                <i data-lucide="refresh-cw" size="32"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Acción Participativa</h3>
+                            <p class="text-sm font-bold text-purple-600 mb-4 uppercase tracking-wider">Orlando Fals Borda</p>
+                            <p class="text-slate-600 text-sm leading-relaxed relative z-10">Investigar para transformar. La comunidad construye su propio conocimiento.</p>
+                            <div class="mt-4 flex items-center text-purple-500 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                Leer más <i data-lucide="arrow-right" size="14" class="ml-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: METODOLOGÍA (IAP) -->
+            <div id="slide-3" class="slide">
+                <div class="p-12 h-full flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-12 anim-slide-r">
+                        <div>
+                            <span class="text-teal-600 font-bold uppercase tracking-widest text-sm">Investigación Acción</span>
+                            <h2 class="text-4xl font-bold text-slate-800 mt-2">Ruta Metodológica</h2>
+                        </div>
+                        <button onclick="openModal('instrumentos')" class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-orange-500 hover:shadow-orange-500/30 transition-all flex items-center hover:scale-105 group">
+                            <i data-lucide="clipboard-list" class="inline w-5 h-5 mr-2 group-hover:animate-bounce"></i> Ver Instrumentos
+                        </button>
+                    </div>
+
+                    <div class="relative mt-8">
+                        <!-- Línea conectora animada -->
+                        <div class="absolute top-1/2 left-0 w-full h-3 bg-slate-200 rounded-full -z-10 anim-pop d-1 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-orange-400 via-teal-400 to-purple-400 w-full animate-pulse"></div>
+                        </div>
+                        
+                        <div class="flex justify-between gap-6">
+                            <!-- Paso 1 -->
+                            <div class="bg-white p-8 rounded-2xl shadow-xl w-1/3 text-center border-t-8 border-orange-500 anim-pop d-2 hover:-translate-y-4 transition-transform duration-500 cursor-default group relative">
+                                <div class="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold text-2xl mx-auto -mt-16 shadow-lg mb-6 border-4 border-slate-100 group-hover:scale-110 transition-transform">1</div>
+                                <h3 class="font-bold text-xl text-slate-800 mb-2">Diagnóstico</h3>
+                                <p class="text-slate-500 text-sm leading-relaxed">Entrevistas y encuestas para identificar manifestaciones de identidad.</p>
+                                <i data-lucide="search" class="absolute bottom-4 right-4 text-orange-100 w-12 h-12"></i>
+                            </div>
+                            
+                            <!-- Paso 2 -->
+                            <div class="bg-white p-8 rounded-2xl shadow-xl w-1/3 text-center border-t-8 border-teal-500 anim-pop d-3 hover:-translate-y-4 transition-transform duration-500 cursor-default group relative">
+                                <div class="w-16 h-16 bg-teal-500 text-white rounded-full flex items-center justify-center font-bold text-2xl mx-auto -mt-16 shadow-lg mb-6 border-4 border-slate-100 group-hover:scale-110 transition-transform">2</div>
+                                <h3 class="font-bold text-xl text-slate-800 mb-2">Acción</h3>
+                                <p class="text-slate-500 text-sm leading-relaxed">Laboratorio teatral: creación de guiones basados en historias familiares.</p>
+                                <i data-lucide="play-circle" class="absolute bottom-4 right-4 text-teal-100 w-12 h-12"></i>
+                            </div>
+                            
+                            <!-- Paso 3 -->
+                            <div class="bg-white p-8 rounded-2xl shadow-xl w-1/3 text-center border-t-8 border-purple-500 anim-pop d-4 hover:-translate-y-4 transition-transform duration-500 cursor-default group relative">
+                                <div class="w-16 h-16 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold text-2xl mx-auto -mt-16 shadow-lg mb-6 border-4 border-slate-100 group-hover:scale-110 transition-transform">3</div>
+                                <h3 class="font-bold text-xl text-slate-800 mb-2">Reflexión</h3>
+                                <p class="text-slate-500 text-sm leading-relaxed">Sistematización de hallazgos y codificación temática.</p>
+                                <i data-lucide="file-text" class="absolute bottom-4 right-4 text-purple-100 w-12 h-12"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: HALLAZGOS (AUDITORÍA PROFUNDA) -->
+            <div id="slide-4" class="slide">
+                <div class="p-12 h-full flex flex-col justify-center bg-white/60">
+                    <h2 class="text-4xl font-bold text-slate-800 mb-2 anim-pop">Hallazgos Principales</h2>
+                    <p class="text-slate-600 mb-8 anim-pop d-1">Resultados cualitativos de la intervención teatral:</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <!-- Columna Gráficos -->
+                        <div class="space-y-8 w-full">
+                            <div class="anim-slide-r d-1 group cursor-default">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-slate-700 flex items-center gap-2">
+                                        <i data-lucide="sun" class="text-orange-500 w-4 h-4"></i> Orgullo Caribe
+                                    </span>
+                                    <span class="font-bold text-orange-600 text-xl group-hover:scale-110 transition-transform">Alta</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-8 overflow-hidden shadow-inner relative">
+                                    <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full relative overflow-hidden" data-width="95%">
+                                        <div class="absolute inset-0 bg-white/30 w-full h-full animate-pulse opacity-20"></div>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 pl-2">Recuperación de tradiciones orales.</p>
+                            </div>
+
+                            <div class="anim-slide-r d-2 group cursor-default">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-slate-700 flex items-center gap-2">
+                                        <i data-lucide="heart" class="text-teal-500 w-4 h-4"></i> Valoración del Origen
+                                    </span>
+                                    <span class="font-bold text-teal-600 text-xl group-hover:scale-110 transition-transform">Muy Alta</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-8 overflow-hidden shadow-inner">
+                                    <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="88%"></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 pl-2">Re-evaluación positiva de la herencia campesina.</p>
+                            </div>
+
+                            <div class="anim-slide-r d-3 group cursor-default">
+                                <div class="flex justify-between mb-2">
+                                    <span class="font-bold text-slate-700 flex items-center gap-2">
+                                        <i data-lucide="users" class="text-purple-500 w-4 h-4"></i> Convivencia Escolar
+                                    </span>
+                                    <span class="font-bold text-purple-600 text-xl group-hover:scale-110 transition-transform">Mejorada</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-8 overflow-hidden shadow-inner">
+                                    <div class="chart-bar h-full bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full" data-width="80%"></div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1 pl-2">Reducción de exclusión simbólica.</p>
+                            </div>
+                        </div>
+
+                        <!-- Columna Cita Destacada (PDF) -->
+                        <div class="anim-pop d-4 bg-orange-50 border-l-8 border-orange-500 p-8 rounded-r-2xl shadow-lg relative transform hover:scale-105 transition-transform duration-300">
+                            <i data-lucide="quote" class="absolute top-4 left-4 text-orange-200 w-16 h-16 -z-0"></i>
+                            <blockquote class="relative z-10 text-xl font-serif italic text-slate-700 leading-relaxed mb-4">
+                                "Antes me daba pena decir que mi papá era pescador. En la obra de teatro, <strong>el pescador era el héroe</strong>. Ahora entiendo mi historia."
+                            </blockquote>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-300"></div>
+                                <div>
+                                    <p class="font-bold text-slate-800 text-sm">Estudiante de 8° Grado</p>
+                                    <p class="text-xs text-slate-500">Entrevista final - Grupo Focal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: EVIDENCIAS -->
+            <div id="slide-5" class="slide">
+                <div class="p-12 h-full flex flex-col">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-6 anim-pop flex items-center gap-3">
+                        <i data-lucide="camera" class="text-slate-400"></i> Evidencias Fotográficas
+                    </h2>
+                    
+                    <div class="grid grid-cols-4 grid-rows-2 gap-4 flex-1">
+                        <!-- IMAGEN GRANDE ft1 -->
+                        <div class="col-span-2 row-span-2 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-1 border border-white/50" onclick="openModal('img_ft1')">
+                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+                                <span class="text-orange-400 font-bold text-sm uppercase">Fase de Acción</span>
+                                <span class="text-white font-bold text-xl">Montaje Escénico</span>
+                            </div>
+                        </div>
+                        <!-- ft2 -->
+                        <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-2 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft2')">
+                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                             <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+                        <!-- ft3 -->
+                        <div class="col-span-1 row-span-2 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-3 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft3')">
+                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute bottom-4 left-4 bg-black/50 text-white px-2 py-1 rounded text-xs backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">Talleres</div>
+                        </div>
+                        <!-- ft4 -->
+                        <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-4 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft4')">
+                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: CONCLUSIONES (AUDITORÍA: HOJA DE RUTA) -->
+            <div id="slide-6" class="slide">
+                <div class="p-12 h-full flex flex-col justify-center items-center">
+                    <h2 class="text-5xl font-extrabold text-slate-800 mb-4 anim-pop text-center">Hoja de Ruta Institucional</h2>
+                    <p class="text-slate-500 mb-12 anim-pop d-1 text-center max-w-2xl">Recomendaciones para la sostenibilidad del proyecto (Basado en PDF):</p>
+
+                    <div class="flex flex-wrap justify-center gap-8 w-full">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-xs text-center border-t-8 border-orange-500 anim-pop d-1 hover:-translate-y-4 transition-transform duration-300 group">
+                            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-600 group-hover:rotate-180 transition-transform duration-700">
+                                <i data-lucide="building" size="32"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2 text-slate-800">1. Institucionalizar</h3>
+                            <p class="text-slate-600 text-sm">Incorporar el teatro al currículo permanente, no como evento aislado.</p>
+                        </div>
+
+                        <!-- Card 2 (Destacada) -->
+                        <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl max-w-xs text-center border-t-8 border-teal-500 anim-pop d-2 hover:-translate-y-6 transition-transform duration-300 transform scale-105 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity"></div>
+                            <div class="w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-400 group-hover:pulse">
+                                <i data-lucide="graduation-cap" size="32"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2 text-white">2. Formar</h3>
+                            <p class="text-slate-300 text-sm">Capacitar a docentes rurales en herramientas de pedagogía teatral.</p>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-xs text-center border-t-8 border-purple-500 anim-pop d-3 hover:-translate-y-4 transition-transform duration-300 group">
+                            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 group-hover:rotate-180 transition-transform duration-700">
+                                <i data-lucide="share-2" size="32"></i>
+                            </div>
+                            <h3 class="font-bold text-xl mb-2 text-slate-800">3. Replicar</h3>
+                            <p class="text-slate-600 text-sm">Adaptar el modelo exitoso a otros contextos rurales del Caribe.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12 anim-pop d-4 bg-orange-100 text-orange-800 px-6 py-2 rounded-full font-bold text-sm shadow-inner">
+                        "El teatro en la escuela rural es una herramienta vital de resistencia."
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: REFERENTES -->
+            <div id="slide-7" class="slide">
+                <div class="p-16 h-full flex flex-col justify-center items-center">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-10 border-b-4 border-orange-400 pb-2 anim-slide-r">Referencias Bibliográficas</h2>
+                    
+                    <div class="space-y-4 max-w-3xl w-full">
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-orange-500 transition-all anim-slide-r d-1 cursor-default hover:shadow-lg hover:translate-x-2">
+                            <p class="pl-4 -indent-4 text-slate-700"><strong>Boal, A. (2009).</strong> <em>La estética del oprimido</em>. Alba Editorial.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-teal-500 transition-all anim-slide-r d-2 cursor-default hover:shadow-lg hover:translate-x-2">
+                            <p class="pl-4 -indent-4 text-slate-700"><strong>Fals Borda, O. (1987).</strong> <em>Ciencia propia y colonialismo intelectual</em>. Carlos Valencia Editores.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-purple-500 transition-all anim-slide-r d-3 cursor-default hover:shadow-lg hover:translate-x-2">
+                            <p class="pl-4 -indent-4 text-slate-700"><strong>Walsh, C. (2009).</strong> <em>Interculturalidad, estado y sociedad</em>. Universidad Andina Simón Bolívar.</p>
+                        </div>
+                    </div>
+                    
+                    <button onclick="goToSlide(0)" class="mt-10 bg-slate-800 text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-500 transition-all hover:scale-105 anim-pop d-4 flex items-center gap-2">
+                        <i data-lucide="rotate-ccw" size="18"></i> Volver al Inicio
+                    </button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL (Ventana Emergente) -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-slate-800">Recurso</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full"><i data-lucide="x"></i></button>
+            </div>
+            <div id="modal-body" class="text-slate-600">
+                <!-- Contenido Dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA -->
+    <script>
+        lucide.createIcons();
+        
+        let currentSlideIndex = 0;
+        const totalSlides = 8;
+
+        function goToSlide(index) {
+            // Validar límites
+            if(index < 0) index = 0;
+            if(index >= totalSlides) index = totalSlides - 1;
+            
+            currentSlideIndex = index;
+
+            // Actualizar menú
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.id) === index);
+            });
+
+            // Cambiar Slide
+            const current = document.querySelector('.slide.active');
+            if(current) current.classList.remove('active');
+
+            const next = document.getElementById(`slide-${index}`);
+            // Pequeño truco para reiniciar animaciones: clonar y reemplazar
+            const nextClone = next.cloneNode(true);
+            next.parentNode.replaceChild(nextClone, next);
+            nextClone.classList.add('active');
+
+            // ANIMAR GRÁFICOS (Si es slide 4)
+            if(index === 4) {
+                setTimeout(() => {
+                    document.querySelectorAll('.chart-bar').forEach(bar => {
+                        bar.style.width = bar.getAttribute('data-width');
+                    });
+                }, 300);
+            }
+
+            // Barra de progreso
+            document.getElementById('progress-bar').style.width = `${((index + 1) / totalSlides) * 100}%`;
+            
+            // Re-inicializar iconos si es necesario
+            lucide.createIcons();
+        }
+
+        function nextSlide() {
+            if(currentSlideIndex < totalSlides - 1) {
+                goToSlide(currentSlideIndex + 1);
+            }
+        }
+
+        function prevSlide() {
+            if(currentSlideIndex > 0) {
+                goToSlide(currentSlideIndex - 1);
+            }
+        }
+
+        // CONTROL DEL MODAL CON CONTENIDO DEL PDF
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+
+            if(type === 'instrumentos') {
+                title.textContent = "Instrumentos de Recolección";
+                body.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4 text-left">
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <div class="flex items-center gap-2 mb-2 text-orange-600 font-bold"><i data-lucide="file-text"></i> Consentimientos</div>
+                            <p class="text-sm">Firmados por padres y acudientes, garantizando la ética de la investigación con menores.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <div class="flex items-center gap-2 mb-2 text-teal-600 font-bold"><i data-lucide="book"></i> Diarios de Campo</div>
+                            <p class="text-sm">Registro sistemático de 12 sesiones de taller teatral, observando comportamientos y lenguaje.</p>
+                        </div>
+                        <div class="col-span-2 bg-slate-50 p-4 rounded-lg">
+                            <div class="flex items-center gap-2 mb-2 text-purple-600 font-bold"><i data-lucide="users"></i> Grupos Focales</div>
+                            <p class="text-sm">Espacios de diálogo post-intervención para validar cambios en la percepción de identidad.</p>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'diagnostico') {
+                 title.textContent = "Detalle del Diagnóstico";
+                 body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <p class="bg-red-50 p-4 rounded-lg text-red-800 border-l-4 border-red-500">
+                            <strong>El Dolor:</strong> Adolescentes con debilidad en su auto-percepción cultural y búsqueda desesperada de pertenencia externa.
+                        </p>
+                        <p>Se identificó que los estudiantes ocultaban el oficio de sus padres (pesca/agricultura) por considerarlo "inferior" frente a modelos urbanos vistos en redes sociales.</p>
+                    </div>
+                 `;
+            } else if (type === 'video') {
+                title.textContent = "Contexto I.E. El Cedro";
+                body.innerHTML = `<img src="https://ieelcedro.com/wp-content/uploads/2024/12/20240221_071804-1536x1152.jpg" class="rounded-lg shadow-lg w-full mb-2"><p class="text-sm italic">Acceso limitado y entorno fluvial rico en biodiversidad.</p>`;
+            } else if (type === 'img_ft1') {
+                title.textContent = "Montaje Escénico";
+                body.innerHTML = `<img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg" class="rounded-lg shadow-lg w-full">`;
+            } else if (type === 'img_ft2') {
+                title.textContent = "Evidencia Fotográfica 2";
+                body.innerHTML = `<img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg" class="rounded-lg shadow-lg w-full">`;
+            } else if (type === 'img_ft3') {
+                title.textContent = "Evidencia Fotográfica 3";
+                body.innerHTML = `<img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg" class="rounded-lg shadow-lg w-full">`;
+            } else if (type === 'img_ft4') {
+                title.textContent = "Evidencia Fotográfica 4";
+                body.innerHTML = `<img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg" class="rounded-lg shadow-lg w-full">`;
+            } else if (type === 'teoria_boal') {
+                title.textContent = "Augusto Boal";
+                body.innerHTML = `
+                    <div class="text-left bg-orange-50 p-6 rounded-xl">
+                        <p class="mb-4"><strong>Concepto Clave: Espect-actor</strong></p>
+                        <p class="text-sm text-slate-700 mb-4">Boal democratiza el teatro. Ya no hay una barrera entre el que actúa y el que mira. En el aula rural, esto permitió que los estudiantes dejaran de ser pasivos ante su realidad y "ensayaran" formas de cambiarla en el escenario.</p>
+                        <p class="text-xs text-slate-500 italic border-t border-orange-200 pt-2">"Ser ciudadano no es vivir en sociedad, es transformarla."</p>
+                    </div>
+                `;
+            } else if (type === 'teoria_hall') {
+                title.textContent = "Stuart Hall";
+                body.innerHTML = `
+                    <div class="text-left bg-teal-50 p-6 rounded-xl">
+                        <p class="mb-4"><strong>Concepto Clave: Identidad como Producción</strong></p>
+                        <p class="text-sm text-slate-700 mb-4">Para Hall, la identidad caribe no es una pieza de museo que se rescata, sino algo que se produce. Los estudiantes no "recordaron" ser caribes, sino que *reconstruyeron* lo que significa serlo hoy, integrando lo rural con sus nuevas realidades.</p>
+                    </div>
+                `;
+            } else if (type === 'teoria_iap') {
+                title.textContent = "Orlando Fals Borda";
+                body.innerHTML = `
+                    <div class="text-left bg-purple-50 p-6 rounded-xl">
+                        <p class="mb-4"><strong>Concepto Clave: Sentipensante</strong></p>
+                        <p class="text-sm text-slate-700 mb-4">Metodología colombiana que une la razón (investigación) con el corazón (acción). Fue fundamental para que la investigación no fuera fría, sino que validara las emociones y el lenguaje local de los estudiantes.</p>
+                    </div>
+                `;
+            }
+
+            lucide.createIcons();
+            overlay.classList.add('open');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('open');
+        }
+
+        // Iniciar
+        goToSlide(0);
+    </script>
+</body>
+</html>
