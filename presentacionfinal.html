@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tesis Interactiva: Teatro e Identidad - IBERO</title>
     
-    <!-- FUENTES -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Nunito+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- ICONOS -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
@@ -21,8 +18,8 @@
         :root {
             --primary: #ea580c;
             --secondary: #0d9488;
-            --glass: rgba(255, 255, 255, 0.85);
-            --glass-dark: rgba(255, 255, 255, 0.5);
+            --glass: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
         }
 
         body {
@@ -34,69 +31,70 @@
             display: flex; justify-content: center; align-items: center;
         }
 
-        h1, h2, h3 { font-family: 'Montserrat', sans-serif; }
+        h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
 
-        /* --- FONDO ANIMADO AURORA --- */
+        /* --- FONDO ANIMADO AURORA MEJORADO --- */
         .aurora-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(45deg, #ffedd5 0%, #ffdecb 100%);
+            background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 50%, #e0f2fe 100%);
             z-index: -2; overflow: hidden;
         }
         .aurora-blob {
             position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.7;
+            filter: blur(90px); opacity: 0.6;
             mix-blend-mode: multiply;
-            animation: floatBlob 15s infinite alternate ease-in-out;
+            animation: floatBlob 20s infinite alternate ease-in-out;
         }
-        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #fb923c; animation-duration: 25s; }
-        .blob-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #2dd4bf; animation-delay: -5s; animation-duration: 20s; }
-        .blob-3 { top: 40%; left: 40%; width: 40vw; height: 40vw; background: #a78bfa; animation-delay: -10s; animation-duration: 22s; }
+        .blob-1 { top: -10%; left: -10%; width: 55vw; height: 55vw; background: #fb923c; animation-duration: 25s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 65vw; height: 65vw; background: #2dd4bf; animation-delay: -5s; animation-duration: 28s; }
+        .blob-3 { top: 30%; left: 30%; width: 45vw; height: 45vw; background: #a78bfa; animation-delay: -10s; animation-duration: 22s; }
 
         @keyframes floatBlob {
             0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(30px, 20px) scale(1.1) rotate(10deg); }
-            100% { transform: translate(-20px, -30px) scale(0.95) rotate(-5deg); }
+            50% { transform: translate(40px, 30px) scale(1.1) rotate(15deg); }
+            100% { transform: translate(-30px, -40px) scale(0.9) rotate(-5deg); }
         }
 
         /* --- CONTENEDOR PRINCIPAL --- */
         .main-container {
-            width: 95%; height: 95%; max-width: 1600px;
-            background: var(--glass);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-radius: 40px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            width: 96%; height: 96%; max-width: 1650px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border-radius: 35px;
+            box-shadow: 
+                0 20px 50px -12px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
             display: flex; overflow: hidden; position: relative;
         }
 
         /* --- SIDEBAR --- */
         .sidebar {
             width: 90px; height: 100%;
-            background: rgba(255,255,255,0.95);
-            border-right: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.85);
+            border-right: 1px solid rgba(255,255,255,0.4);
             display: flex; flex-direction: column; align-items: center;
-            padding: 20px 0;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 24px 0;
+            transition: width 0.5s cubic-bezier(0.2, 0, 0, 1);
             z-index: 50;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.05);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.03);
             position: relative;
         }
-        .sidebar:hover { width: 260px; }
+        .sidebar:hover { width: 280px; }
         
         .logo-box {
-            width: 50px; height: 50px;
-            background: linear-gradient(135deg, #ea580c, #c2410c);
-            border-radius: 16px; color: white;
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, #ea580c, #db2777);
+            border-radius: 18px; color: white;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 24px; margin-bottom: 10px;
-            flex-shrink: 0; box-shadow: 0 10px 15px -3px rgba(234, 88, 12, 0.3);
-            animation: pulseLogo 3s infinite;
+            font-weight: 900; font-size: 24px; margin-bottom: 12px;
+            flex-shrink: 0; box-shadow: 0 10px 20px -5px rgba(234, 88, 12, 0.4);
+            animation: pulseLogo 4s infinite ease-in-out;
         }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes pulseLogo { 0%, 100% { transform: scale(1); box-shadow: 0 10px 20px -5px rgba(234, 88, 12, 0.4); } 50% { transform: scale(1.05); box-shadow: 0 15px 30px -5px rgba(234, 88, 12, 0.6); } }
 
         .menu-label {
-            font-size: 10px; font-weight: 800; color: #94a3b8;
-            margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;
+            font-size: 11px; font-weight: 800; color: #94a3b8;
+            margin-bottom: 24px; text-transform: uppercase; letter-spacing: 1.5px;
         }
 
         .expand-hint {
@@ -104,36 +102,33 @@
             width: 24px; height: 24px;
             background: white; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: #ea580c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); color: #ea580c;
             animation: bounceRight 2s infinite; cursor: pointer;
+            z-index: 60;
         }
         @keyframes bounceRight {
             0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(5px); }
+            50% { transform: translateX(4px); }
         }
         .sidebar:hover .expand-hint { opacity: 0; pointer-events: none; }
 
         .nav-btn {
-            width: 90%; padding: 12px; margin: 4px 0;
-            border-radius: 12px; display: flex; align-items: center;
+            width: 88%; padding: 14px; margin: 5px 0;
+            border-radius: 16px; display: flex; align-items: center;
             color: #64748b; cursor: pointer; transition: all 0.3s ease;
             border: none; background: transparent; overflow: hidden; white-space: nowrap; position: relative;
         }
-        .nav-btn:hover, .nav-btn.active { background: #fff7ed; color: #ea580c; transform: translateX(5px); }
+        .nav-btn:hover { background: white; color: #ea580c; transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .nav-btn.active { background: #fff7ed; color: #ea580c; font-weight: 700; box-shadow: inset 0 0 0 1px #fed7aa; }
+        
         .nav-btn i { min-width: 24px; margin: 0 14px; transition: transform 0.2s; }
-        .nav-btn:hover i { transform: scale(1.1); }
-        .nav-text { opacity: 0; transition: opacity 0.2s; font-weight: 600; font-size: 14px; }
+        .nav-btn:hover i { transform: scale(1.15) rotate(5deg); }
+        
+        .nav-text { opacity: 0; transition: opacity 0.3s ease 0.1s; font-size: 15px; font-weight: 600; }
         .sidebar:hover .nav-text { opacity: 1; }
         
-        .active-indicator {
-            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 4px; height: 0; background: #ea580c;
-            border-radius: 0 4px 4px 0; transition: height 0.3s;
-        }
-        .nav-btn.active .active-indicator { height: 70%; }
-
         /* --- SLIDES & ANIMACIONES --- */
-        .content-area { flex: 1; position: relative; overflow: hidden; background: rgba(255,255,255,0.4); }
+        .content-area { flex: 1; position: relative; overflow: hidden; background: rgba(255,255,255,0.2); }
 
         .slide {
             display: none; width: 100%; height: 100%;
@@ -141,19 +136,19 @@
         }
         
         @keyframes slideFadeIn {
-            from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+            from { opacity: 0; transform: translateY(15px); filter: blur(8px); }
             to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
         .slide.active { 
             display: flex; 
-            animation: slideFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideFadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        .anim-pop { opacity: 0; transform: scale(0.9) translateY(20px); transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .anim-pop { opacity: 0; transform: scale(0.95) translateY(15px); transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .active .anim-pop { opacity: 1; transform: scale(1) translateY(0); }
 
-        .anim-slide-r { opacity: 0; transform: translateX(-50px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .anim-slide-r { opacity: 0; transform: translateX(-30px); transition: all 0.6s ease-out; }
         .active .anim-slide-r { opacity: 1; transform: translateX(0); }
 
         .d-1 { transition-delay: 0.1s; }
@@ -161,192 +156,131 @@
         .d-3 { transition-delay: 0.3s; }
         .d-4 { transition-delay: 0.4s; }
         .d-5 { transition-delay: 0.5s; }
-        .d-6 { transition-delay: 0.6s; }
 
-        .chart-bar { width: 0%; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .chart-bar { width: 0%; transition: width 1.8s cubic-bezier(0.22, 1, 0.36, 1); }
 
-        .float-img { animation: floatImage 6s ease-in-out infinite; }
-        @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .float-img { animation: floatImage 8s ease-in-out infinite; }
+        @keyframes floatImage { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
         /* --- COMPONENTES --- */
-        .hero-title { font-size: 3rem; line-height: 1.1; font-weight: 900; color: #1e293b; margin-bottom: 10px; }
-        @media (min-width: 1024px) { .hero-title { font-size: 4rem; } }
+        .hero-title { font-size: 3.5rem; line-height: 1.05; font-weight: 900; color: #1e293b; margin-bottom: 12px; letter-spacing: -1px; }
+        @media (min-width: 1280px) { .hero-title { font-size: 4.5rem; } }
         
         .gradient-text { 
-            background: linear-gradient(to right, #ea580c, #db2777); 
+            background: linear-gradient(120deg, #ea580c, #db2777, #ea580c); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             background-size: 200% auto;
-            animation: shineText 5s linear infinite;
+            animation: shineText 8s linear infinite;
         }
         @keyframes shineText { to { background-position: 200% center; } }
 
         .ref-card {
-            background: white; padding: 1.5rem; border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.8); padding: 1.8rem; border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            cursor: pointer; border-bottom: 5px solid transparent;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; height: 100%;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.6);
+            display: flex; flex-direction: column; height: 100%; position: relative;
+            overflow: hidden;
         }
-        .ref-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
+        .ref-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: white; background: white; }
         
-        .ref-card::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            transition: 0.5s;
-        }
-        .ref-card:hover::after { left: 100%; }
-
         /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px);
             z-index: 100; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
         
         .modal-content {
-            background: white; padding: 2.5rem; border-radius: 24px;
+            background: #fff; padding: 3rem; border-radius: 30px;
             width: 90%; max-width: 900px;
-            max-height: 90vh; overflow-y: auto;
-            transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.8);
+            max-height: 85vh; overflow-y: auto;
+            transform: scale(0.95) translateY(20px); transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
         .modal-overlay.open .modal-content { transform: scale(1) translateY(0); }
 
-        /* --- NAVEGACIÓN FLOTANTE --- */
+        /* --- CONTROLES --- */
         .nav-controls {
-            position: absolute; bottom: 30px; right: 30px; z-index: 60;
-            display: flex; gap: 10px;
+            position: absolute; bottom: 35px; right: 35px; z-index: 60;
+            display: flex; gap: 12px;
         }
         .control-btn {
-            width: 50px; height: 50px; border-radius: 50%;
+            width: 55px; height: 55px; border-radius: 50%;
             background: white; color: #64748b;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.8);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
             transition: all 0.3s;
         }
-        .control-btn:hover { background: #ea580c; color: white; transform: scale(1.15) rotate(5deg); box-shadow: 0 10px 25px rgba(234, 88, 12, 0.4); }
+        .control-btn:hover { background: #ea580c; color: white; transform: scale(1.1) rotate(0deg); border-color: #ea580c; box-shadow: 0 10px 25px rgba(234, 88, 12, 0.3); }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
 
         /* Timeline/Fases */
         .phase-timeline {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin: 20px 0;
+            display: flex; justify-content: space-between; position: relative; margin: 30px 0;
         }
         .phase-timeline::before {
-            content: '';
-            position: absolute;
-            top: 30px;
-            left: 10%;
-            right: 10%;
-            height: 4px;
-            background: linear-gradient(90deg, #ea580c, #0d9488, #8b5cf6);
-            border-radius: 2px;
+            content: ''; position: absolute; top: 35px; left: 8%; right: 8%; height: 6px;
+            background: linear-gradient(90deg, #ea580c 0%, #0d9488 50%, #8b5cf6 100%);
+            border-radius: 3px; opacity: 0.3;
         }
         .phase-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 1;
-            width: 20%;
+            display: flex; flex-direction: column; align-items: center; z-index: 1; width: 20%;
         }
         .phase-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 4px solid white;
+            transition: transform 0.3s;
         }
+        .phase-item:hover .phase-circle { transform: scale(1.1); }
         .phase-label {
-            margin-top: 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-align: center;
-            color: #475569;
+            margin-top: 15px; font-size: 0.8rem; font-weight: 700;
+            text-align: center; color: #475569;
         }
 
-        /* Tooltip on hover */
-        .tooltip-card {
-            position: relative;
-        }
+        /* Tooltip */
         .tooltip-card .tooltip-content {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            width: 250px;
-            text-align: left;
-            z-index: 20;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1e293b; color: white; padding: 16px; border-radius: 16px;
+            font-size: 0.85rem; width: 260px; text-align: left; z-index: 20;
+            transition: all 0.3s; box-shadow: 0 15px 35px rgba(0,0,0,0.2); pointer-events: none;
         }
-        .tooltip-card:hover .tooltip-content {
-            visibility: visible;
-            opacity: 1;
-            bottom: calc(100% + 10px);
-        }
+        .tooltip-card:hover .tooltip-content { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); bottom: calc(100% + 15px); }
         .tooltip-card .tooltip-content::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 8px solid transparent;
-            border-top-color: #1e293b;
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 8px solid transparent; border-top-color: #1e293b;
         }
 
-        /* QR Code style */
-        .qr-container {
-            background: white;
-            padding: 12px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            display: inline-block;
+        /* Estilos Metodología Específica */
+        .method-highlight {
+            position: relative; overflow: hidden;
+            transition: transform 0.3s ease;
         }
-        .qr-container img {
-            width: 120px;
-            height: 120px;
-        }
+        .method-highlight:hover { transform: translateY(-5px); }
     </style>
 </head>
 <body>
 
-    <!-- FONDO AURORA -->
     <div class="aurora-bg">
         <div class="aurora-blob blob-1"></div>
         <div class="aurora-blob blob-2"></div>
         <div class="aurora-blob blob-3"></div>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <div class="main-container">
         
-        <!-- SIDEBAR -->
         <nav class="sidebar">
             <div class="logo-box">IB</div>
             <div class="menu-label">MENÚ</div>
@@ -356,71 +290,57 @@
             </div>
 
             <button onclick="goToSlide(0)" class="nav-btn active" data-id="0">
-                <div class="active-indicator"></div>
                 <i data-lucide="home"></i> <span class="nav-text">Portada</span>
             </button>
             <button onclick="goToSlide(1)" class="nav-btn" data-id="1">
-                <div class="active-indicator"></div>
                 <i data-lucide="help-circle"></i> <span class="nav-text">Problema</span>
             </button>
             <button onclick="goToSlide(2)" class="nav-btn" data-id="2">
-                <div class="active-indicator"></div>
                 <i data-lucide="book-open"></i> <span class="nav-text">Referentes</span>
             </button>
             <button onclick="goToSlide(3)" class="nav-btn" data-id="3">
-                <div class="active-indicator"></div>
                 <i data-lucide="git-branch"></i> <span class="nav-text">Metodología</span>
             </button>
             <button onclick="goToSlide(4)" class="nav-btn" data-id="4">
-                <div class="active-indicator"></div>
                 <i data-lucide="bar-chart-2"></i> <span class="nav-text">Resultados</span>
             </button>
             <button onclick="goToSlide(5)" class="nav-btn" data-id="5">
-                <div class="active-indicator"></div>
                 <i data-lucide="image"></i> <span class="nav-text">Evidencias</span>
             </button>
             <button onclick="goToSlide(6)" class="nav-btn" data-id="6">
-                <div class="active-indicator"></div>
                 <i data-lucide="check-circle"></i> <span class="nav-text">Conclusiones</span>
             </button>
             <button onclick="goToSlide(7)" class="nav-btn" data-id="7">
-                <div class="active-indicator"></div>
                 <i data-lucide="list"></i> <span class="nav-text">Referencias</span>
             </button>
 
-            <div style="margin-top: auto; padding: 20px; text-align: center; opacity: 0.5;">
-                <small style="font-weight: bold; text-transform: uppercase; font-size: 10px;">Maestría Educación</small>
+            <div style="margin-top: auto; padding: 20px; text-align: center; opacity: 0.6;">
+                <small style="font-weight: 800; text-transform: uppercase; font-size: 9px; letter-spacing: 1px;">Maestría Educación</small>
             </div>
         </nav>
 
-        <!-- ÁREA DE CONTENIDO -->
         <main class="content-area">
             
-            <!-- Barra de Progreso -->
-            <div style="position: absolute; top: 0; left: 0; height: 6px; width: 100%; z-index: 100;">
-                <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #ea580c, #db2777); width: 12%; transition: width 0.5s; box-shadow: 0 0 10px rgba(234, 88, 12, 0.5);"></div>
+            <div style="position: absolute; top: 0; left: 0; height: 4px; width: 100%; z-index: 100;">
+                <div id="progress-bar" style="height: 100%; background: linear-gradient(90deg, #ea580c, #db2777); width: 12%; transition: width 0.5s; box-shadow: 0 0 15px rgba(234, 88, 12, 0.4);"></div>
             </div>
 
-            <!-- CONTROLES FLOTANTES -->
             <div class="nav-controls">
                 <button onclick="prevSlide()" class="control-btn" title="Anterior">
-                    <i data-lucide="chevron-left"></i>
+                    <i data-lucide="arrow-left"></i>
                 </button>
                 <button onclick="nextSlide()" class="control-btn" title="Siguiente">
-                    <i data-lucide="chevron-right"></i>
+                    <i data-lucide="arrow-right"></i>
                 </button>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 0: PORTADA -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-0" class="slide active">
                 <div class="w-full h-full flex flex-col items-center justify-center text-center p-8 relative">
-                    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ea580c 1px, transparent 1px); background-size: 30px 30px;"></div>
+                    <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#ea580c 2px, transparent 2px); background-size: 40px 40px;"></div>
                     
-                    <div class="anim-pop d-1 mb-6">
-                        <div class="bg-white/90 p-6 rounded-2xl shadow-xl inline-block backdrop-blur-sm border border-white/50 hover:scale-110 transition-transform duration-500">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYLWHh-TE6EEvELClXilNNWBNTED2V2DP-DkeDHbF9aDTp4Fc5QQ&s&ec=121507574" alt="Logo IBERO" style="height: 80px; object-fit: contain;">
+                    <div class="anim-pop d-1 mb-8">
+                        <div class="bg-white/80 p-8 rounded-3xl shadow-2xl inline-block backdrop-blur-md border border-white/60 hover:scale-105 transition-transform duration-700">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYLWHh-TE6EEvELClXilNNWBNTED2V2DP-DkeDHbF9aDTp4Fc5QQ&s&ec=121507574" alt="Logo IBERO" style="height: 90px; object-fit: contain;">
                         </div>
                     </div>
 
@@ -429,306 +349,280 @@
                         <span class="gradient-text">Identidad Cultural</span>
                     </h1>
 
-                    <p class="text-xl md:text-2xl text-slate-600 font-light max-w-3xl mx-auto mb-4 anim-pop d-3 leading-relaxed">
-                        Fortalecimiento de la identidad cultural caribe y reducción de la <strong>exclusión simbólica</strong> en una Institución Educativa Rural del municipio de Ayapel.
-                    </p>
+                    <div class="max-w-3xl mx-auto mb-8 anim-pop d-3">
+                        <p class="text-xl md:text-2xl text-slate-600 font-light leading-relaxed">
+                            Fortalecimiento de la identidad cultural caribe y reducción de la <strong class="text-slate-800 font-semibold">exclusión simbólica</strong> en una Institución Educativa Rural del municipio de Ayapel.
+                        </p>
+                    </div>
                     
-                    <p class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-6 anim-pop d-3">
-                        Corporación Universitaria Iberoamericana · Maestría en Educación
-                    </p>
+                    <div class="inline-flex items-center gap-3 px-6 py-2 bg-white/50 rounded-full border border-white/50 text-xs font-bold tracking-widest uppercase text-slate-500 mb-10 anim-pop d-3 shadow-sm">
+                        <span>Corporación Universitaria Iberoamericana</span>
+                        <span class="w-1 h-1 bg-slate-400 rounded-full"></span>
+                        <span>Maestría en Educación</span>
+                    </div>
 
-                    <!-- INVESTIGADORES -->
-                    <div class="flex flex-col md:flex-row gap-4 anim-pop d-4 max-w-4xl w-full justify-center">
-                        <div class="bg-white/70 p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">EJ</div>
+                    <div class="flex flex-col md:flex-row gap-6 anim-pop d-4 max-w-4xl w-full justify-center">
+                        <div class="bg-white/60 p-5 rounded-2xl shadow-lg border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1 group">
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-red-500 text-white flex items-center justify-center font-bold text-lg shadow-lg shrink-0 group-hover:scale-110 transition-transform">EJ</div>
                             <div class="text-left">
-                                <h3 class="font-bold text-slate-800 text-sm leading-tight">Elías José Torres Brunal</h3>
-                                <p class="text-slate-500 text-xs">Investigador Principal</p>
+                                <h3 class="font-bold text-slate-800 text-base leading-tight">Elías José Torres Brunal</h3>
+                                <p class="text-slate-500 text-xs mt-1">Investigador Principal</p>
                             </div>
                         </div>
-                        <div class="bg-white/70 p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1">
-                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">ER</div>
+                        <div class="bg-white/60 p-5 rounded-2xl shadow-lg border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1 group">
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 text-white flex items-center justify-center font-bold text-lg shadow-lg shrink-0 group-hover:scale-110 transition-transform">ER</div>
                             <div class="text-left">
-                                <h3 class="font-bold text-slate-800 text-sm leading-tight">Ever de Jesús Reyes Sánchez</h3>
-                                <p class="text-slate-500 text-xs">Investigador Principal</p>
+                                <h3 class="font-bold text-slate-800 text-base leading-tight">Ever de Jesús Reyes Sánchez</h3>
+                                <p class="text-slate-500 text-xs mt-1">Investigador Principal</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-6 anim-pop d-5">
-                         <button onclick="nextSlide()" class="bg-orange-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform animate-pulse flex items-center gap-2 mx-auto">
+                    <div class="mt-10 anim-pop d-5">
+                         <button onclick="nextSlide()" class="bg-orange-600 text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-2xl hover:bg-orange-500 hover:scale-105 transition-all flex items-center gap-3 mx-auto">
                             <span>Comenzar Presentación</span>
-                            <i data-lucide="arrow-right" size="18"></i>
+                            <i data-lucide="arrow-right" size="20"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 1: PROBLEMA -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-1" class="slide">
                 <div class="flex flex-col md:flex-row h-full">
-                    <div class="w-full md:w-1/2 p-10 flex flex-col justify-center bg-white/60 backdrop-blur-md">
+                    <div class="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white/50 backdrop-blur-md">
                         <div class="anim-slide-r d-1">
-                            <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm border border-orange-200">Problematización</span>
+                            <span class="bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm border border-orange-200">Planteamiento</span>
                             
-                            <!-- PREGUNTA EXACTA -->
-                            <div class="mt-5 p-5 bg-slate-800 rounded-2xl shadow-2xl border-l-4 border-orange-500 relative overflow-hidden group">
-                                <div class="absolute top-0 right-0 p-4 opacity-10">
-                                    <i data-lucide="help-circle" size="80" class="text-white"></i>
+                            <div class="mt-6 p-8 bg-slate-800 rounded-3xl shadow-2xl border-l-8 border-orange-500 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 transform group-hover:scale-125 transition-transform duration-700">
+                                    <i data-lucide="help-circle" size="100" class="text-white"></i>
                                 </div>
-                                <h3 class="text-orange-400 font-bold text-xs uppercase mb-3 tracking-widest">Pregunta Problematizadora</h3>
-                                <p class="text-base font-serif italic text-white leading-relaxed text-justify relative z-10">
+                                <h3 class="text-orange-400 font-bold text-xs uppercase mb-4 tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                                    Pregunta Problematizadora
+                                </h3>
+                                <p class="text-lg md:text-xl font-serif italic text-white leading-relaxed text-justify relative z-10">
                                     "¿Cómo puede el teatro contribuir, desde una propuesta pedagógica, al fortalecimiento de la identidad cultural caribe y a la reducción de prácticas de exclusión simbólica entre estudiantes de 7.º y 8.º grado de una institución educativa ubicada en la zona rural del municipio de Ayapel, Córdoba?"
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Descripción del contexto -->
-                        <div class="mt-4 p-4 bg-amber-50 rounded-xl border-l-4 border-amber-400 anim-slide-r d-2">
-                            <h4 class="font-bold text-amber-800 text-sm mb-2 flex items-center gap-2">
-                                <i data-lucide="info" size="16"></i> Contexto del Problema
+                        <div class="mt-6 p-6 bg-amber-50 rounded-2xl border-l-4 border-amber-400 anim-slide-r d-2 shadow-sm">
+                            <h4 class="font-bold text-amber-800 text-base mb-2 flex items-center gap-2">
+                                <i data-lucide="info" size="18"></i> Contexto del Problema
                             </h4>
-                            <p class="text-sm text-amber-900 leading-relaxed">
+                            <p class="text-amber-900 leading-relaxed text-sm md:text-base">
                                 En la zona rural del Caribe colombiano, los estudiantes adolescentes enfrentan prácticas de <strong>exclusión simbólica</strong> que debilitan su identidad cultural. La escasa integración del arte en el currículo limita espacios de expresión y reconocimiento de tradiciones locales.
                             </p>
                         </div>
                         
-                        <div class="mt-5 flex gap-3 anim-pop d-3">
-                             <button onclick="openModal('objetivos')" class="flex-1 bg-teal-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2">
+                        <div class="mt-8 flex gap-4 anim-pop d-3">
+                             <button onclick="openModal('objetivos')" class="flex-1 bg-teal-600 text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:bg-teal-700 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="target"></i> Ver Objetivos
                             </button>
-                            <button onclick="openModal('arbol')" class="flex-1 bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                            <button onclick="openModal('arbol')" class="flex-1 bg-white text-slate-600 border border-slate-200 px-6 py-4 rounded-xl font-bold shadow-md hover:bg-slate-50 hover:shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="git-fork"></i> Árbol de Problemas
                             </button>
                         </div>
                     </div>
 
                     <div class="w-full md:w-1/2 relative overflow-hidden group">
-                        <img src="https://ieelcedro.com/wp-content/uploads/2024/12/20240221_071804-1536x1152.jpg" class="w-full h-full object-cover float-img anim-pop d-3 group-hover:scale-110 transition-transform duration-1000">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                        <img src="https://ieelcedro.com/wp-content/uploads/2024/12/20240221_071804-1536x1152.jpg" class="w-full h-full object-cover float-img anim-pop d-3 group-hover:scale-105 transition-transform duration-1000 filter brightness-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90"></div>
                         
-                        <div class="absolute bottom-0 left-0 w-full p-8 anim-pop d-4">
-                            <div class="text-white mb-4">
-                                <h3 class="font-bold text-xl mb-1 flex items-center gap-2"><i data-lucide="map-pin" class="text-orange-500"></i> Contexto Territorial</h3>
-                                <p class="text-sm opacity-90 leading-relaxed max-w-md">
-                                    Institución Educativa Rural en Ayapel, Córdoba. Acceso fluvial, riqueza cultural (pesca, tradición oral, herencia afrodescendiente) pero con limitaciones estructurales y escasa integración del arte en el currículo.
-                                </p>
+                        <div class="absolute bottom-0 left-0 w-full p-10 anim-pop d-4">
+                            <div class="text-white mb-2">
+                                <div class="bg-black/30 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                                    <h3 class="font-bold text-2xl mb-2 flex items-center gap-3"><i data-lucide="map-pin" class="text-orange-500"></i> Contexto Territorial</h3>
+                                    <p class="text-base opacity-90 leading-relaxed">
+                                        Institución Educativa Rural en Ayapel, Córdoba. Un territorio de riqueza cultural (pesca, tradición oral, herencia afrodescendiente) que contrasta con limitaciones estructurales y una escasa integración del arte en el currículo escolar.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 2: REFERENTES TEÓRICOS -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-2" class="slide">
                 <div class="p-8 h-full flex flex-col">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-2 anim-pop text-center">Fundamentación Teórica</h2>
-                    <p class="text-center text-slate-500 mb-4 anim-pop d-1">Pase el cursor sobre cada tarjeta para ver más información</p>
+                    <div class="text-center mb-6">
+                        <span class="text-orange-600 font-bold tracking-widest uppercase text-xs">Estado del Arte</span>
+                        <h2 class="text-4xl font-bold text-slate-800 anim-pop mt-2">Fundamentación Teórica</h2>
+                    </div>
                     
-                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch max-w-7xl mx-auto w-full">
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch max-w-7xl mx-auto w-full pt-4">
                         
-                        <!-- Eje 1 -->
-                        <div class="ref-card tooltip-card anim-pop d-2 border-t-4 border-orange-500 group" onclick="openModal('teoria_1')">
+                        <div class="ref-card tooltip-card anim-pop d-2 border-t-8 border-orange-500 group" onclick="openModal('teoria_1')">
                             <div class="tooltip-content">
                                 <strong class="text-orange-400">Autores clave:</strong> Walsh (2009), Candau (2010), Tubino (2005)<br><br>
                                 La identidad es un proceso dinámico. La interculturalidad crítica supera enfoques folclorizantes y reconoce la escuela como espacio de configuración identitaria.
                             </div>
-                            <div class="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center text-orange-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="globe" size="24"></i>
+                            <div class="bg-orange-50 w-16 h-16 rounded-2xl flex items-center justify-center text-orange-600 mb-6 mx-auto group-hover:bg-orange-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <i data-lucide="globe" size="32"></i>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Identidad e Interculturalidad</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Walsh · Candau · Tubino</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Identidad como proceso dinámico y relacional. Interculturalidad crítica frente a la folclorización.</p>
-                            <div class="mt-3 text-center">
-                                <span class="text-xs text-orange-600 font-semibold">Hover para más info →</span>
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 text-center group-hover:text-orange-600 transition-colors">Identidad e Interculturalidad</h3>
+                            <p class="text-xs text-slate-400 text-center mb-4 font-extrabold uppercase tracking-wide">Walsh · Candau · Tubino</p>
+                            <p class="text-slate-600 text-sm leading-relaxed text-center flex-1">Identidad como proceso dinámico y relacional. Interculturalidad crítica frente a la folclorización.</p>
+                            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                                <span class="text-xs text-orange-600 font-bold flex items-center justify-center gap-1 group-hover:gap-2 transition-all">Ver detalles <i data-lucide="arrow-right" size="12"></i></span>
                             </div>
                         </div>
 
-                        <!-- Eje 2 -->
-                        <div class="ref-card tooltip-card anim-pop d-3 border-t-4 border-teal-500 group" onclick="openModal('teoria_2')">
+                        <div class="ref-card tooltip-card anim-pop d-3 border-t-8 border-teal-500 group" onclick="openModal('teoria_2')">
                             <div class="tooltip-content">
                                 <strong class="text-teal-400">Autores clave:</strong> Boal (2009), Schechner (2013), Nussbaum (2010)<br><br>
                                 El teatro no es solo actividad artística sino lenguaje pedagógico. Permite articular cuerpo, emoción, memoria, palabra y creación colectiva.
                             </div>
-                            <div class="bg-teal-100 w-12 h-12 rounded-full flex items-center justify-center text-teal-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="drama" size="24"></i>
+                            <div class="bg-teal-50 w-16 h-16 rounded-2xl flex items-center justify-center text-teal-600 mb-6 mx-auto group-hover:bg-teal-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <i data-lucide="drama" size="32"></i>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Teatro Pedagógico</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Boal · Schechner · Nussbaum</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Lenguaje para articular cuerpo, emoción y memoria. Herramienta de resignificación simbólica.</p>
-                            <div class="mt-3 text-center">
-                                <span class="text-xs text-teal-600 font-semibold">Hover para más info →</span>
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 text-center group-hover:text-teal-600 transition-colors">Teatro Pedagógico</h3>
+                            <p class="text-xs text-slate-400 text-center mb-4 font-extrabold uppercase tracking-wide">Boal · Schechner · Nussbaum</p>
+                            <p class="text-slate-600 text-sm leading-relaxed text-center flex-1">Lenguaje para articular cuerpo, emoción y memoria. Herramienta de resignificación simbólica.</p>
+                            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                                <span class="text-xs text-teal-600 font-bold flex items-center justify-center gap-1 group-hover:gap-2 transition-all">Ver detalles <i data-lucide="arrow-right" size="12"></i></span>
                             </div>
                         </div>
 
-                        <!-- Eje 3 -->
-                        <div class="ref-card tooltip-card anim-pop d-4 border-t-4 border-purple-500 group" onclick="openModal('teoria_3')">
+                        <div class="ref-card tooltip-card anim-pop d-4 border-t-8 border-purple-500 group" onclick="openModal('teoria_3')">
                             <div class="tooltip-content">
                                 <strong class="text-purple-400">Enfoque:</strong> Desarrollo del adolescente<br><br>
                                 La adolescencia es etapa clave para construcción identitaria. Búsqueda de sentido, pertenencia y reconocimiento cultural. El teatro ofrece espacio seguro para explorar roles y narrativas propias.
                             </div>
-                            <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center text-purple-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="user" size="24"></i>
+                            <div class="bg-purple-50 w-16 h-16 rounded-2xl flex items-center justify-center text-purple-600 mb-6 mx-auto group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <i data-lucide="user" size="32"></i>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Adolescencia y Subjetivación</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Identidad y Sentido</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Etapa clave para la construcción identitaria. Búsqueda de pertenencia y reconocimiento cultural.</p>
-                            <div class="mt-3 text-center">
-                                <span class="text-xs text-purple-600 font-semibold">Hover para más info →</span>
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 text-center group-hover:text-purple-600 transition-colors">Adolescencia y Subjetivación</h3>
+                            <p class="text-xs text-slate-400 text-center mb-4 font-extrabold uppercase tracking-wide">Identidad y Sentido</p>
+                            <p class="text-slate-600 text-sm leading-relaxed text-center flex-1">Etapa clave para la construcción identitaria. Búsqueda de pertenencia y reconocimiento cultural.</p>
+                            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                                <span class="text-xs text-purple-600 font-bold flex items-center justify-center gap-1 group-hover:gap-2 transition-all">Ver detalles <i data-lucide="arrow-right" size="12"></i></span>
                             </div>
                         </div>
 
-                        <!-- Eje 4 -->
-                        <div class="ref-card tooltip-card anim-pop d-5 border-t-4 border-blue-500 group" onclick="openModal('teoria_4')">
+                        <div class="ref-card tooltip-card anim-pop d-5 border-t-8 border-blue-500 group" onclick="openModal('teoria_4')">
                             <div class="tooltip-content">
                                 <strong class="text-blue-400">Fuentes:</strong> MEN, UNESCO<br><br>
                                 Análisis de limitaciones estructurales en educación rural colombiana. Escasa integración del arte al currículo. Necesidad de educación contextualizada e inclusiva.
                             </div>
-                            <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-blue-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="school" size="24"></i>
+                            <div class="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-600 mb-6 mx-auto group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300 shadow-sm">
+                                <i data-lucide="school" size="32"></i>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Educación Artística y Ruralidad</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">MEN · UNESCO</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Análisis de limitaciones estructurales y escasa integración del arte en el currículo rural.</p>
-                            <div class="mt-3 text-center">
-                                <span class="text-xs text-blue-600 font-semibold">Hover para más info →</span>
+                            <h3 class="text-xl font-bold text-slate-800 mb-3 text-center group-hover:text-blue-600 transition-colors">Educación Artística Rural</h3>
+                            <p class="text-xs text-slate-400 text-center mb-4 font-extrabold uppercase tracking-wide">MEN · UNESCO</p>
+                            <p class="text-slate-600 text-sm leading-relaxed text-center flex-1">Análisis de limitaciones estructurales y escasa integración del arte en el currículo rural.</p>
+                            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                                <span class="text-xs text-blue-600 font-bold flex items-center justify-center gap-1 group-hover:gap-2 transition-all">Ver detalles <i data-lucide="arrow-right" size="12"></i></span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 3: METODOLOGÍA -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-3" class="slide">
                 <div class="p-10 h-full flex flex-col justify-center overflow-y-auto">
-                    <div class="flex justify-between items-end mb-6 anim-slide-r">
-                        <div>
-                            <span class="text-teal-600 font-bold uppercase tracking-widest text-sm">Investigación Acción Participativa (IAP)</span>
-                            <h2 class="text-4xl font-bold text-slate-800 mt-2">Diseño Metodológico</h2>
+                    <div class="flex flex-col mb-6 anim-slide-r">
+                        <span class="text-teal-600 font-bold uppercase tracking-widest text-sm mb-1">Marco Metodológico</span>
+                        <h2 class="text-4xl font-bold text-slate-800">Diseño de Investigación</h2>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-xl border-l-8 border-teal-500 anim-pop d-1 mb-8 relative overflow-hidden">
+                        <div class="absolute right-0 top-0 p-8 opacity-5">
+                            <i data-lucide="file-text" size="150"></i>
                         </div>
-                        <div class="text-right">
-                             <div class="bg-slate-100 px-4 py-2 rounded-lg mb-2 text-xs font-bold text-slate-600">Enfoque: Cualitativo</div>
+                        <div class="relative z-10">
+                            <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2">
+                                <i data-lucide="quote" class="text-teal-500 fill-teal-500"></i>
+                                Fundamentación Epistemológica
+                            </h3>
+                            <p class="text-slate-600 text-lg leading-relaxed text-justify">
+                                La investigación se inscribe en el <strong class="text-teal-600">paradigma sociocrítico</strong>, en tanto parte del reconocimiento de problemáticas educativas asociadas a la exclusión simbólica, la pérdida de identidad cultural y las desigualdades propias del contexto rural caribe, y busca no solo comprender la realidad, sino transformarla mediante una intervención pedagógica.
+                                <br><br>
+                                El estudio adopta un <strong class="text-teal-600">enfoque cualitativo</strong>, orientado a interpretar las experiencias, percepciones y significados construidos por los estudiantes y docentes alrededor del teatro y la identidad cultural, privilegiando el análisis contextual y simbólico del fenómeno educativo.
+                                <br><br>
+                                En coherencia con ello, el tipo de investigación corresponde a la <strong class="text-teal-600">Investigación Acción Participativa (IAP)</strong>, dado que integra diagnóstico, acción y reflexión crítica, promueve la participación activa de la comunidad educativa y concibe el conocimiento como una construcción colectiva orientada al cambio pedagógico y social.
+                            </p>
                         </div>
                     </div>
 
-                    <!-- PARADIGMA, ENFOQUE, TIPO -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 anim-pop d-1">
-                        <div class="bg-gradient-to-br from-orange-500 to-red-600 p-5 rounded-2xl shadow-lg text-white">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="eye" class="opacity-80"></i>
-                                <h3 class="font-bold">Paradigma</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 anim-pop d-2">
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-2xl border border-orange-200 flex items-center gap-4 method-highlight">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-orange-600 shadow-sm shrink-0">
+                                <i data-lucide="eye"></i>
                             </div>
-                            <p class="text-lg font-semibold">Hermenéutico-Interpretativo</p>
-                            <p class="text-sm opacity-80 mt-1">Comprensión de significados y sentidos</p>
+                            <div>
+                                <h4 class="font-bold text-orange-800 text-sm uppercase tracking-wide">Paradigma</h4>
+                                <p class="font-bold text-lg text-slate-800">Sociocrítico</p>
+                            </div>
                         </div>
-                        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 p-5 rounded-2xl shadow-lg text-white">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="search" class="opacity-80"></i>
-                                <h3 class="font-bold">Enfoque</h3>
+                        <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-5 rounded-2xl border border-teal-200 flex items-center gap-4 method-highlight">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-teal-600 shadow-sm shrink-0">
+                                <i data-lucide="search"></i>
                             </div>
-                            <p class="text-lg font-semibold">Cualitativo</p>
-                            <p class="text-sm opacity-80 mt-1">Exploración de experiencias y significados</p>
+                            <div>
+                                <h4 class="font-bold text-teal-800 text-sm uppercase tracking-wide">Enfoque</h4>
+                                <p class="font-bold text-lg text-slate-800">Cualitativo</p>
+                            </div>
                         </div>
-                        <div class="bg-gradient-to-br from-purple-500 to-violet-600 p-5 rounded-2xl shadow-lg text-white">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="git-branch" class="opacity-80"></i>
-                                <h3 class="font-bold">Tipo</h3>
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-2xl border border-purple-200 flex items-center gap-4 method-highlight">
+                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-purple-600 shadow-sm shrink-0">
+                                <i data-lucide="users"></i>
                             </div>
-                            <p class="text-lg font-semibold">IAP</p>
-                            <p class="text-sm opacity-80 mt-1">Investigación Acción Participativa</p>
-                        </div>
-                    </div>
-
-                    <!-- POBLACIÓN, TÉCNICAS, ANÁLISIS -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 anim-pop d-2">
-                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-blue-500">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="users" class="text-blue-500"></i>
-                                <h3 class="font-bold text-slate-800">Población</h3>
+                            <div>
+                                <h4 class="font-bold text-purple-800 text-sm uppercase tracking-wide">Tipo</h4>
+                                <p class="font-bold text-lg text-slate-800">IAP</p>
                             </div>
-                            <p class="text-slate-600 text-sm">Estudiantes de grados <strong>7° y 8°</strong> de la institución educativa objeto de estudio.</p>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-purple-500">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="clipboard-list" class="text-purple-500"></i>
-                                <h3 class="font-bold text-slate-800">Técnicas</h3>
-                            </div>
-                            <p class="text-slate-600 text-sm">Entrevistas semiestructuradas, encuestas y observación participante.</p>
-                        </div>
-                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-orange-500">
-                            <div class="flex items-center gap-3 mb-2">
-                                <i data-lucide="bar-chart-2" class="text-orange-500"></i>
-                                <h3 class="font-bold text-slate-800">Análisis</h3>
-                            </div>
-                            <p class="text-slate-600 text-sm">Codificación temática y análisis cualitativo por categorías emergentes.</p>
                         </div>
                     </div>
 
-                    <!-- FASES DE LA INVESTIGACIÓN -->
-                    <div class="bg-slate-50 p-6 rounded-2xl anim-pop d-3">
-                        <h3 class="font-bold text-slate-800 text-center mb-4 flex items-center justify-center gap-2">
+                    <div class="bg-slate-50/80 p-6 rounded-2xl anim-pop d-3 border border-white">
+                        <h3 class="font-bold text-slate-800 text-center mb-2 flex items-center justify-center gap-2">
                             <i data-lucide="workflow" class="text-teal-600"></i>
-                            Fases de la Investigación
+                            Ruta Metodológica
                         </h3>
                         <div class="phase-timeline">
                             <div class="phase-item">
-                                <div class="phase-circle bg-gradient-to-br from-orange-500 to-red-500">1</div>
-                                <p class="phase-label">Diagnóstico<br><span class="text-xs text-slate-400">Identificación de necesidades</span></p>
+                                <div class="phase-circle bg-gradient-to-br from-orange-400 to-red-500">1</div>
+                                <p class="phase-label">Diagnóstico</p>
                             </div>
                             <div class="phase-item">
-                                <div class="phase-circle bg-gradient-to-br from-amber-500 to-orange-500">2</div>
-                                <p class="phase-label">Planificación<br><span class="text-xs text-slate-400">Diseño de propuesta</span></p>
+                                <div class="phase-circle bg-gradient-to-br from-amber-400 to-orange-400">2</div>
+                                <p class="phase-label">Planificación</p>
                             </div>
                             <div class="phase-item">
-                                <div class="phase-circle bg-gradient-to-br from-teal-500 to-emerald-500">3</div>
-                                <p class="phase-label">Acción<br><span class="text-xs text-slate-400">Implementación teatral</span></p>
+                                <div class="phase-circle bg-gradient-to-br from-teal-400 to-emerald-500">3</div>
+                                <p class="phase-label">Acción</p>
                             </div>
                             <div class="phase-item">
-                                <div class="phase-circle bg-gradient-to-br from-blue-500 to-indigo-500">4</div>
-                                <p class="phase-label">Observación<br><span class="text-xs text-slate-400">Recolección de datos</span></p>
+                                <div class="phase-circle bg-gradient-to-br from-blue-400 to-indigo-500">4</div>
+                                <p class="phase-label">Observación</p>
                             </div>
                             <div class="phase-item">
-                                <div class="phase-circle bg-gradient-to-br from-purple-500 to-violet-500">5</div>
-                                <p class="phase-label">Reflexión<br><span class="text-xs text-slate-400">Análisis y conclusiones</span></p>
+                                <div class="phase-circle bg-gradient-to-br from-purple-400 to-violet-500">5</div>
+                                <p class="phase-label">Reflexión</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- QR Y ÉTICA -->
-                    <div class="flex flex-wrap gap-4 mt-4 anim-pop d-4 justify-center">
-                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
-                            <div class="qr-container">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://drive.google.com/formatos-consentimiento" alt="QR Formatos">
+                    <div class="mt-4 anim-pop d-4">
+                         <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex flex-col md:flex-row items-center justify-center gap-6">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-emerald-100 p-2 rounded-full">
+                                     <i data-lucide="shield-check" class="text-emerald-600" size="24"></i>
+                                </div>
+                                <h4 class="font-bold text-emerald-800">Consideraciones Éticas:</h4>
                             </div>
-                            <div class="text-left">
-                                <h4 class="font-bold text-slate-700 text-sm">Formatos Éticos</h4>
-                                <p class="text-xs text-slate-500">Consentimientos informados,<br>asentimientos y formatos de ética</p>
+                            <div class="flex gap-4 text-sm text-emerald-700 font-semibold">
+                                <span class="flex items-center gap-1">✓ Consentimiento Informado</span>
+                                <span class="flex items-center gap-1">✓ Asentimiento Voluntario</span>
+                                <span class="flex items-center gap-1">✓ Confidencialidad</span>
                             </div>
-                        </div>
-                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
-                            <h4 class="font-bold text-emerald-800 text-sm mb-2 flex items-center gap-2">
-                                <i data-lucide="shield-check" size="16"></i> Consideraciones Éticas
-                            </h4>
-                            <ul class="text-xs text-emerald-700 space-y-1">
-                                <li>✓ Consentimiento informado</li>
-                                <li>✓ Asentimiento voluntario</li>
-                                <li>✓ Confidencialidad</li>
-                                <li>✓ Protección del bienestar</li>
-                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 4: RESULTADOS (Hallazgos con organizadores gráficos) -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-4" class="slide">
                 <div class="p-8 h-full flex flex-col overflow-y-auto">
                     <div class="flex justify-between items-center mb-6 anim-slide-r">
@@ -736,142 +630,136 @@
                             <span class="text-teal-600 font-bold uppercase tracking-widest text-sm">Análisis de Resultados</span>
                             <h2 class="text-3xl font-bold text-slate-800">Hallazgos por Categorías</h2>
                         </div>
-                        <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600">Página 1 de 2</span>
+                        <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 shadow-sm border border-slate-200">Página 1 de 2</span>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
-                        <!-- CATEGORÍA 1 con gráfico -->
-                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-1">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                    <i data-lucide="flag" class="text-orange-600" size="20"></i>
+                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-1 border border-slate-100">
+                            <div class="flex items-center gap-4 mb-5">
+                                <div class="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600">
+                                    <i data-lucide="flag" size="24"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-slate-800">1. Teatro como Afirmación Identitaria</h3>
-                                    <span class="text-xs text-orange-600 font-semibold">Categoría Principal</span>
+                                    <h3 class="font-bold text-slate-800 text-lg">1. Teatro como Afirmación Identitaria</h3>
+                                    <span class="text-xs text-orange-600 font-bold uppercase bg-orange-50 px-2 py-1 rounded-md">Categoría Principal</span>
                                 </div>
                             </div>
-                            <div class="space-y-3">
+                            <div class="space-y-4">
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Orgullo por tradiciones caribeñas</span>
                                         <span class="font-bold text-orange-600">92%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="92%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-sm" data-width="92%"></div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Reconocimiento de relatos locales</span>
                                         <span class="font-bold text-orange-600">87%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="87%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-sm" data-width="87%"></div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Valoración del origen campesino</span>
                                         <span class="font-bold text-orange-600">85%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="85%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full shadow-sm" data-width="85%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- CATEGORÍA 2 con gráfico -->
-                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-2">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
-                                    <i data-lucide="heart-handshake" class="text-teal-600" size="20"></i>
+                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-2 border border-slate-100">
+                            <div class="flex items-center gap-4 mb-5">
+                                <div class="w-12 h-12 rounded-2xl bg-teal-100 flex items-center justify-center text-teal-600">
+                                    <i data-lucide="heart-handshake" size="24"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-slate-800">2. Transformación Socioemocional</h3>
-                                    <span class="text-xs text-teal-600 font-semibold">Categoría Principal</span>
+                                    <h3 class="font-bold text-slate-800 text-lg">2. Transformación Socioemocional</h3>
+                                    <span class="text-xs text-teal-600 font-bold uppercase bg-teal-50 px-2 py-1 rounded-md">Categoría Principal</span>
                                 </div>
                             </div>
-                            <div class="space-y-3">
+                            <div class="space-y-4">
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Mejora en expresión emocional</span>
                                         <span class="font-bold text-teal-600">88%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="88%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full shadow-sm" data-width="88%"></div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Incremento de empatía</span>
                                         <span class="font-bold text-teal-600">84%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="84%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full shadow-sm" data-width="84%"></div>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="flex justify-between text-xs mb-1">
+                                    <div class="flex justify-between text-sm mb-1.5 font-medium">
                                         <span class="text-slate-600">Reducción de exclusión simbólica</span>
                                         <span class="font-bold text-teal-600">79%</span>
                                     </div>
-                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
-                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="79%"></div>
+                                    <div class="h-4 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full shadow-sm" data-width="79%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- CATEGORÍA 3 -->
-                        <div class="bg-slate-800 p-6 rounded-2xl shadow-lg anim-pop d-3 text-white">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                        <div class="bg-slate-800 p-6 rounded-2xl shadow-lg anim-pop d-3 text-white border border-slate-600 relative overflow-hidden">
+                             <div class="absolute right-0 top-0 p-4 opacity-10"><i data-lucide="alert-triangle" size="80"></i></div>
+                            <div class="flex items-center gap-3 mb-4 relative z-10">
+                                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm">
                                     <i data-lucide="alert-triangle" class="text-amber-400" size="20"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold">3. Desafíos y Proyecciones</h3>
-                                    <span class="text-xs text-amber-400 font-semibold">Categoría Emergente</span>
+                                    <h3 class="font-bold text-lg">3. Desafíos y Proyecciones</h3>
+                                    <span class="text-xs text-amber-400 font-semibold uppercase tracking-wide">Categoría Emergente</span>
                                 </div>
                             </div>
-                            <ul class="space-y-2 text-sm text-slate-300">
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="minus" size="16" class="text-red-400 mt-1"></i>
-                                    Limitaciones de infraestructura y recursos
+                            <ul class="space-y-3 text-sm text-slate-300 relative z-10">
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="minus-circle" size="18" class="text-red-400 mt-0.5"></i>
+                                    <span>Limitaciones de infraestructura y recursos técnicos en la I.E.</span>
                                 </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="minus" size="16" class="text-red-400 mt-1"></i>
-                                    Escasa presencia del teatro en el currículo
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="minus-circle" size="18" class="text-red-400 mt-0.5"></i>
+                                    <span>Escasa presencia del teatro en el currículo formal</span>
                                 </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="plus" size="16" class="text-green-400 mt-1"></i>
-                                    Necesidad de continuidad pedagógica
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="plus-circle" size="18" class="text-green-400 mt-0.5"></i>
+                                    <span>Necesidad de garantizar la continuidad pedagógica</span>
                                 </li>
                             </ul>
                         </div>
 
-                        <!-- DISCUSIÓN -->
-                        <div class="bg-gradient-to-br from-purple-600 to-violet-700 p-6 rounded-2xl shadow-lg anim-pop d-4 text-white">
-                            <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
-                                <i data-lucide="message-square"></i> Discusión
+                        <div class="bg-gradient-to-br from-purple-600 to-indigo-800 p-6 rounded-2xl shadow-lg anim-pop d-4 text-white border border-purple-500 relative overflow-hidden">
+                            <div class="absolute right-0 top-0 p-4 opacity-10"><i data-lucide="message-square" size="80"></i></div>
+                            <h3 class="font-bold text-xl mb-4 flex items-center gap-2 relative z-10">
+                                <i data-lucide="message-square"></i> Discusión de Resultados
                             </h3>
-                            <ul class="space-y-2 text-sm">
-                                <li class="flex items-start gap-2">
+                            <ul class="space-y-3 text-sm relative z-10">
+                                <li class="flex items-start gap-3 bg-white/10 p-2 rounded-lg backdrop-blur-sm">
                                     <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
-                                    El teatro actúa como lenguaje pedagógico <strong>situado</strong> y pertinente al territorio
+                                    <span>El teatro actúa como lenguaje pedagógico <strong>situado</strong> y pertinente al territorio.</span>
                                 </li>
-                                <li class="flex items-start gap-2">
+                                <li class="flex items-start gap-3 bg-white/10 p-2 rounded-lg backdrop-blur-sm">
                                     <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
-                                    Resignificación de la identidad desde la <strong>vivencia</strong>
+                                    <span>Resignificación de la identidad desde la <strong>vivencia</strong> directa.</span>
                                 </li>
-                                <li class="flex items-start gap-2">
+                                <li class="flex items-start gap-3 bg-white/10 p-2 rounded-lg backdrop-blur-sm">
                                     <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
-                                    Coherencia entre memoria, interculturalidad y arte
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
-                                    Favorece la convivencia y participación activa
+                                    <span>Coherencia entre memoria colectiva, interculturalidad crítica y arte.</span>
                                 </li>
                             </ul>
                         </div>
@@ -879,165 +767,138 @@
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 5: EVIDENCIAS (Galería) -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-5" class="slide">
                 <div class="p-10 h-full flex flex-col">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Resultados</span>
+                            <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Registro Fotográfico</span>
                             <h2 class="text-3xl font-bold text-slate-800 anim-pop flex items-center gap-3">
                                 <i data-lucide="camera" class="text-slate-400"></i> Galería de Evidencias
                             </h2>
                         </div>
                         <div class="flex items-center gap-4">
-                            <span class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full border border-red-200 anim-pop d-1">
-                                * Rostros protegidos por ética de investigación
+                            <span class="text-xs bg-red-100 text-red-800 px-3 py-1.5 rounded-full border border-red-200 anim-pop d-1 font-semibold flex items-center gap-2">
+                                <i data-lucide="shield" size="12"></i> Rostros protegidos por ética
                             </span>
-                            <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600">Página 2 de 2</span>
+                            <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 border border-slate-200">Página 2 de 2</span>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-4 grid-rows-2 gap-4 flex-1">
-                        <!-- IMAGEN GRANDE -->
-                        <div class="col-span-2 row-span-2 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-1 border border-white/50" onclick="openModal('img_ft1')">
-                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6">
-                                <span class="text-orange-400 font-bold text-sm uppercase">Fase de Acción</span>
-                                <span class="text-white font-bold text-xl">Montaje Escénico Colectivo</span>
+                    <div class="grid grid-cols-4 grid-rows-2 gap-5 flex-1 p-2">
+                        <div class="col-span-2 row-span-2 relative rounded-3xl overflow-hidden shadow-xl group cursor-pointer anim-pop d-1 border-4 border-white" onclick="openModal('img_ft1')">
+                            <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <span class="text-orange-400 font-bold text-sm uppercase tracking-wider mb-1">Fase de Acción</span>
+                                <span class="text-white font-bold text-2xl">Montaje Escénico Colectivo</span>
                             </div>
                         </div>
-                        <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-2 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft2')">
+                        <div class="col-span-1 row-span-1 relative rounded-3xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-2 hover:translate-y-1 transition-transform border-4 border-white" onclick="openModal('img_ft2')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
-                                <span class="text-white text-xs font-semibold">Ensayos grupales</span>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i data-lucide="zoom-in" class="text-white" size="32"></i>
                             </div>
                         </div>
-                        <div class="col-span-1 row-span-2 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-3 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft3')">
+                        <div class="col-span-1 row-span-2 relative rounded-3xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-3 hover:translate-y-1 transition-transform border-4 border-white" onclick="openModal('img_ft3')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
-                                <span class="text-white text-xs font-semibold">Expresión corporal</span>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i data-lucide="zoom-in" class="text-white" size="32"></i>
                             </div>
                         </div>
-                        <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-4 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft4')">
+                        <div class="col-span-1 row-span-1 relative rounded-3xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-4 hover:translate-y-1 transition-transform border-4 border-white" onclick="openModal('img_ft4')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
-                                <span class="text-white text-xs font-semibold">Presentación final</span>
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <i data-lucide="zoom-in" class="text-white" size="32"></i>
                             </div>
                         </div>
                     </div>
 
-                    <!-- QR al portafolio -->
                     <div class="mt-4 flex justify-center anim-pop d-5">
-                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
-                            <div class="qr-container">
-                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://drive.google.com/portafolio-investigacion" alt="QR Portafolio">
-                            </div>
-                            <div class="text-left">
-                                <h4 class="font-bold text-slate-700 text-sm">Portafolio de Investigación</h4>
-                                <p class="text-xs text-slate-500">Diarios de campo, matrices de<br>sistematización y más evidencias</p>
-                            </div>
+                         <div class="bg-white/80 p-4 rounded-xl shadow-sm border border-slate-200 text-slate-500 text-xs flex items-center gap-3">
+                            <i data-lucide="folder-open" class="text-slate-400"></i>
+                            <p>Para ver el <strong>Portafolio Completo</strong> (diarios de campo, matrices), consulte el documento anexo a la tesis.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 6: CONCLUSIONES -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-6" class="slide">
                 <div class="p-10 h-full flex flex-col justify-center items-center overflow-y-auto">
-                    <h2 class="text-3xl font-extrabold text-slate-800 mb-6 anim-pop text-center">Conclusiones, Proyecciones y Aportes</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-800 mb-8 anim-pop text-center">Conclusiones, Proyecciones y Aportes</h2>
 
-                    <!-- RESPUESTA DIRECTA A LA PREGUNTA -->
-                    <div class="w-full max-w-5xl mb-6 anim-pop d-1">
-                        <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 rounded-2xl shadow-xl text-white">
-                            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
-                                <i data-lucide="message-circle-question"></i> Respuesta a la Pregunta de Investigación
+                    <div class="w-full max-w-5xl mb-8 anim-pop d-1">
+                        <div class="bg-gradient-to-r from-orange-500 to-red-600 p-8 rounded-3xl shadow-2xl text-white relative overflow-hidden">
+                             <div class="absolute top-0 right-0 p-6 opacity-20"><i data-lucide="check-circle" size="100"></i></div>
+                            <h3 class="font-bold text-xl mb-4 flex items-center gap-3 relative z-10">
+                                <div class="bg-white/20 p-2 rounded-full"><i data-lucide="message-circle-question" size="24"></i></div>
+                                Respuesta a la Pregunta de Investigación
                             </h3>
-                            <p class="text-base leading-relaxed">
-                                El teatro, implementado como propuesta pedagógica, <strong>sí contribuye significativamente</strong> al fortalecimiento de la identidad cultural caribe al permitir que los estudiantes expresen, reconozcan y valoren sus tradiciones, memorias y herencia cultural. Asimismo, <strong>reduce las prácticas de exclusión simbólica</strong> al generar espacios de encuentro, empatía y reconocimiento mutuo entre los participantes.
+                            <p class="text-lg leading-relaxed relative z-10">
+                                El teatro, implementado como propuesta pedagógica, <strong class="text-yellow-200">sí contribuye significativamente</strong> al fortalecimiento de la identidad cultural caribe al permitir que los estudiantes expresen, reconozcan y valoren sus tradiciones. Asimismo, <strong>reduce las prácticas de exclusión simbólica</strong> al generar espacios de encuentro, empatía y reconocimiento mutuo.
                             </p>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap justify-center gap-6 w-full max-w-6xl">
                         
-                        <!-- Conclusiones -->
-                        <div class="bg-white p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-orange-500 anim-pop d-2">
-                            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600">
-                                <i data-lucide="check-circle" size="24"></i>
+                        <div class="bg-white p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-8 border-orange-500 anim-pop d-2 hover:transform hover:-translate-y-2 transition-transform duration-300">
+                            <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-orange-600">
+                                <i data-lucide="clipboard-check" size="28"></i>
                             </div>
-                            <h3 class="font-bold text-lg mb-3 text-slate-800 text-center">Conclusiones</h3>
-                            <ul class="text-slate-600 text-sm leading-relaxed text-left space-y-2">
+                            <h3 class="font-bold text-lg mb-4 text-slate-800 text-center">Conclusiones</h3>
+                            <ul class="text-slate-600 text-sm leading-relaxed text-left space-y-3">
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    <i data-lucide="check" size="16" class="text-orange-500 mt-0.5 shrink-0"></i>
                                     Estrategia eficaz para fortalecer la identidad caribe
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    <i data-lucide="check" size="16" class="text-orange-500 mt-0.5 shrink-0"></i>
                                     Expresión simbólica de la memoria local
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    <i data-lucide="check" size="16" class="text-orange-500 mt-0.5 shrink-0"></i>
                                     Favorece cohesión social y pertenencia
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
-                                    Educación rural más inclusiva
                                 </li>
                             </ul>
                         </div>
 
-                        <!-- Recomendaciones -->
-                        <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-teal-500 anim-pop d-3 text-white">
-                            <div class="w-12 h-12 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-3 text-teal-400">
-                                <i data-lucide="trending-up" size="24"></i>
+                        <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-8 border-teal-500 anim-pop d-3 text-white hover:transform hover:-translate-y-2 transition-transform duration-300">
+                            <div class="w-14 h-14 bg-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-teal-400">
+                                <i data-lucide="trending-up" size="28"></i>
                             </div>
-                            <h3 class="font-bold text-lg mb-3 text-center">Proyecciones</h3>
-                            <ul class="text-slate-300 text-sm leading-relaxed text-left space-y-2">
+                            <h3 class="font-bold text-lg mb-4 text-center">Proyecciones</h3>
+                            <ul class="text-slate-300 text-sm leading-relaxed text-left space-y-3">
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    <i data-lucide="arrow-right" size="16" class="text-teal-400 mt-0.5 shrink-0"></i>
                                     Incorporar teatro como práctica permanente
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
-                                    Fortalecer formación docente en pedagogía teatral
+                                    <i data-lucide="arrow-right" size="16" class="text-teal-400 mt-0.5 shrink-0"></i>
+                                    Fortalecer formación docente en arte
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    <i data-lucide="arrow-right" size="16" class="text-teal-400 mt-0.5 shrink-0"></i>
                                     Articular arte con proyectos transversales
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
-                                    Replicar en otros contextos rurales
                                 </li>
                             </ul>
                         </div>
 
-                        <!-- Aportes a líneas de investigación -->
-                        <div class="bg-gradient-to-br from-purple-600 to-violet-700 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-purple-300 anim-pop d-4 text-white">
-                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 text-purple-200">
-                                <i data-lucide="graduation-cap" size="24"></i>
+                        <div class="bg-gradient-to-br from-purple-600 to-indigo-700 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-8 border-purple-300 anim-pop d-4 text-white hover:transform hover:-translate-y-2 transition-transform duration-300">
+                            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-200">
+                                <i data-lucide="graduation-cap" size="28"></i>
                             </div>
-                            <h3 class="font-bold text-lg mb-3 text-center">Aportes a la Maestría</h3>
-                            <ul class="text-purple-100 text-sm leading-relaxed text-left space-y-2">
+                            <h3 class="font-bold text-lg mb-4 text-center">Aportes a la Maestría</h3>
+                            <ul class="text-purple-100 text-sm leading-relaxed text-left space-y-3">
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="star" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    <i data-lucide="star" size="16" class="text-yellow-300 mt-0.5 shrink-0"></i>
                                     <strong>Línea: Educación y Diversidad Cultural</strong>
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="star" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    <i data-lucide="star" size="16" class="text-yellow-300 mt-0.5 shrink-0"></i>
                                     <strong>Línea: Pedagogías Alternativas</strong>
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <i data-lucide="lightbulb" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
-                                    Modelo replicable para contextos rurales
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <i data-lucide="lightbulb" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
-                                    Integración arte-currículo
+                                    <i data-lucide="lightbulb" size="16" class="text-yellow-300 mt-0.5 shrink-0"></i>
+                                    Modelo replicable rural
                                 </li>
                             </ul>
                         </div>
@@ -1046,33 +907,30 @@
                 </div>
             </div>
 
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
-            <!-- SLIDE 7: REFERENCIAS BIBLIOGRÁFICAS -->
-            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-7" class="slide">
                 <div class="p-12 h-full flex flex-col justify-center items-center">
-                    <h2 class="text-3xl font-bold text-slate-800 mb-8 border-b-4 border-orange-400 pb-2 anim-slide-r">Referencias Bibliográficas</h2>
-                    <p class="text-slate-500 text-sm mb-6 anim-pop d-1">Formato APA 7ª edición</p>
+                    <h2 class="text-4xl font-bold text-slate-800 mb-8 border-b-4 border-orange-400 pb-2 anim-slide-r">Referencias Bibliográficas</h2>
+                    <p class="text-slate-500 text-sm mb-8 anim-pop d-1 font-bold bg-white px-4 py-1 rounded-full shadow-sm">Formato APA 7ª edición</p>
                     
                     <div class="space-y-4 max-w-4xl w-full">
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-md transition-all anim-slide-r d-1">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Boal, A. (2009). <em>La estética del oprimido</em>. Alba Editorial.</p>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-lg hover:scale-[1.01] transition-all anim-slide-r d-1">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm leading-relaxed">Boal, A. (2009). <em>La estética del oprimido</em>. Alba Editorial.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-teal-500 hover:shadow-md transition-all anim-slide-r d-2">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Candau, V. M. (2010). Educación intercultural en América Latina: Distintas concepciones y tensiones actuales. <em>Estudios Pedagógicos, 36</em>(2), 333-342. https://doi.org/10.4067/S0718-07052010000200019</p>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-teal-500 hover:shadow-lg hover:scale-[1.01] transition-all anim-slide-r d-2">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm leading-relaxed">Candau, V. M. (2010). Educación intercultural en América Latina: Distintas concepciones y tensiones actuales. <em>Estudios Pedagógicos, 36</em>(2), 333-342. https://doi.org/10.4067/S0718-07052010000200019</p>
                         </div>
-                         <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 transition-all anim-slide-r d-3 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Nussbaum, M. (2010). <em>Sin fines de lucro: Por qué la democracia necesita de las humanidades</em>. Katz Editores.</p>
+                         <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-purple-500 transition-all anim-slide-r d-3 hover:shadow-lg hover:scale-[1.01]">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm leading-relaxed">Nussbaum, M. (2010). <em>Sin fines de lucro: Por qué la democracia necesita de las humanidades</em>. Katz Editores.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-all anim-slide-r d-4">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Schechner, R. (2013). <em>Performance Studies: An Introduction</em> (3rd ed.). Routledge.</p>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-lg hover:scale-[1.01] transition-all anim-slide-r d-4">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm leading-relaxed">Schechner, R. (2013). <em>Performance Studies: An Introduction</em> (3rd ed.). Routledge.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500 hover:shadow-md transition-all anim-slide-r d-5">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Walsh, C. (2009). <em>Interculturalidad, estado, sociedad: Luchas (de)coloniales de nuestra época</em>. Universidad Andina Simón Bolívar / Ediciones Abya-Yala.</p>
+                        <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-amber-500 hover:shadow-lg hover:scale-[1.01] transition-all anim-slide-r d-5">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm leading-relaxed">Walsh, C. (2009). <em>Interculturalidad, estado, sociedad: Luchas (de)coloniales de nuestra época</em>. Universidad Andina Simón Bolívar / Ediciones Abya-Yala.</p>
                         </div>
                     </div>
                     
-                    <button onclick="goToSlide(0)" class="mt-8 bg-slate-800 text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-500 transition-all hover:scale-105 anim-pop d-6 flex items-center gap-2">
+                    <button onclick="goToSlide(0)" class="mt-12 bg-slate-800 text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-500 transition-all hover:scale-105 anim-pop d-6 flex items-center gap-2">
                         <i data-lucide="rotate-ccw" size="18"></i> Volver al Inicio
                     </button>
                 </div>
@@ -1081,7 +939,6 @@
         </main>
     </div>
 
-    <!-- MODAL -->
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
@@ -1089,8 +946,7 @@
                 <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full"><i data-lucide="x"></i></button>
             </div>
             <div id="modal-body" class="text-slate-600">
-                <!-- Contenido Dinámico -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -1142,16 +998,16 @@
                         </div>
                         <div class="space-y-4">
                             <h4 class="font-bold text-slate-800 uppercase text-sm border-b pb-1">Objetivos Específicos</h4>
-                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
-                                <span class="bg-orange-500 text-white font-bold px-3 py-1 rounded-full text-sm">1</span>
+                            <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl">
+                                <span class="bg-orange-500 text-white font-bold px-3 py-1 rounded-full text-sm shrink-0">1</span>
                                 <p class="text-sm"><strong>Diagnosticar</strong> las manifestaciones identitarias, simbólicas y culturales presentes en los estudiantes en relación con su contexto caribe rural.</p>
                             </div>
-                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
-                                <span class="bg-teal-500 text-white font-bold px-3 py-1 rounded-full text-sm">2</span>
+                            <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl">
+                                <span class="bg-teal-500 text-white font-bold px-3 py-1 rounded-full text-sm shrink-0">2</span>
                                 <p class="text-sm"><strong>Interpretar</strong> las posibilidades del lenguaje teatral como estrategia didáctica para promover la expresión simbólica, el reconocimiento cultural y la reconstrucción identitaria.</p>
                             </div>
-                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
-                                <span class="bg-purple-500 text-white font-bold px-3 py-1 rounded-full text-sm">3</span>
+                            <div class="flex gap-4 items-start bg-slate-50 p-4 rounded-xl">
+                                <span class="bg-purple-500 text-white font-bold px-3 py-1 rounded-full text-sm shrink-0">3</span>
                                 <p class="text-sm"><strong>Evaluar</strong> la pertinencia y el alcance de la propuesta pedagógica diseñada en función de las necesidades culturales y educativas de la institución.</p>
                             </div>
                         </div>
@@ -1161,23 +1017,23 @@
                 title.textContent = "Árbol de Problemas";
                 body.innerHTML = `
                     <div class="text-left space-y-4">
-                        <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                        <div class="bg-red-50 p-6 rounded-xl border-l-4 border-red-500">
                             <h4 class="font-bold text-red-800 mb-2">Problema Central</h4>
-                            <p class="text-red-700">Prácticas de exclusión simbólica y debilitamiento de la identidad cultural caribe en estudiantes de zonas rurales.</p>
+                            <p class="text-red-700 text-lg">Prácticas de exclusión simbólica y debilitamiento de la identidad cultural caribe en estudiantes de zonas rurales.</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
-                                <h4 class="font-bold text-amber-800 mb-2 text-sm">Causas</h4>
-                                <ul class="text-sm text-amber-700 space-y-1">
+                            <div class="bg-amber-50 p-5 rounded-xl border-l-4 border-amber-500">
+                                <h4 class="font-bold text-amber-800 mb-2 text-sm uppercase">Causas</h4>
+                                <ul class="text-sm text-amber-700 space-y-2">
                                     <li>• Escasa integración del arte al currículo</li>
                                     <li>• Desvalorización de tradiciones locales</li>
                                     <li>• Limitada expresión cultural en la escuela</li>
                                     <li>• Aislamiento geográfico y cultural</li>
                                 </ul>
                             </div>
-                            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                                <h4 class="font-bold text-blue-800 mb-2 text-sm">Efectos</h4>
-                                <ul class="text-sm text-blue-700 space-y-1">
+                            <div class="bg-blue-50 p-5 rounded-xl border-l-4 border-blue-500">
+                                <h4 class="font-bold text-blue-800 mb-2 text-sm uppercase">Efectos</h4>
+                                <ul class="text-sm text-blue-700 space-y-2">
                                     <li>• Baja autoestima cultural</li>
                                     <li>• Pérdida de memoria colectiva</li>
                                     <li>• Exclusión entre pares</li>
@@ -1195,21 +1051,21 @@
                     'img_ft4': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg' 
                 };
                 title.textContent = "Evidencia Fotográfica";
-                body.innerHTML = `<img src="${urls[type]}" class="rounded-lg shadow-lg w-full">`;
+                body.innerHTML = `<img src="${urls[type]}" class="rounded-xl shadow-2xl w-full">`;
             } else if (type === 'teoria_1') {
                 title.textContent = "Identidad Cultural e Interculturalidad Crítica";
                 body.innerHTML = `
                     <div class="text-left space-y-4">
-                        <div class="bg-orange-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-orange-800 mb-2">Concepto Central</h4>
-                            <p class="text-slate-700">La identidad cultural es un proceso dinámico, relacional y en constante construcción. La escuela es un espacio clave en la configuración identitaria.</p>
+                        <div class="bg-orange-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-orange-800 mb-2 text-lg">Concepto Central</h4>
+                            <p class="text-slate-700 leading-relaxed">La identidad cultural es un proceso dinámico, relacional y en constante construcción. La escuela es un espacio clave en la configuración identitaria, donde se deben superar las visiones esencialistas.</p>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-slate-800 mb-2">Autores de Referencia</h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li><strong>Walsh (2009):</strong> Interculturalidad crítica vs. funcional</li>
-                                <li><strong>Candau (2010):</strong> Tensiones en educación intercultural latinoamericana</li>
-                                <li><strong>Tubino (2005):</strong> Diferenciación de enfoques interculturales</li>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-3 text-lg">Autores de Referencia</h4>
+                            <ul class="text-base text-slate-600 space-y-3">
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Walsh (2009):</strong> Interculturalidad crítica vs. funcional.</li>
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Candau (2010):</strong> Tensiones en educación intercultural latinoamericana.</li>
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Tubino (2005):</strong> Diferenciación de enfoques interculturales.</li>
                             </ul>
                         </div>
                     </div>
@@ -1218,16 +1074,16 @@
                 title.textContent = "Teatro como Estrategia Pedagógica";
                 body.innerHTML = `
                     <div class="text-left space-y-4">
-                        <div class="bg-teal-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-teal-800 mb-2">Concepto Central</h4>
-                            <p class="text-slate-700">El teatro no es solo actividad artística sino un lenguaje pedagógico que permite articular cuerpo, emoción, memoria, palabra y creación colectiva.</p>
+                        <div class="bg-teal-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-teal-800 mb-2 text-lg">Concepto Central</h4>
+                            <p class="text-slate-700 leading-relaxed">El teatro no es solo actividad artística sino un lenguaje pedagógico que permite articular cuerpo, emoción, memoria, palabra y creación colectiva, facilitando procesos de catarsis y reflexión.</p>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-slate-800 mb-2">Autores de Referencia</h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li><strong>Boal (2009):</strong> Teatro del Oprimido y estética liberadora</li>
-                                <li><strong>Schechner (2013):</strong> Performance como práctica cultural</li>
-                                <li><strong>Nussbaum (2010):</strong> Emociones políticas y educación humanística</li>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-3 text-lg">Autores de Referencia</h4>
+                            <ul class="text-base text-slate-600 space-y-3">
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Boal (2009):</strong> Teatro del Oprimido y estética liberadora.</li>
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Schechner (2013):</strong> Performance como práctica cultural.</li>
+                                <li class="p-2 hover:bg-white rounded-lg transition-colors"><strong>Nussbaum (2010):</strong> Emociones políticas y educación humanística.</li>
                             </ul>
                         </div>
                     </div>
@@ -1236,16 +1092,16 @@
                 title.textContent = "Adolescencia, Identidad y Subjetivación";
                 body.innerHTML = `
                     <div class="text-left space-y-4">
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-purple-800 mb-2">Concepto Central</h4>
-                            <p class="text-slate-700">La adolescencia es una etapa clave para la construcción identitaria, caracterizada por la búsqueda de sentido, pertenencia y reconocimiento cultural.</p>
+                        <div class="bg-purple-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-purple-800 mb-2 text-lg">Concepto Central</h4>
+                            <p class="text-slate-700 leading-relaxed">La adolescencia es una etapa clave para la construcción identitaria, caracterizada por la búsqueda de sentido, pertenencia y reconocimiento cultural.</p>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-slate-800 mb-2">Aportes Teóricos</h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li>El teatro ofrece un espacio seguro para explorar roles y narrativas propias</li>
-                                <li>Permite la experimentación con diferentes formas de ser y expresarse</li>
-                                <li>Favorece la construcción de una identidad integrada y coherente</li>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-3 text-lg">Aportes Teóricos</h4>
+                            <ul class="text-base text-slate-600 space-y-3">
+                                <li>El teatro ofrece un espacio seguro para explorar roles y narrativas propias.</li>
+                                <li>Permite la experimentación con diferentes formas de ser y expresarse.</li>
+                                <li>Favorece la construcción de una identidad integrada y coherente.</li>
                             </ul>
                         </div>
                     </div>
@@ -1254,16 +1110,16 @@
                 title.textContent = "Educación Artística y Ruralidad";
                 body.innerHTML = `
                     <div class="text-left space-y-4">
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-blue-800 mb-2">Concepto Central</h4>
-                            <p class="text-slate-700">Análisis de las limitaciones estructurales de la educación rural en Colombia y la escasa integración del arte al currículo.</p>
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-blue-800 mb-2 text-lg">Concepto Central</h4>
+                            <p class="text-slate-700 leading-relaxed">Análisis de las limitaciones estructurales de la educación rural en Colombia y la escasa integración del arte al currículo.</p>
                         </div>
-                        <div class="bg-slate-50 p-4 rounded-lg">
-                            <h4 class="font-bold text-slate-800 mb-2">Fuentes Institucionales</h4>
-                            <ul class="text-sm text-slate-600 space-y-2">
-                                <li><strong>MEN:</strong> Lineamientos de educación artística y rural</li>
-                                <li><strong>UNESCO:</strong> Educación para el desarrollo sostenible e inclusión cultural</li>
-                                <li>Necesidad de una educación contextualizada que reconozca la diversidad territorial</li>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-3 text-lg">Fuentes Institucionales</h4>
+                            <ul class="text-base text-slate-600 space-y-3">
+                                <li><strong>MEN:</strong> Lineamientos de educación artística y rural.</li>
+                                <li><strong>UNESCO:</strong> Educación para el desarrollo sostenible e inclusión cultural.</li>
+                                <li>Necesidad de una educación contextualizada que reconozca la diversidad territorial.</li>
                             </ul>
                         </div>
                     </div>
