@@ -161,6 +161,7 @@
         .d-3 { transition-delay: 0.3s; }
         .d-4 { transition-delay: 0.4s; }
         .d-5 { transition-delay: 0.5s; }
+        .d-6 { transition-delay: 0.6s; }
 
         .chart-bar { width: 0%; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
 
@@ -208,7 +209,7 @@
         
         .modal-content {
             background: white; padding: 2.5rem; border-radius: 24px;
-            width: 90%; max-width: 800px;
+            width: 90%; max-width: 900px;
             max-height: 90vh; overflow-y: auto;
             transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: center;
@@ -237,6 +238,100 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Timeline/Fases */
+        .phase-timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 0;
+        }
+        .phase-timeline::before {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: linear-gradient(90deg, #ea580c, #0d9488, #8b5cf6);
+            border-radius: 2px;
+        }
+        .phase-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            width: 20%;
+        }
+        .phase-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .phase-label {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            color: #475569;
+        }
+
+        /* Tooltip on hover */
+        .tooltip-card {
+            position: relative;
+        }
+        .tooltip-card .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            width: 250px;
+            text-align: left;
+            z-index: 20;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .tooltip-card:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            bottom: calc(100% + 10px);
+        }
+        .tooltip-card .tooltip-content::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 8px solid transparent;
+            border-top-color: #1e293b;
+        }
+
+        /* QR Code style */
+        .qr-container {
+            background: white;
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: inline-block;
+        }
+        .qr-container img {
+            width: 120px;
+            height: 120px;
+        }
     </style>
 </head>
 <body>
@@ -316,14 +411,15 @@
                 </button>
             </div>
 
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- SLIDE 0: PORTADA -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-0" class="slide active">
                 <div class="w-full h-full flex flex-col items-center justify-center text-center p-8 relative">
                     <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ea580c 1px, transparent 1px); background-size: 30px 30px;"></div>
                     
-                    <div class="anim-pop d-1 mb-8">
+                    <div class="anim-pop d-1 mb-6">
                         <div class="bg-white/90 p-6 rounded-2xl shadow-xl inline-block backdrop-blur-sm border border-white/50 hover:scale-110 transition-transform duration-500">
-                            <!-- Logo IBERO placeholder -->
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYLWHh-TE6EEvELClXilNNWBNTED2V2DP-DkeDHbF9aDTp4Fc5QQ&s&ec=121507574" alt="Logo IBERO" style="height: 80px; object-fit: contain;">
                         </div>
                     </div>
@@ -333,26 +429,25 @@
                         <span class="gradient-text">Identidad Cultural</span>
                     </h1>
 
-                    <p class="text-xl md:text-2xl text-slate-600 font-light max-w-3xl mx-auto mb-6 anim-pop d-3 leading-relaxed">
-                        Fortalecimiento de la identidad cultural caribe y reducción de la <strong>exclusión simbólica</strong> en la I.E. El Cedro.
+                    <p class="text-xl md:text-2xl text-slate-600 font-light max-w-3xl mx-auto mb-4 anim-pop d-3 leading-relaxed">
+                        Fortalecimiento de la identidad cultural caribe y reducción de la <strong>exclusión simbólica</strong> en una Institución Educativa Rural del municipio de Ayapel.
                     </p>
                     
-                    <p class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-6 anim-pop d-3">Corporación Universitaria Iberoamericana</p>
+                    <p class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-6 anim-pop d-3">
+                        Corporación Universitaria Iberoamericana · Maestría en Educación
+                    </p>
 
-                    <!-- INVESTIGADORES (DOS ESTUDIANTES) -->
+                    <!-- INVESTIGADORES -->
                     <div class="flex flex-col md:flex-row gap-4 anim-pop d-4 max-w-4xl w-full justify-center">
-                        <!-- Estudiante 1 -->
                         <div class="bg-white/70 p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1">
-                            <div class="w-12 h-12 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">EJ</div>
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-600 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">EJ</div>
                             <div class="text-left">
                                 <h3 class="font-bold text-slate-800 text-sm leading-tight">Elías José Torres Brunal</h3>
                                 <p class="text-slate-500 text-xs">Investigador Principal</p>
                             </div>
                         </div>
-
-                        <!-- Estudiante 2 -->
                         <div class="bg-white/70 p-4 rounded-2xl shadow-xl border border-white flex items-center gap-4 hover:bg-white/90 transition-all cursor-default flex-1">
-                            <div class="w-12 h-12 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">EJ</div>
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-lg shrink-0">ER</div>
                             <div class="text-left">
                                 <h3 class="font-bold text-slate-800 text-sm leading-tight">Ever de Jesús Reyes Sánchez</h3>
                                 <p class="text-slate-500 text-xs">Investigador Principal</p>
@@ -360,40 +455,52 @@
                         </div>
                     </div>
 
-                    <div class="mt-8 anim-pop d-5">
-                         <button onclick="nextSlide()" class="bg-orange-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform animate-pulse">
-                            Comenzar Presentación
+                    <div class="mt-6 anim-pop d-5">
+                         <button onclick="nextSlide()" class="bg-orange-500 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform animate-pulse flex items-center gap-2 mx-auto">
+                            <span>Comenzar Presentación</span>
+                            <i data-lucide="arrow-right" size="18"></i>
                         </button>
                     </div>
-
                 </div>
             </div>
 
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- SLIDE 1: PROBLEMA -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-1" class="slide">
                 <div class="flex flex-col md:flex-row h-full">
-                    <div class="w-full md:w-1/2 p-12 flex flex-col justify-center bg-white/60 backdrop-blur-md">
+                    <div class="w-full md:w-1/2 p-10 flex flex-col justify-center bg-white/60 backdrop-blur-md">
                         <div class="anim-slide-r d-1">
                             <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm border border-orange-200">Problematización</span>
                             
                             <!-- PREGUNTA EXACTA -->
-                            <div class="mt-6 p-6 bg-slate-800 rounded-2xl shadow-2xl border-l-4 border-orange-500 relative overflow-hidden group">
+                            <div class="mt-5 p-5 bg-slate-800 rounded-2xl shadow-2xl border-l-4 border-orange-500 relative overflow-hidden group">
                                 <div class="absolute top-0 right-0 p-4 opacity-10">
-                                    <i data-lucide="help-circle" size="100" class="text-white"></i>
+                                    <i data-lucide="help-circle" size="80" class="text-white"></i>
                                 </div>
                                 <h3 class="text-orange-400 font-bold text-xs uppercase mb-3 tracking-widest">Pregunta Problematizadora</h3>
-                                <p class="text-lg font-serif italic text-white leading-relaxed text-justify relative z-10">
-                                    "¿Cómo puede el teatro contribuir, desde una propuesta pedagógica, al fortalecimiento de la identidad cultural caribe y a la reducción de prácticas de exclusión simbólica entre estudiantes de 7.º y 8.º grado de la Institución Educativa El Cedro, ubicada en la zona rural del municipio de Ayapel, Córdoba?"
+                                <p class="text-base font-serif italic text-white leading-relaxed text-justify relative z-10">
+                                    "¿Cómo puede el teatro contribuir, desde una propuesta pedagógica, al fortalecimiento de la identidad cultural caribe y a la reducción de prácticas de exclusión simbólica entre estudiantes de 7.º y 8.º grado de una institución educativa ubicada en la zona rural del municipio de Ayapel, Córdoba?"
                                 </p>
                             </div>
                         </div>
+
+                        <!-- Descripción del contexto -->
+                        <div class="mt-4 p-4 bg-amber-50 rounded-xl border-l-4 border-amber-400 anim-slide-r d-2">
+                            <h4 class="font-bold text-amber-800 text-sm mb-2 flex items-center gap-2">
+                                <i data-lucide="info" size="16"></i> Contexto del Problema
+                            </h4>
+                            <p class="text-sm text-amber-900 leading-relaxed">
+                                En la zona rural del Caribe colombiano, los estudiantes adolescentes enfrentan prácticas de <strong>exclusión simbólica</strong> que debilitan su identidad cultural. La escasa integración del arte en el currículo limita espacios de expresión y reconocimiento de tradiciones locales.
+                            </p>
+                        </div>
                         
-                        <div class="mt-8 flex gap-4 anim-pop d-3">
+                        <div class="mt-5 flex gap-3 anim-pop d-3">
                              <button onclick="openModal('objetivos')" class="flex-1 bg-teal-600 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:bg-teal-700 transition-all flex items-center justify-center gap-2">
                                 <i data-lucide="target"></i> Ver Objetivos
                             </button>
-                            <button onclick="openModal('diagnostico')" class="flex-1 bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                                <i data-lucide="clipboard"></i> Diagnóstico
+                            <button onclick="openModal('arbol')" class="flex-1 bg-white text-slate-600 border border-slate-200 px-4 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                                <i data-lucide="git-fork"></i> Árbol de Problemas
                             </button>
                         </div>
                     </div>
@@ -402,11 +509,11 @@
                         <img src="https://ieelcedro.com/wp-content/uploads/2024/12/20240221_071804-1536x1152.jpg" class="w-full h-full object-cover float-img anim-pop d-3 group-hover:scale-110 transition-transform duration-1000">
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                         
-                        <div class="absolute bottom-0 left-0 w-full p-10 anim-pop d-4">
+                        <div class="absolute bottom-0 left-0 w-full p-8 anim-pop d-4">
                             <div class="text-white mb-4">
-                                <h3 class="font-bold text-2xl mb-1 flex items-center gap-2"><i data-lucide="map-pin" class="text-orange-500"></i> Contexto</h3>
+                                <h3 class="font-bold text-xl mb-1 flex items-center gap-2"><i data-lucide="map-pin" class="text-orange-500"></i> Contexto Territorial</h3>
                                 <p class="text-sm opacity-90 leading-relaxed max-w-md">
-                                    I.E. El Cedro, zona rural de Ayapel, Córdoba. Acceso fluvial y limitaciones estructurales. Escenario de riqueza cultural (pesca, tradición oral) pero con escasa integración curricular del arte.
+                                    Institución Educativa Rural en Ayapel, Córdoba. Acceso fluvial, riqueza cultural (pesca, tradición oral, herencia afrodescendiente) pero con limitaciones estructurales y escasa integración del arte en el currículo.
                                 </p>
                             </div>
                         </div>
@@ -414,62 +521,93 @@
                 </div>
             </div>
 
-            <!-- SLIDE 2: REFERENTES TEÓRICOS (4 EJES) -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- SLIDE 2: REFERENTES TEÓRICOS -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-2" class="slide">
                 <div class="p-8 h-full flex flex-col">
                     <h2 class="text-3xl font-bold text-slate-800 mb-2 anim-pop text-center">Fundamentación Teórica</h2>
-                    <p class="text-center text-slate-500 mb-6 anim-pop d-1">Cuatro ejes fundamentales que sustentan la investigación</p>
+                    <p class="text-center text-slate-500 mb-4 anim-pop d-1">Pase el cursor sobre cada tarjeta para ver más información</p>
                     
                     <div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch max-w-7xl mx-auto w-full">
                         
                         <!-- Eje 1 -->
-                        <div class="ref-card anim-pop d-2 border-t-4 border-orange-500 group" onclick="openModal('teoria_1')">
+                        <div class="ref-card tooltip-card anim-pop d-2 border-t-4 border-orange-500 group" onclick="openModal('teoria_1')">
+                            <div class="tooltip-content">
+                                <strong class="text-orange-400">Autores clave:</strong> Walsh (2009), Candau (2010), Tubino (2005)<br><br>
+                                La identidad es un proceso dinámico. La interculturalidad crítica supera enfoques folclorizantes y reconoce la escuela como espacio de configuración identitaria.
+                            </div>
                             <div class="bg-orange-100 w-12 h-12 rounded-full flex items-center justify-center text-orange-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
                                 <i data-lucide="globe" size="24"></i>
                             </div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Identidad e Interculturalidad</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Walsh, Candau, Tubino</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify">Identidad como proceso dinámico y relacional. Interculturalidad crítica frente a la folclorización.</p>
+                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Walsh · Candau · Tubino</p>
+                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Identidad como proceso dinámico y relacional. Interculturalidad crítica frente a la folclorización.</p>
+                            <div class="mt-3 text-center">
+                                <span class="text-xs text-orange-600 font-semibold">Hover para más info →</span>
+                            </div>
                         </div>
 
                         <!-- Eje 2 -->
-                        <div class="ref-card anim-pop d-3 border-t-4 border-teal-500 group" onclick="openModal('teoria_2')">
+                        <div class="ref-card tooltip-card anim-pop d-3 border-t-4 border-teal-500 group" onclick="openModal('teoria_2')">
+                            <div class="tooltip-content">
+                                <strong class="text-teal-400">Autores clave:</strong> Boal (2009), Schechner (2013), Nussbaum (2010)<br><br>
+                                El teatro no es solo actividad artística sino lenguaje pedagógico. Permite articular cuerpo, emoción, memoria, palabra y creación colectiva.
+                            </div>
                             <div class="bg-teal-100 w-12 h-12 rounded-full flex items-center justify-center text-teal-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="masks" size="24"></i>
+                                <i data-lucide="drama" size="24"></i>
                             </div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Teatro Pedagógico</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Boal, Schechner, Nussbaum</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify">Lenguaje para articular cuerpo, emoción y memoria. Herramienta de resignificación simbólica.</p>
+                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Boal · Schechner · Nussbaum</p>
+                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Lenguaje para articular cuerpo, emoción y memoria. Herramienta de resignificación simbólica.</p>
+                            <div class="mt-3 text-center">
+                                <span class="text-xs text-teal-600 font-semibold">Hover para más info →</span>
+                            </div>
                         </div>
 
                         <!-- Eje 3 -->
-                        <div class="ref-card anim-pop d-4 border-t-4 border-purple-500 group" onclick="openModal('teoria_3')">
+                        <div class="ref-card tooltip-card anim-pop d-4 border-t-4 border-purple-500 group" onclick="openModal('teoria_3')">
+                            <div class="tooltip-content">
+                                <strong class="text-purple-400">Enfoque:</strong> Desarrollo del adolescente<br><br>
+                                La adolescencia es etapa clave para construcción identitaria. Búsqueda de sentido, pertenencia y reconocimiento cultural. El teatro ofrece espacio seguro para explorar roles y narrativas propias.
+                            </div>
                             <div class="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center text-purple-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
                                 <i data-lucide="user" size="24"></i>
                             </div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Adolescencia y Subjetivación</h3>
                             <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">Identidad y Sentido</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify">Etapa clave para la construcción identitaria. Búsqueda de pertenencia y reconocimiento cultural.</p>
+                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Etapa clave para la construcción identitaria. Búsqueda de pertenencia y reconocimiento cultural.</p>
+                            <div class="mt-3 text-center">
+                                <span class="text-xs text-purple-600 font-semibold">Hover para más info →</span>
+                            </div>
                         </div>
 
                         <!-- Eje 4 -->
-                        <div class="ref-card anim-pop d-5 border-t-4 border-blue-500 group" onclick="openModal('teoria_4')">
+                        <div class="ref-card tooltip-card anim-pop d-5 border-t-4 border-blue-500 group" onclick="openModal('teoria_4')">
+                            <div class="tooltip-content">
+                                <strong class="text-blue-400">Fuentes:</strong> MEN, UNESCO<br><br>
+                                Análisis de limitaciones estructurales en educación rural colombiana. Escasa integración del arte al currículo. Necesidad de educación contextualizada e inclusiva.
+                            </div>
                             <div class="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-blue-600 mb-4 mx-auto group-hover:scale-110 transition-transform">
-                                <i data-lucide="map" size="24"></i>
+                                <i data-lucide="school" size="24"></i>
                             </div>
                             <h3 class="text-lg font-bold text-slate-800 mb-2 text-center">Educación Artística y Ruralidad</h3>
-                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">MEN, UNESCO</p>
-                            <p class="text-slate-600 text-xs leading-relaxed text-justify">Análisis de limitaciones estructurales y escasa integración del arte en el currículo rural.</p>
+                            <p class="text-xs text-slate-500 text-center mb-4 font-bold uppercase">MEN · UNESCO</p>
+                            <p class="text-slate-600 text-xs leading-relaxed text-justify flex-1">Análisis de limitaciones estructurales y escasa integración del arte en el currículo rural.</p>
+                            <div class="mt-3 text-center">
+                                <span class="text-xs text-blue-600 font-semibold">Hover para más info →</span>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
 
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- SLIDE 3: METODOLOGÍA -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-3" class="slide">
-                <div class="p-12 h-full flex flex-col justify-center">
-                    <div class="flex justify-between items-end mb-8 anim-slide-r">
+                <div class="p-10 h-full flex flex-col justify-center overflow-y-auto">
+                    <div class="flex justify-between items-end mb-6 anim-slide-r">
                         <div>
                             <span class="text-teal-600 font-bold uppercase tracking-widest text-sm">Investigación Acción Participativa (IAP)</span>
                             <h2 class="text-4xl font-bold text-slate-800 mt-2">Diseño Metodológico</h2>
@@ -479,128 +617,286 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 anim-pop d-1">
-                        <!-- Población -->
-                        <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500">
+                    <!-- PARADIGMA, ENFOQUE, TIPO -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 anim-pop d-1">
+                        <div class="bg-gradient-to-br from-orange-500 to-red-600 p-5 rounded-2xl shadow-lg text-white">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i data-lucide="eye" class="opacity-80"></i>
+                                <h3 class="font-bold">Paradigma</h3>
+                            </div>
+                            <p class="text-lg font-semibold">Hermenéutico-Interpretativo</p>
+                            <p class="text-sm opacity-80 mt-1">Comprensión de significados y sentidos</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-teal-500 to-emerald-600 p-5 rounded-2xl shadow-lg text-white">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i data-lucide="search" class="opacity-80"></i>
+                                <h3 class="font-bold">Enfoque</h3>
+                            </div>
+                            <p class="text-lg font-semibold">Cualitativo</p>
+                            <p class="text-sm opacity-80 mt-1">Exploración de experiencias y significados</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-500 to-violet-600 p-5 rounded-2xl shadow-lg text-white">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i data-lucide="git-branch" class="opacity-80"></i>
+                                <h3 class="font-bold">Tipo</h3>
+                            </div>
+                            <p class="text-lg font-semibold">IAP</p>
+                            <p class="text-sm opacity-80 mt-1">Investigación Acción Participativa</p>
+                        </div>
+                    </div>
+
+                    <!-- POBLACIÓN, TÉCNICAS, ANÁLISIS -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 anim-pop d-2">
+                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-blue-500">
                             <div class="flex items-center gap-3 mb-2">
                                 <i data-lucide="users" class="text-blue-500"></i>
                                 <h3 class="font-bold text-slate-800">Población</h3>
                             </div>
-                            <p class="text-slate-600 text-sm">Estudiantes de grados 7° y 8° de la I.E. El Cedro.</p>
+                            <p class="text-slate-600 text-sm">Estudiantes de grados <strong>7° y 8°</strong> de la institución educativa objeto de estudio.</p>
                         </div>
-                        <!-- Técnicas -->
-                        <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-purple-500">
+                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-purple-500">
                             <div class="flex items-center gap-3 mb-2">
                                 <i data-lucide="clipboard-list" class="text-purple-500"></i>
                                 <h3 class="font-bold text-slate-800">Técnicas</h3>
                             </div>
-                            <p class="text-slate-600 text-sm">Entrevistas semiestructuradas y Encuestas.</p>
+                            <p class="text-slate-600 text-sm">Entrevistas semiestructuradas, encuestas y observación participante.</p>
                         </div>
-                        <!-- Análisis -->
-                        <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-orange-500">
+                        <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-orange-500">
                             <div class="flex items-center gap-3 mb-2">
                                 <i data-lucide="bar-chart-2" class="text-orange-500"></i>
                                 <h3 class="font-bold text-slate-800">Análisis</h3>
                             </div>
-                            <p class="text-slate-600 text-sm">Codificación temática y análisis cualitativo por categorías.</p>
+                            <p class="text-slate-600 text-sm">Codificación temática y análisis cualitativo por categorías emergentes.</p>
                         </div>
                     </div>
 
-                    <div class="relative mt-4">
-                        <div class="absolute top-1/2 left-0 w-full h-3 bg-slate-200 rounded-full -z-10 anim-pop d-1 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-400 via-teal-400 to-green-400 w-full animate-pulse"></div>
-                        </div>
-                        
-                        <div class="flex justify-between gap-6">
-                            <div class="bg-white p-4 rounded-xl shadow-xl w-1/3 text-center border-t-8 border-blue-500 anim-pop d-2">
-                                <h3 class="font-bold text-md text-slate-800 uppercase tracking-widest mb-1">Fase 1</h3>
-                                <div class="font-bold text-lg text-blue-600">Diagnosticar</div>
-                                <p class="text-slate-500 text-xs mt-1">Manifestaciones identitarias y simbólicas.</p>
+                    <!-- FASES DE LA INVESTIGACIÓN -->
+                    <div class="bg-slate-50 p-6 rounded-2xl anim-pop d-3">
+                        <h3 class="font-bold text-slate-800 text-center mb-4 flex items-center justify-center gap-2">
+                            <i data-lucide="workflow" class="text-teal-600"></i>
+                            Fases de la Investigación
+                        </h3>
+                        <div class="phase-timeline">
+                            <div class="phase-item">
+                                <div class="phase-circle bg-gradient-to-br from-orange-500 to-red-500">1</div>
+                                <p class="phase-label">Diagnóstico<br><span class="text-xs text-slate-400">Identificación de necesidades</span></p>
                             </div>
-                            
-                            <div class="bg-white p-4 rounded-xl shadow-xl w-1/3 text-center border-t-8 border-teal-500 anim-pop d-3">
-                                <h3 class="font-bold text-md text-slate-800 uppercase tracking-widest mb-1">Fase 2</h3>
-                                <div class="font-bold text-lg text-teal-600">Interpretar / Diseñar</div>
-                                <p class="text-slate-500 text-xs mt-1">Lenguaje teatral como estrategia didáctica.</p>
+                            <div class="phase-item">
+                                <div class="phase-circle bg-gradient-to-br from-amber-500 to-orange-500">2</div>
+                                <p class="phase-label">Planificación<br><span class="text-xs text-slate-400">Diseño de propuesta</span></p>
                             </div>
-                            
-                            <div class="bg-white p-4 rounded-xl shadow-xl w-1/3 text-center border-t-8 border-green-500 anim-pop d-4">
-                                <h3 class="font-bold text-md text-slate-800 uppercase tracking-widest mb-1">Fase 3</h3>
-                                <div class="font-bold text-lg text-green-600">Evaluar</div>
-                                <p class="text-slate-500 text-xs mt-1">Pertinencia y alcance de la propuesta.</p>
+                            <div class="phase-item">
+                                <div class="phase-circle bg-gradient-to-br from-teal-500 to-emerald-500">3</div>
+                                <p class="phase-label">Acción<br><span class="text-xs text-slate-400">Implementación teatral</span></p>
+                            </div>
+                            <div class="phase-item">
+                                <div class="phase-circle bg-gradient-to-br from-blue-500 to-indigo-500">4</div>
+                                <p class="phase-label">Observación<br><span class="text-xs text-slate-400">Recolección de datos</span></p>
+                            </div>
+                            <div class="phase-item">
+                                <div class="phase-circle bg-gradient-to-br from-purple-500 to-violet-500">5</div>
+                                <p class="phase-label">Reflexión<br><span class="text-xs text-slate-400">Análisis y conclusiones</span></p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="mt-6 text-center anim-pop d-5">
-                        <span class="text-xs text-slate-500 italic bg-white/50 px-4 py-1 rounded-full border border-slate-200">
-                            * Consideraciones Éticas: Consentimiento informado, Confidencialidad y Bienestar.
-                        </span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- SLIDE 4: RESULTADOS (3 CATEGORÍAS) -->
-            <div id="slide-4" class="slide">
-                <div class="p-12 h-full flex flex-col justify-center bg-white/60">
-                    <h2 class="text-4xl font-bold text-slate-800 mb-2 anim-pop">Análisis de Resultados</h2>
-                    <p class="text-slate-600 mb-8 anim-pop d-1">Resultados organizados en tres categorías centrales:</p>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <!-- Categorías -->
-                        <div class="space-y-6 w-full">
-                            <!-- Cat 1 -->
-                            <div class="anim-slide-r d-1 bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500">
-                                <div class="flex justify-between mb-2">
-                                    <h4 class="font-bold text-slate-800">1. Afirmación Identitaria</h4>
-                                    <span class="text-orange-600 font-bold text-sm">Logrado</span>
-                                </div>
-                                <p class="text-sm text-slate-600 leading-snug">Fortalecimiento del orgullo por tradiciones caribeñas y reconocimiento de relatos locales y afrodescendientes.</p>
+                    <!-- QR Y ÉTICA -->
+                    <div class="flex flex-wrap gap-4 mt-4 anim-pop d-4 justify-center">
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                            <div class="qr-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://drive.google.com/formatos-consentimiento" alt="QR Formatos">
                             </div>
-
-                            <!-- Cat 2 -->
-                            <div class="anim-slide-r d-2 bg-white p-4 rounded-xl shadow-sm border-l-4 border-teal-500">
-                                <div class="flex justify-between mb-2">
-                                    <h4 class="font-bold text-slate-800">2. Transformación Socioemocional</h4>
-                                    <span class="text-teal-600 font-bold text-sm">Logrado</span>
-                                </div>
-                                <p class="text-sm text-slate-600 leading-snug">Mejora en expresión emocional, empatía y disminución de exclusión simbólica.</p>
-                            </div>
-
-                            <!-- Cat 3 -->
-                            <div class="anim-slide-r d-3 bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500">
-                                <div class="flex justify-between mb-2">
-                                    <h4 class="font-bold text-slate-800">3. Desafíos y Proyecciones</h4>
-                                    <span class="text-red-600 font-bold text-sm">En Proceso</span>
-                                </div>
-                                <p class="text-sm text-slate-600 leading-snug">Limitaciones de infraestructura y necesidad de continuidad pedagógica en el currículo.</p>
+                            <div class="text-left">
+                                <h4 class="font-bold text-slate-700 text-sm">Formatos Éticos</h4>
+                                <p class="text-xs text-slate-500">Consentimientos informados,<br>asentimientos y formatos de ética</p>
                             </div>
                         </div>
-
-                        <!-- Discusión -->
-                        <div class="anim-pop d-4 bg-slate-800 p-8 rounded-2xl shadow-2xl relative transform hover:scale-105 transition-transform duration-300">
-                            <h3 class="text-white font-bold text-xl mb-4 border-b border-slate-600 pb-2">Discusión</h3>
-                            <ul class="space-y-3 text-slate-300 text-sm list-disc pl-4">
-                                <li>El teatro actúa como lenguaje pedagógico <strong>situado</strong>.</li>
-                                <li>Resignificación de la identidad desde la <strong>vivencia</strong>.</li>
-                                <li>Coherencia entre memoria, interculturalidad y arte.</li>
-                                <li>Favorece la convivencia y participación activa.</li>
+                        <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200">
+                            <h4 class="font-bold text-emerald-800 text-sm mb-2 flex items-center gap-2">
+                                <i data-lucide="shield-check" size="16"></i> Consideraciones Éticas
+                            </h4>
+                            <ul class="text-xs text-emerald-700 space-y-1">
+                                <li>✓ Consentimiento informado</li>
+                                <li>✓ Asentimiento voluntario</li>
+                                <li>✓ Confidencialidad</li>
+                                <li>✓ Protección del bienestar</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- SLIDE 5: EVIDENCIAS (Mantenido igual por ser visual) -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- SLIDE 4: RESULTADOS (Hallazgos con organizadores gráficos) -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <div id="slide-4" class="slide">
+                <div class="p-8 h-full flex flex-col overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6 anim-slide-r">
+                        <div>
+                            <span class="text-teal-600 font-bold uppercase tracking-widest text-sm">Análisis de Resultados</span>
+                            <h2 class="text-3xl font-bold text-slate-800">Hallazgos por Categorías</h2>
+                        </div>
+                        <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600">Página 1 de 2</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
+                        <!-- CATEGORÍA 1 con gráfico -->
+                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-1">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                                    <i data-lucide="flag" class="text-orange-600" size="20"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800">1. Teatro como Afirmación Identitaria</h3>
+                                    <span class="text-xs text-orange-600 font-semibold">Categoría Principal</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Orgullo por tradiciones caribeñas</span>
+                                        <span class="font-bold text-orange-600">92%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="92%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Reconocimiento de relatos locales</span>
+                                        <span class="font-bold text-orange-600">87%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="87%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Valoración del origen campesino</span>
+                                        <span class="font-bold text-orange-600">85%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full" data-width="85%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CATEGORÍA 2 con gráfico -->
+                        <div class="bg-white p-6 rounded-2xl shadow-lg anim-pop d-2">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center">
+                                    <i data-lucide="heart-handshake" class="text-teal-600" size="20"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-800">2. Transformación Socioemocional</h3>
+                                    <span class="text-xs text-teal-600 font-semibold">Categoría Principal</span>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Mejora en expresión emocional</span>
+                                        <span class="font-bold text-teal-600">88%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="88%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Incremento de empatía</span>
+                                        <span class="font-bold text-teal-600">84%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="84%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-slate-600">Reducción de exclusión simbólica</span>
+                                        <span class="font-bold text-teal-600">79%</span>
+                                    </div>
+                                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+                                        <div class="chart-bar h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full" data-width="79%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CATEGORÍA 3 -->
+                        <div class="bg-slate-800 p-6 rounded-2xl shadow-lg anim-pop d-3 text-white">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <i data-lucide="alert-triangle" class="text-amber-400" size="20"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold">3. Desafíos y Proyecciones</h3>
+                                    <span class="text-xs text-amber-400 font-semibold">Categoría Emergente</span>
+                                </div>
+                            </div>
+                            <ul class="space-y-2 text-sm text-slate-300">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="minus" size="16" class="text-red-400 mt-1"></i>
+                                    Limitaciones de infraestructura y recursos
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="minus" size="16" class="text-red-400 mt-1"></i>
+                                    Escasa presencia del teatro en el currículo
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="plus" size="16" class="text-green-400 mt-1"></i>
+                                    Necesidad de continuidad pedagógica
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- DISCUSIÓN -->
+                        <div class="bg-gradient-to-br from-purple-600 to-violet-700 p-6 rounded-2xl shadow-lg anim-pop d-4 text-white">
+                            <h3 class="font-bold text-xl mb-4 flex items-center gap-2">
+                                <i data-lucide="message-square"></i> Discusión
+                            </h3>
+                            <ul class="space-y-2 text-sm">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
+                                    El teatro actúa como lenguaje pedagógico <strong>situado</strong> y pertinente al territorio
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
+                                    Resignificación de la identidad desde la <strong>vivencia</strong>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
+                                    Coherencia entre memoria, interculturalidad y arte
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="16" class="text-green-300 mt-1"></i>
+                                    Favorece la convivencia y participación activa
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- SLIDE 5: EVIDENCIAS (Galería) -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-5" class="slide">
-                <div class="p-12 h-full flex flex-col">
+                <div class="p-10 h-full flex flex-col">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-3xl font-bold text-slate-800 anim-pop flex items-center gap-3">
-                            <i data-lucide="camera" class="text-slate-400"></i> Galería de Evidencias
-                        </h2>
-                        <span class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full border border-red-200 anim-pop d-1">
-                            * Rostros protegidos por ética de investigación
-                        </span>
+                        <div>
+                            <span class="text-slate-500 font-bold uppercase tracking-widest text-sm">Resultados</span>
+                            <h2 class="text-3xl font-bold text-slate-800 anim-pop flex items-center gap-3">
+                                <i data-lucide="camera" class="text-slate-400"></i> Galería de Evidencias
+                            </h2>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs bg-red-100 text-red-800 px-3 py-1 rounded-full border border-red-200 anim-pop d-1">
+                                * Rostros protegidos por ética de investigación
+                            </span>
+                            <span class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600">Página 2 de 2</span>
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-4 grid-rows-2 gap-4 flex-1">
@@ -614,49 +910,135 @@
                         </div>
                         <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-2 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft2')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
+                                <span class="text-white text-xs font-semibold">Ensayos grupales</span>
+                            </div>
                         </div>
                         <div class="col-span-1 row-span-2 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-3 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft3')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
+                                <span class="text-white text-xs font-semibold">Expresión corporal</span>
+                            </div>
                         </div>
                         <div class="col-span-1 row-span-1 relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer anim-pop d-4 hover:translate-y-1 transition-transform border border-white/50" onclick="openModal('img_ft4')">
                             <img src="https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3">
+                                <span class="text-white text-xs font-semibold">Presentación final</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR al portafolio -->
+                    <div class="mt-4 flex justify-center anim-pop d-5">
+                        <div class="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                            <div class="qr-container">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://drive.google.com/portafolio-investigacion" alt="QR Portafolio">
+                            </div>
+                            <div class="text-left">
+                                <h4 class="font-bold text-slate-700 text-sm">Portafolio de Investigación</h4>
+                                <p class="text-xs text-slate-500">Diarios de campo, matrices de<br>sistematización y más evidencias</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <!-- SLIDE 6: CONCLUSIONES -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-6" class="slide">
-                <div class="p-12 h-full flex flex-col justify-center items-center">
-                    <h2 class="text-4xl font-extrabold text-slate-800 mb-8 anim-pop text-center">Conclusiones y Recomendaciones</h2>
+                <div class="p-10 h-full flex flex-col justify-center items-center overflow-y-auto">
+                    <h2 class="text-3xl font-extrabold text-slate-800 mb-6 anim-pop text-center">Conclusiones, Proyecciones y Aportes</h2>
+
+                    <!-- RESPUESTA DIRECTA A LA PREGUNTA -->
+                    <div class="w-full max-w-5xl mb-6 anim-pop d-1">
+                        <div class="bg-gradient-to-r from-orange-500 to-red-600 p-6 rounded-2xl shadow-xl text-white">
+                            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                                <i data-lucide="message-circle-question"></i> Respuesta a la Pregunta de Investigación
+                            </h3>
+                            <p class="text-base leading-relaxed">
+                                El teatro, implementado como propuesta pedagógica, <strong>sí contribuye significativamente</strong> al fortalecimiento de la identidad cultural caribe al permitir que los estudiantes expresen, reconozcan y valoren sus tradiciones, memorias y herencia cultural. Asimismo, <strong>reduce las prácticas de exclusión simbólica</strong> al generar espacios de encuentro, empatía y reconocimiento mutuo entre los participantes.
+                            </p>
+                        </div>
+                    </div>
 
                     <div class="flex flex-wrap justify-center gap-6 w-full max-w-6xl">
                         
-                        <!-- Conclusión -->
-                        <div class="bg-white p-8 rounded-3xl shadow-xl w-full md:w-[45%] text-center border-t-8 border-orange-500 anim-pop d-1 hover:-translate-y-2 transition-transform duration-300">
-                            <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 text-orange-600">
-                                <i data-lucide="check-circle" size="32"></i>
+                        <!-- Conclusiones -->
+                        <div class="bg-white p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-orange-500 anim-pop d-2">
+                            <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600">
+                                <i data-lucide="check-circle" size="24"></i>
                             </div>
-                            <h3 class="font-bold text-xl mb-4 text-slate-800">Conclusiones</h3>
-                            <ul class="text-slate-600 text-sm leading-relaxed text-left list-disc pl-6 space-y-2">
-                                <li>Estrategia eficaz para fortalecer la identidad caribe.</li>
-                                <li>Expresión simbólica de la memoria local.</li>
-                                <li>Favorece el sentido de pertenencia y cohesión.</li>
-                                <li>Contribuye a una educación rural inclusiva.</li>
+                            <h3 class="font-bold text-lg mb-3 text-slate-800 text-center">Conclusiones</h3>
+                            <ul class="text-slate-600 text-sm leading-relaxed text-left space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    Estrategia eficaz para fortalecer la identidad caribe
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    Expresión simbólica de la memoria local
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    Favorece cohesión social y pertenencia
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="check" size="14" class="text-orange-500 mt-1 shrink-0"></i>
+                                    Educación rural más inclusiva
+                                </li>
                             </ul>
                         </div>
 
                         <!-- Recomendaciones -->
-                        <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full md:w-[45%] text-center border-t-8 border-teal-500 anim-pop d-2 hover:-translate-y-4 transition-transform duration-300 transform scale-105 relative">
-                            <div class="w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-4 text-teal-400">
-                                <i data-lucide="trending-up" size="32"></i>
+                        <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-teal-500 anim-pop d-3 text-white">
+                            <div class="w-12 h-12 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto mb-3 text-teal-400">
+                                <i data-lucide="trending-up" size="24"></i>
                             </div>
-                            <h3 class="font-bold text-xl mb-4 text-white">Recomendaciones</h3>
-                            <ul class="text-slate-300 text-sm leading-relaxed text-left list-disc pl-6 space-y-2">
-                                <li>Incorporar teatro como práctica permanente.</li>
-                                <li>Fortalecer formación docente en pedagogía teatral.</li>
-                                <li>Articular arte con proyectos transversales.</li>
-                                <li>Replicar propuesta en otros contextos rurales.</li>
+                            <h3 class="font-bold text-lg mb-3 text-center">Proyecciones</h3>
+                            <ul class="text-slate-300 text-sm leading-relaxed text-left space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    Incorporar teatro como práctica permanente
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    Fortalecer formación docente en pedagogía teatral
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    Articular arte con proyectos transversales
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="arrow-right" size="14" class="text-teal-400 mt-1 shrink-0"></i>
+                                    Replicar en otros contextos rurales
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Aportes a líneas de investigación -->
+                        <div class="bg-gradient-to-br from-purple-600 to-violet-700 p-6 rounded-2xl shadow-xl w-full md:w-[30%] border-t-4 border-purple-300 anim-pop d-4 text-white">
+                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 text-purple-200">
+                                <i data-lucide="graduation-cap" size="24"></i>
+                            </div>
+                            <h3 class="font-bold text-lg mb-3 text-center">Aportes a la Maestría</h3>
+                            <ul class="text-purple-100 text-sm leading-relaxed text-left space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="star" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    <strong>Línea: Educación y Diversidad Cultural</strong>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="star" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    <strong>Línea: Pedagogías Alternativas</strong>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="lightbulb" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    Modelo replicable para contextos rurales
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <i data-lucide="lightbulb" size="14" class="text-yellow-300 mt-1 shrink-0"></i>
+                                    Integración arte-currículo
+                                </li>
                             </ul>
                         </div>
 
@@ -664,30 +1046,33 @@
                 </div>
             </div>
 
-            <!-- SLIDE 7: REFERENTES -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
+            <!-- SLIDE 7: REFERENCIAS BIBLIOGRÁFICAS -->
+            <!-- ═══════════════════════════════════════════════════════════════════ -->
             <div id="slide-7" class="slide">
-                <div class="p-16 h-full flex flex-col justify-center items-center">
+                <div class="p-12 h-full flex flex-col justify-center items-center">
                     <h2 class="text-3xl font-bold text-slate-800 mb-8 border-b-4 border-orange-400 pb-2 anim-slide-r">Referencias Bibliográficas</h2>
+                    <p class="text-slate-500 text-sm mb-6 anim-pop d-1">Formato APA 7ª edición</p>
                     
                     <div class="space-y-4 max-w-4xl w-full">
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-orange-500 transition-all anim-slide-r d-1 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm"><strong>Boal, A. (2009).</strong> <em>La estética del oprimido</em>. Alba Editorial.</p>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-orange-500 hover:shadow-md transition-all anim-slide-r d-1">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Boal, A. (2009). <em>La estética del oprimido</em>. Alba Editorial.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-teal-500 transition-all anim-slide-r d-2 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm"><strong>Candau, V. M. (2010).</strong> <em>Educación intercultural en América Latina</em>.</p>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-teal-500 hover:shadow-md transition-all anim-slide-r d-2">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Candau, V. M. (2010). Educación intercultural en América Latina: Distintas concepciones y tensiones actuales. <em>Estudios Pedagógicos, 36</em>(2), 333-342. https://doi.org/10.4067/S0718-07052010000200019</p>
                         </div>
                          <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-purple-500 transition-all anim-slide-r d-3 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm"><strong>Nussbaum, M. (2010).</strong> <em>Sin fines de lucro: Por qué la democracia necesita de las humanidades</em>.</p>
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Nussbaum, M. (2010). <em>Sin fines de lucro: Por qué la democracia necesita de las humanidades</em>. Katz Editores.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-blue-500 transition-all anim-slide-r d-4 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm"><strong>Walsh, C. (2009).</strong> <em>Interculturalidad, estado y sociedad</em>. Universidad Andina Simón Bolívar.</p>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-500 hover:shadow-md transition-all anim-slide-r d-4">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Schechner, R. (2013). <em>Performance Studies: An Introduction</em> (3rd ed.). Routledge.</p>
                         </div>
-                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-300 hover:border-red-500 transition-all anim-slide-r d-5 hover:shadow-md">
-                            <p class="pl-4 -indent-4 text-slate-700 text-sm"><strong>Schechner, R. (2013).</strong> <em>Performance Studies: An Introduction</em>. Routledge.</p>
+                        <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-500 hover:shadow-md transition-all anim-slide-r d-5">
+                            <p class="pl-4 -indent-4 text-slate-700 text-sm">Walsh, C. (2009). <em>Interculturalidad, estado, sociedad: Luchas (de)coloniales de nuestra época</em>. Universidad Andina Simón Bolívar / Ediciones Abya-Yala.</p>
                         </div>
                     </div>
                     
-                    <button onclick="goToSlide(0)" class="mt-8 bg-slate-800 text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-500 transition-all hover:scale-105 anim-pop d-4 flex items-center gap-2">
+                    <button onclick="goToSlide(0)" class="mt-8 bg-slate-800 text-white px-8 py-3 rounded-full shadow-lg hover:bg-orange-500 transition-all hover:scale-105 anim-pop d-6 flex items-center gap-2">
                         <i data-lucide="rotate-ccw" size="18"></i> Volver al Inicio
                     </button>
                 </div>
@@ -726,6 +1111,8 @@
             const nextClone = next.cloneNode(true);
             next.parentNode.replaceChild(nextClone, next);
             nextClone.classList.add('active');
+            
+            // Animar barras de gráficos en slide 4
             if(index === 4) {
                 setTimeout(() => {
                     document.querySelectorAll('.chart-bar').forEach(bar => {
@@ -750,45 +1137,137 @@
                 body.innerHTML = `
                     <div class="text-left space-y-6">
                         <div class="bg-orange-50 p-6 rounded-xl border-l-4 border-orange-500">
-                            <h4 class="font-bold text-orange-800 mb-2 uppercase text-sm">Objetivo General</h4>
-                            <p class="text-slate-700">Diseñar una propuesta pedagógica basada en el teatro para el fortalecimiento de la identidad cultural caribe en estudiantes de 7.º y 8.º grado de la Institución Educativa El Cedro, ubicada en la zona rural del municipio de Ayapel.</p>
+                            <h4 class="font-bold text-orange-800 mb-2 uppercase text-sm flex items-center gap-2"><i data-lucide="target" size="16"></i> Objetivo General</h4>
+                            <p class="text-slate-700">Diseñar una propuesta pedagógica basada en el teatro para el fortalecimiento de la identidad cultural caribe en estudiantes de 7.º y 8.º grado de una institución educativa ubicada en la zona rural del municipio de Ayapel.</p>
                         </div>
                         <div class="space-y-4">
                             <h4 class="font-bold text-slate-800 uppercase text-sm border-b pb-1">Objetivos Específicos</h4>
-                            <div class="flex gap-4 items-start">
-                                <span class="bg-slate-200 text-slate-700 font-bold px-2 rounded">1</span>
-                                <p class="text-sm"><strong>Diagnosticar</strong> las manifestaciones identitarias, simbólicas y culturales presentes en los estudiantes.</p>
+                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
+                                <span class="bg-orange-500 text-white font-bold px-3 py-1 rounded-full text-sm">1</span>
+                                <p class="text-sm"><strong>Diagnosticar</strong> las manifestaciones identitarias, simbólicas y culturales presentes en los estudiantes en relación con su contexto caribe rural.</p>
                             </div>
-                            <div class="flex gap-4 items-start">
-                                <span class="bg-slate-200 text-slate-700 font-bold px-2 rounded">2</span>
-                                <p class="text-sm"><strong>Interpretar</strong> las posibilidades del lenguaje teatral como estrategia didáctica para la reconstrucción identitaria.</p>
+                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
+                                <span class="bg-teal-500 text-white font-bold px-3 py-1 rounded-full text-sm">2</span>
+                                <p class="text-sm"><strong>Interpretar</strong> las posibilidades del lenguaje teatral como estrategia didáctica para promover la expresión simbólica, el reconocimiento cultural y la reconstrucción identitaria.</p>
                             </div>
-                            <div class="flex gap-4 items-start">
-                                <span class="bg-slate-200 text-slate-700 font-bold px-2 rounded">3</span>
-                                <p class="text-sm"><strong>Evaluar</strong> la pertinencia y el alcance de la propuesta pedagógica diseñada.</p>
+                            <div class="flex gap-4 items-start bg-slate-50 p-3 rounded-lg">
+                                <span class="bg-purple-500 text-white font-bold px-3 py-1 rounded-full text-sm">3</span>
+                                <p class="text-sm"><strong>Evaluar</strong> la pertinencia y el alcance de la propuesta pedagógica diseñada en función de las necesidades culturales y educativas de la institución.</p>
                             </div>
                         </div>
                     </div>
                 `;
-            } else if (type === 'diagnostico') {
-                 title.textContent = "Árbol de Problemas";
-                 body.innerHTML = `<div class="text-left space-y-4"><p class="bg-red-50 p-4 rounded-lg text-red-800 border-l-4 border-red-500"><strong>Problema Central:</strong> Prácticas de exclusión simbólica y debilitamiento de la identidad cultural caribe.</p></div>`;
+            } else if (type === 'arbol') {
+                title.textContent = "Árbol de Problemas";
+                body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <div class="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                            <h4 class="font-bold text-red-800 mb-2">Problema Central</h4>
+                            <p class="text-red-700">Prácticas de exclusión simbólica y debilitamiento de la identidad cultural caribe en estudiantes de zonas rurales.</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500">
+                                <h4 class="font-bold text-amber-800 mb-2 text-sm">Causas</h4>
+                                <ul class="text-sm text-amber-700 space-y-1">
+                                    <li>• Escasa integración del arte al currículo</li>
+                                    <li>• Desvalorización de tradiciones locales</li>
+                                    <li>• Limitada expresión cultural en la escuela</li>
+                                    <li>• Aislamiento geográfico y cultural</li>
+                                </ul>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                                <h4 class="font-bold text-blue-800 mb-2 text-sm">Efectos</h4>
+                                <ul class="text-sm text-blue-700 space-y-1">
+                                    <li>• Baja autoestima cultural</li>
+                                    <li>• Pérdida de memoria colectiva</li>
+                                    <li>• Exclusión entre pares</li>
+                                    <li>• Desarraigo identitario</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
             } else if (type.startsWith('img_')) {
-                const urls = { 'img_ft1': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg', 'img_ft2': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg', 'img_ft3': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg', 'img_ft4': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg' };
+                const urls = { 
+                    'img_ft1': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft1.jpeg', 
+                    'img_ft2': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft2.jpeg', 
+                    'img_ft3': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft3.jpeg', 
+                    'img_ft4': 'https://raw.githubusercontent.com/recursosedcucativos/vibecoding/main/img/ft4.jpeg' 
+                };
                 title.textContent = "Evidencia Fotográfica";
                 body.innerHTML = `<img src="${urls[type]}" class="rounded-lg shadow-lg w-full">`;
             } else if (type === 'teoria_1') {
-                title.textContent = "Identidad Cultural e Interculturalidad";
-                body.innerHTML = `<div class="text-left p-4 bg-orange-50 rounded"><p class="mb-2">La identidad no es estática. Se retoman aportes de <strong>Walsh</strong> para diferenciar la interculturalidad crítica de enfoques folclorizantes.</p></div>`;
+                title.textContent = "Identidad Cultural e Interculturalidad Crítica";
+                body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <div class="bg-orange-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-orange-800 mb-2">Concepto Central</h4>
+                            <p class="text-slate-700">La identidad cultural es un proceso dinámico, relacional y en constante construcción. La escuela es un espacio clave en la configuración identitaria.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Autores de Referencia</h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li><strong>Walsh (2009):</strong> Interculturalidad crítica vs. funcional</li>
+                                <li><strong>Candau (2010):</strong> Tensiones en educación intercultural latinoamericana</li>
+                                <li><strong>Tubino (2005):</strong> Diferenciación de enfoques interculturales</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
             } else if (type === 'teoria_2') {
-                title.textContent = "Teatro como Estrategia";
-                body.innerHTML = `<div class="text-left p-4 bg-teal-50 rounded"><p class="mb-2">Sustentado en <strong>Boal</strong> (Teatro del Oprimido) y <strong>Nussbaum</strong> (Emociones políticas). Permite articular cuerpo, emoción y memoria.</p></div>`;
+                title.textContent = "Teatro como Estrategia Pedagógica";
+                body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <div class="bg-teal-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-teal-800 mb-2">Concepto Central</h4>
+                            <p class="text-slate-700">El teatro no es solo actividad artística sino un lenguaje pedagógico que permite articular cuerpo, emoción, memoria, palabra y creación colectiva.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Autores de Referencia</h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li><strong>Boal (2009):</strong> Teatro del Oprimido y estética liberadora</li>
+                                <li><strong>Schechner (2013):</strong> Performance como práctica cultural</li>
+                                <li><strong>Nussbaum (2010):</strong> Emociones políticas y educación humanística</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
             } else if (type === 'teoria_3') {
-                title.textContent = "Adolescencia e Identidad";
-                body.innerHTML = `<div class="text-left p-4 bg-purple-50 rounded"><p class="mb-2">La adolescencia como etapa de búsqueda de sentido. El teatro ofrece un espacio seguro para explorar roles y narrativas propias.</p></div>`;
+                title.textContent = "Adolescencia, Identidad y Subjetivación";
+                body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-purple-800 mb-2">Concepto Central</h4>
+                            <p class="text-slate-700">La adolescencia es una etapa clave para la construcción identitaria, caracterizada por la búsqueda de sentido, pertenencia y reconocimiento cultural.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Aportes Teóricos</h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li>El teatro ofrece un espacio seguro para explorar roles y narrativas propias</li>
+                                <li>Permite la experimentación con diferentes formas de ser y expresarse</li>
+                                <li>Favorece la construcción de una identidad integrada y coherente</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
             } else if (type === 'teoria_4') {
-                title.textContent = "Educación Rural";
-                body.innerHTML = `<div class="text-left p-4 bg-blue-50 rounded"><p class="mb-2">Análisis de las limitaciones estructurales en Colombia y la necesidad de inclusión cultural según lineamientos del <strong>MEN</strong>.</p></div>`;
+                title.textContent = "Educación Artística y Ruralidad";
+                body.innerHTML = `
+                    <div class="text-left space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-blue-800 mb-2">Concepto Central</h4>
+                            <p class="text-slate-700">Análisis de las limitaciones estructurales de la educación rural en Colombia y la escasa integración del arte al currículo.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2">Fuentes Institucionales</h4>
+                            <ul class="text-sm text-slate-600 space-y-2">
+                                <li><strong>MEN:</strong> Lineamientos de educación artística y rural</li>
+                                <li><strong>UNESCO:</strong> Educación para el desarrollo sostenible e inclusión cultural</li>
+                                <li>Necesidad de una educación contextualizada que reconozca la diversidad territorial</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
             }
 
             lucide.createIcons();
