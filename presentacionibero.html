@@ -156,9 +156,13 @@
 
         /* --- ELEMENTS & CARDS --- */
         h1 {
-            font-size: 2.2rem; margin-bottom: 20px; line-height: 1.2;
+            font-size: 1.8rem;
+            margin-bottom: 20px; 
+            line-height: 1.2;
             background: linear-gradient(120deg, #ffffff, var(--secondary), #ffffff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             animation: shine 3s linear infinite;
         }
         h2 { font-size: 2rem; color: var(--secondary); margin-bottom: 25px; }
@@ -183,6 +187,20 @@
         .info-card:hover {
             border-color: var(--secondary);
             background: rgba(0, 51, 102, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* Estilo para tarjetas interactivas (Teóricos) */
+        .interactive-card {
+            cursor: pointer;
+            border: 1px solid var(--accent);
+        }
+        .interactive-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(0, 169, 224, 0.15);
+        }
+        .click-hint {
+            position: absolute; top: 10px; right: 10px; font-size: 0.8rem;
+            color: var(--secondary); opacity: 0.7;
         }
 
         /* --- CUSTOM SVGs --- */
@@ -226,12 +244,43 @@
         }
         .close-btn:hover { color: var(--secondary); }
 
+        /* Modal Específico para Teóricos */
+        #modal-theorist .modal-content {
+            text-align: left;
+            border-left: 5px solid var(--accent);
+        }
+        #theorist-list li {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+        }
+        #theorist-list li::before {
+            content: '➤'; position: absolute; left: 0; color: var(--secondary); font-size: 0.8rem;
+        }
+
         /* --- STICKERS / BADGES --- */
         .sticker {
             position: absolute; top: -10px; right: -10px;
             background: var(--accent); color: #fff; padding: 5px 10px;
             font-size: 0.8rem; font-weight: bold; border-radius: 20px;
             box-shadow: 0 5px 10px rgba(0,0,0,0.3); animation: floatBadge 3s infinite ease-in-out;
+        }
+
+        /* --- HALLAZGOS INTEGRADOS (ESTILOS MEJORADOS) --- */
+        .finding-item {
+            display: flex; align-items: flex-start; gap: 15px;
+            margin-bottom: 20px; padding: 15px;
+            background: rgba(255,255,255,0.03); border-radius: 10px;
+            border-left: 3px solid transparent; transition: 0.3s;
+        }
+        .finding-item:hover {
+            background: rgba(255,255,255,0.08); border-left-color: var(--secondary);
+            transform: translateX(10px);
+        }
+        .finding-icon {
+            min-width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); display: flex; align-items: center; justify-content: center;
+            color: var(--secondary); font-size: 1.2rem; border: 1px solid var(--secondary);
         }
 
         @keyframes floatBadge {
@@ -306,7 +355,7 @@
         /* Responsive */
         @media (max-width: 768px) {
             .presentation-container { width: 95vw; height: 85vh; }
-            h1 { font-size: 1.5rem; }
+            h1 { font-size: 1.3rem; }
             .grid-layout { grid-template-columns: 1fr; }
             .modal-content { width: 95%; }
         }
@@ -317,7 +366,7 @@
     <canvas id="canvas-bg"></canvas>
     <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
 
-    <!-- LOGO (Única imagen externa permitida) -->
+    <!-- LOGO CORREGIDO (Restaurada la imagen base64 completa del archivo original) -->
     <div class="logo-container">
         <img src="data:image/png;base64,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" alt="IBERO" class="logo-img">
         <div class="logo-text">
@@ -351,7 +400,7 @@
     <!-- MODAL (Ventana Emergente - Ilustración SVG) -->
     <div class="modal" id="modal-contexto">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">×</span>
+            <span class="close-btn" onclick="closeModal('modal-contexto')">×</span>
             <h2 style="color:var(--secondary)">Escenario: Aula Viva</h2>
             <!-- ILUSTRACIÓN SVG DEL AULA -->
             <svg viewBox="0 0 500 250" style="width:100%; border-radius:10px; margin-bottom:20px; border:2px solid var(--secondary);">
@@ -381,13 +430,29 @@
         </div>
     </div>
 
+    <!-- MODAL (Ventana Emergente - Teóricos) -->
+    <div class="modal" id="modal-theorist">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-theorist')">×</span>
+            <div id="theorist-content">
+                <h2 id="theorist-title" style="color:var(--secondary)">Nombre del Autor</h2>
+                <h4 id="theorist-subtitle" style="color:var(--accent); margin-bottom:15px;">Concepto Clave</h4>
+                <ul id="theorist-list" style="list-style:none; text-align:left; line-height:1.6;">
+                    <!-- Contenido dinámico aquí -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
     <!-- SLIDER -->
     <div class="presentation-container">
 
         <!-- SLIDE 1: PORTADA -->
         <div class="slide active" data-guide="Bienvenidos a esta propuesta de transformación educativa.">
+            <!-- Restaurado justify-content: center para el alineado vertical correcto -->
             <div class="slide-content-wrapper" style="text-align: center; justify-content: center; display:flex; flex-direction:column;">
                 <h3 style="color:var(--secondary); letter-spacing: 3px; text-transform: uppercase;">Proyecto de Investigación</h3>
+                <!-- TÍTULO RESTAURADO: Estilo degradado original pero con font-size reducido -->
                 <h1 class="tilt-element">Fortalecimiento de la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B</h1>
                 
                 <div class="grid-layout">
@@ -429,7 +494,7 @@
             <div class="slide-content-wrapper">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>Contexto del Estudio</h2>
-                    <button onclick="openModal()" style="background:var(--secondary); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
+                    <button onclick="openModal('modal-contexto')" style="background:var(--secondary); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
                         <i class="fas fa-eye"></i> Ver Escenario
                     </button>
                 </div>
@@ -511,13 +576,14 @@
             </div>
         </div>
 
-        <!-- SLIDE 5: REFERENTES (ILUSTRACIONES PROPIAS) -->
-        <div class="slide" data-guide="Conozcamos a los teóricos que nos inspiran.">
+        <!-- SLIDE 5: REFERENTES (MODIFICADO: INTERACTIVO) -->
+        <div class="slide" data-guide="Haz clic sobre cada autor para ver sus aportes específicos.">
             <div class="slide-content-wrapper">
-                <h2>Referentes Teóricos</h2>
+                <h2>Referentes Teóricos <span style="font-size:0.9rem; font-weight:normal; color:#aaa;">(Clic para detalles)</span></h2>
                 <div class="grid-layout">
                     <!-- Freire (Diálogo) -->
-                    <div class="info-card" style="text-align:center;">
+                    <div class="info-card interactive-card" onclick="openTheoristModal('freire')" style="text-align:center;">
+                        <span class="click-hint"><i class="fas fa-hand-pointer"></i></span>
                         <svg class="svg-icon" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="45" fill="none" stroke="#00A9E0" stroke-width="2"/>
                             <!-- Speech Bubbles -->
@@ -528,7 +594,8 @@
                         <p style="font-size:0.9rem;">Pedagogía Crítica: Diálogo y humanización.</p>
                     </div>
                     <!-- Goleman (Cerebro/Corazón) -->
-                    <div class="info-card" style="text-align:center;">
+                    <div class="info-card interactive-card" onclick="openTheoristModal('goleman')" style="text-align:center;">
+                        <span class="click-hint"><i class="fas fa-hand-pointer"></i></span>
                         <svg class="svg-icon" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="45" fill="none" stroke="#E4A900" stroke-width="2"/>
                             <!-- Brain Left -->
@@ -540,7 +607,8 @@
                         <p style="font-size:0.9rem;">Inteligencia Emocional: Autorregulación.</p>
                     </div>
                     <!-- Giroux (Resistencia) -->
-                    <div class="info-card" style="text-align:center;">
+                    <div class="info-card interactive-card" onclick="openTheoristModal('giroux')" style="text-align:center;">
+                        <span class="click-hint"><i class="fas fa-hand-pointer"></i></span>
                         <svg class="svg-icon" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="45" fill="none" stroke="#fff" stroke-width="2"/>
                             <!-- Puño/Lápiz -->
@@ -551,7 +619,8 @@
                         <p style="font-size:0.9rem;">Escuela y Transformación Social.</p>
                     </div>
                     <!-- Aguado-Odina (Mundo) -->
-                    <div class="info-card" style="text-align:center;">
+                    <div class="info-card interactive-card" onclick="openTheoristModal('aguado')" style="text-align:center;">
+                        <span class="click-hint"><i class="fas fa-hand-pointer"></i></span>
                         <svg class="svg-icon" viewBox="0 0 100 100">
                             <circle cx="50" cy="50" r="40" stroke="#E4A900" stroke-width="3" fill="none"/>
                             <path d="M10,50 L90,50" stroke="#E4A900" stroke-width="2"/>
@@ -661,7 +730,57 @@
             </div>
         </div>
 
-        <!-- SLIDE 10: CONCLUSIONES -->
+        <!-- NUEVO SLIDE: RESULTADOS INTEGRADOS (SOLICITUD ADICIONAL) -->
+        <div class="slide" data-guide="Una lectura transversal de nuestros hallazgos.">
+            <div class="slide-content-wrapper">
+                <h2>Resultados obtenidos: Lectura integrada de los hallazgos</h2>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+                    
+                    <div class="finding-item">
+                        <div class="finding-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div>
+                            <h4 style="color:var(--secondary)">Normalización del Conflicto</h4>
+                            <p style="font-size:0.95rem;">Los conflictos escolares se presentan como parte habitual de la dinámica del aula y tienden a normalizarse.</p>
+                        </div>
+                    </div>
+
+                    <div class="finding-item">
+                        <div class="finding-icon"><i class="fas fa-brain"></i></div>
+                        <div>
+                            <h4 style="color:var(--accent)">Dificultades de Autorregulación</h4>
+                            <p style="font-size:0.95rem;">La convivencia escolar se ve afectada por dificultades en la autorregulación emocional y en la gestión del conflicto.</p>
+                        </div>
+                    </div>
+
+                    <div class="finding-item">
+                        <div class="finding-icon"><i class="fas fa-user"></i></div>
+                        <div>
+                            <h4 style="color:var(--secondary)">Individualismo vs. Colectivo</h4>
+                            <p style="font-size:0.95rem;">Las respuestas de los estudiantes evidencian estrategias individuales de afrontamiento más que soluciones colectivas.</p>
+                        </div>
+                    </div>
+
+                    <div class="finding-item">
+                        <div class="finding-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <div>
+                            <h4 style="color:var(--primary-light)">El Rol del Docente</h4>
+                            <p style="font-size:0.95rem;">La mediación docente aparece como un factor clave para disminuir tensiones y mejorar el clima del aula.</p>
+                        </div>
+                    </div>
+
+                    <div class="finding-item">
+                        <div class="finding-icon"><i class="fas fa-file-contract"></i></div>
+                        <div>
+                            <h4 style="color:#ff4444">Brecha Institucional</h4>
+                            <p style="font-size:0.95rem;">Existe una brecha entre los lineamientos institucionales sobre convivencia y su aplicación en la práctica cotidiana.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: CONCLUSIONES -->
         <div class="slide" data-guide="El conflicto es una oportunidad de aprendizaje.">
             <div class="slide-content-wrapper">
                 <h2>Conclusiones</h2>
@@ -679,7 +798,7 @@
             </div>
         </div>
 
-        <!-- SLIDE 11: APORTES -->
+        <!-- SLIDE 12: APORTES -->
         <div class="slide" data-guide="Nuestra contribución a la escuela.">
             <div class="slide-content-wrapper">
                 <h2>Aportes</h2>
@@ -702,7 +821,7 @@
             </div>
         </div>
 
-        <!-- SLIDE 12: REFERENCIAS -->
+        <!-- SLIDE 13: REFERENCIAS -->
         <div class="slide" data-guide="Gracias por su atención.">
             <div class="slide-content-wrapper">
                 <h2>Referencias</h2>
@@ -735,6 +854,46 @@
         const progress = document.getElementById('progress');
         const avatarMsg = document.getElementById('avatar-msg');
         const menu = document.getElementById('menu');
+
+        // --- DATOS DE LOS TEÓRICOS PARA EL MODAL ---
+        const theoristData = {
+            freire: {
+                name: "Paulo Freire",
+                concept: "Pedagogía Crítica",
+                points: [
+                    "Concibe el diálogo como una práctica pedagógica esencial para la transformación de las relaciones educativas.",
+                    "Plantea que la convivencia escolar se fortalece cuando se reconoce al otro como sujeto y no como objeto de control.",
+                    "Aporta la idea de que el conflicto, abordado críticamente, puede convertirse en una oportunidad para la conciencia y la humanización de las relaciones (Freire, 2005)."
+                ]
+            },
+            giroux: {
+                name: "Henry Giroux",
+                concept: "Escuela y Política",
+                points: [
+                    "Entiende la escuela como un espacio ético y político donde se reproducen, pero también se pueden transformar, las relaciones sociales.",
+                    "Señala que las prácticas pedagógicas deben cuestionar la exclusión, la violencia simbólica y las dinámicas autoritarias.",
+                    "Su enfoque permite leer la convivencia escolar como un proceso ligado a la justicia social y la participación democrática (Giroux, 2013)."
+                ]
+            },
+            goleman: {
+                name: "Daniel Goleman",
+                concept: "Educación Socioemocional",
+                points: [
+                    "Define las competencias socioemocionales como habilidades aprendidas, no innatas.",
+                    "Destaca la autorregulación emocional, la empatía y las habilidades sociales como claves para el manejo del conflicto.",
+                    "Su aporte sustenta la necesidad de intervenciones pedagógicas intencionadas para fortalecer la convivencia escolar (Goleman, 1995)."
+                ]
+            },
+            aguado: {
+                name: "María Teresa Aguado-Odina",
+                concept: "Educación Intercultural",
+                points: [
+                    "Propone una educación intercultural centrada en el reconocimiento de la diversidad cultural como valor pedagógico.",
+                    "Señala que la convivencia se construye cuando se promueven relaciones basadas en el respeto, el diálogo y la inclusión.",
+                    "Su enfoque permite comprender la convivencia escolar en contextos étnico-culturales como un proceso relacional y no homogéneo (Aguado-Odina, 2023)."
+                ]
+            }
+        };
 
         function init() {
             // Build Menu
@@ -780,9 +939,30 @@
 
         function toggleMenu() { menu.classList.toggle('active'); }
         
-        // Modal Logic
-        function openModal() { document.getElementById('modal-contexto').classList.add('open'); }
-        function closeModal() { document.getElementById('modal-contexto').classList.remove('open'); }
+        // Modal Generic Logic
+        function openModal(modalId) { 
+            document.getElementById(modalId).classList.add('open'); 
+        }
+        function closeModal(modalId) { 
+            document.getElementById(modalId).classList.remove('open'); 
+        }
+
+        // Theorist Modal Logic
+        function openTheoristModal(theoristKey) {
+            const data = theoristData[theoristKey];
+            if(data) {
+                document.getElementById('theorist-title').innerText = data.name;
+                document.getElementById('theorist-subtitle').innerText = data.concept;
+                const list = document.getElementById('theorist-list');
+                list.innerHTML = ""; // Clear current
+                data.points.forEach(point => {
+                    let li = document.createElement('li');
+                    li.innerText = point;
+                    list.appendChild(li);
+                });
+                openModal('modal-theorist');
+            }
+        }
 
         // MOUSE INTERACTION RESTORED (Eye Tracking + 3D Tilt + Particles)
         document.addEventListener('mousemove', (e) => {
