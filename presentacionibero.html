@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortalecimiento de la Convivencia Escolar - IBERO</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --primary: #003366;
+            --primary-light: #004d99;
+            --secondary: #E4A900;
+            --secondary-glow: #ffd700;
+            --accent: #00A9E0;
+            --text: #ffffff;
+            --bg-dark: #050510;
+            --glass: rgba(16, 26, 45, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1500px; /* Profundidad para el efecto 3D */
+        }
+
+        /* --- BACKGROUND CANVAS --- */
+        #canvas-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a2e 0%, #000000 100%);
+        }
+
+        /* --- UI OVERLAYS --- */
+        .logo-container {
+            position: absolute; top: 25px; left: 30px; z-index: 100;
+            display: flex; align-items: center; gap: 15px;
+            animation: slideDown 1s ease-out;
+        }
+
+        .logo-img {
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5px 10px;
+            border-radius: 8px;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.1));
+            transition: transform 0.3s;
+        }
+
+        .logo-text {
+            font-weight: 700; font-size: 1.2rem; letter-spacing: 1px;
+            color: var(--text); text-shadow: 0 0 10px var(--primary);
+        }
+
+        .progress-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+            background: rgba(255,255,255,0.05); z-index: 200;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            width: 0%; transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 15px var(--secondary); position: relative;
+        }
+
+        /* --- NAVIGATION --- */
+        .controls {
+            position: absolute; bottom: 40px; right: 40px; z-index: 100;
+            display: flex; gap: 20px;
+        }
+
+        .btn-nav {
+            background: rgba(0, 51, 102, 0.6); border: 1px solid var(--accent);
+            color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer;
+            backdrop-filter: blur(10px); transition: all 0.3s ease; font-weight: bold;
+            display: flex; align-items: center; gap: 10px; font-size: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-nav:hover {
+            background: var(--secondary); color: var(--primary);
+            transform: translateY(-5px); box-shadow: 0 0 20px var(--secondary-glow);
+        }
+
+        /* --- MENU --- */
+        .menu-toggle {
+            position: absolute; top: 30px; right: 30px; z-index: 110;
+            cursor: pointer; font-size: 1.8rem; color: var(--secondary);
+            background: rgba(0,0,0,0.5); border: 1px solid var(--secondary);
+            border-radius: 50%; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+        }
+        .menu-toggle:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: var(--secondary); color: var(--primary);
+        }
+
+        .menu-overlay {
+            position: absolute; top: 0; right: -350px; width: 350px; height: 100%;
+            background: rgba(5, 5, 16, 0.95); backdrop-filter: blur(20px); z-index: 105;
+            transition: right 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            padding: 90px 30px 30px 30px; border-left: 2px solid var(--secondary);
+            overflow-y: auto;
+        }
+        .menu-overlay.active { right: 0; }
+
+        .menu-item {
+            display: flex; align-items: center; padding: 15px 10px;
+            color: #ccc; text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+            cursor: pointer; font-size: 1rem;
+        }
+        .menu-item:hover {
+            color: var(--secondary); background: rgba(255,255,255,0.05); padding-left: 20px;
+        }
+
+        /* --- SLIDES --- */
+        .presentation-container {
+            width: 85vw; height: 75vh; position: relative; transform-style: preserve-3d;
+        }
+
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; padding: 60px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            display: flex; flex-direction: column; opacity: 0;
+            transform: translateZ(-500px) rotateX(20deg); pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1); overflow: hidden;
+        }
+
+        .slide-content-wrapper {
+            height: 100%; overflow-y: auto; padding-right: 20px;
+            scrollbar-width: thin; scrollbar-color: var(--secondary) transparent;
+        }
+        .slide-content-wrapper::-webkit-scrollbar { width: 6px; }
+        .slide-content-wrapper::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .slide.active {
+            opacity: 1; transform: translateZ(0) rotateX(0); pointer-events: all; z-index: 10;
+        }
+        .slide.prev { transform: translateX(-150%) rotateY(-25deg) scale(0.8); opacity: 0; }
+        .slide.next { transform: translateX(150%) rotateY(25deg) scale(0.8); opacity: 0; }
+
+        /* --- ELEMENTS & CARDS --- */
+        h1 {
+            font-size: 2.2rem; margin-bottom: 20px; line-height: 1.2;
+            background: linear-gradient(120deg, #ffffff, var(--secondary), #ffffff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+        h2 { font-size: 2rem; color: var(--secondary); margin-bottom: 25px; }
+
+        /* Tilt class for 3D effect */
+        .tilt-element {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Fast transition for mouse follow */
+        }
+
+        .grid-layout {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px; margin-top: 20px;
+        }
+
+        .info-card {
+            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1);
+            padding: 25px; border-radius: 15px; position: relative; overflow: hidden;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d; /* Enable 3D for children */
+        }
+        .info-card:hover {
+            border-color: var(--secondary);
+            background: rgba(0, 51, 102, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- CUSTOM SVGs --- */
+        .svg-icon {
+            width: 80px; height: 80px; margin-bottom: 15px;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+            transition: transform 0.3s;
+        }
+        .info-card:hover .svg-icon { transform: translateZ(20px) scale(1.1); } /* Pop out effect */
+
+        /* --- TOOLTIPS --- */
+        .tooltip-target { position: relative; cursor: help; }
+        .tooltip-target::after {
+            content: attr(data-tooltip);
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+            background: var(--secondary); color: var(--primary);
+            padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: bold;
+            white-space: nowrap; opacity: 0; pointer-events: none; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 100; margin-bottom: 10px;
+        }
+        .tooltip-target:hover::after { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+
+        /* --- MODAL --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 1000; display: flex;
+            justify-content: center; align-items: center; opacity: 0; pointer-events: none;
+            transition: 0.5s; backdrop-filter: blur(5px);
+        }
+        .modal.open { opacity: 1; pointer-events: all; }
+        .modal-content {
+            background: #1a1a2e; width: 80%; max-width: 600px; padding: 30px;
+            border-radius: 20px; border: 1px solid var(--secondary);
+            position: relative; transform: scale(0.8); transition: 0.5s;
+            text-align: center;
+        }
+        .modal.open .modal-content { transform: scale(1); }
+        .close-btn {
+            position: absolute; top: 15px; right: 20px; font-size: 1.5rem;
+            color: #fff; cursor: pointer; transition: 0.3s;
+        }
+        .close-btn:hover { color: var(--secondary); }
+
+        /* --- STICKERS / BADGES --- */
+        .sticker {
+            position: absolute; top: -10px; right: -10px;
+            background: var(--accent); color: #fff; padding: 5px 10px;
+            font-size: 0.8rem; font-weight: bold; border-radius: 20px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3); animation: floatBadge 3s infinite ease-in-out;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* --- AVATAR (ESTRUCTURA COMPLETA) --- */
+        .avatar-container {
+            position: absolute; bottom: 30px; left: 40px; z-index: 200;
+        }
+        .avatar { width: 100px; height: 100px; position: relative; }
+        
+        .avatar-head {
+            width: 60px; height: 65px; background: #f1c27d; border-radius: 25px;
+            position: absolute; bottom: 35px; left: 20px; z-index: 2;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* Hair */
+        .avatar-hair {
+            width: 66px; height: 35px; background: #222; border-radius: 30px 30px 5px 5px;
+            position: absolute; top: -5px; left: -3px;
+        }
+
+        /* Eyes Container */
+        .avatar-eyes {
+            position: absolute; top: 25px; left: 10px; width: 40px; height: 15px;
+            display: flex; justify-content: space-between;
+        }
+        
+        .eye {
+            width: 12px; height: 12px; background: #fff; border-radius: 50%;
+            position: relative; overflow: hidden;
+        }
+        
+        .pupil {
+            width: 5px; height: 5px; background: #000; border-radius: 50%;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        /* Glasses */
+        .glasses {
+            width: 50px; height: 15px; position: absolute; top: 23px; left: 5px;
+        }
+        .glasses::before, .glasses::after {
+            content: ''; width: 18px; height: 18px; border: 2px solid #333;
+            border-radius: 50%; position: absolute;
+        }
+        .glasses::after { right: 0; } .glasses::before { left: 0; }
+        .glasses span { 
+            width: 10px; height: 2px; background: #333; 
+            position: absolute; top: 9px; left: 20px; 
+        }
+
+        .avatar-body {
+            width: 80px; height: 45px; background: var(--primary);
+            border-radius: 40px 40px 0 0; position: absolute; bottom: 0; left: 10px;
+            border: 2px solid var(--secondary);
+        }
+
+        .avatar-bubble {
+            background: #fff; color: #000; padding: 10px 20px;
+            border-radius: 20px 20px 20px 0; margin-bottom: 90px;
+            width: 250px; font-size: 0.9rem; opacity: 0; transform: translateY(20px);
+            transition: 0.5s; position: absolute; bottom: 0; left: 10px; pointer-events: none;
+        }
+        .avatar-bubble.show { opacity: 1; transform: translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .presentation-container { width: 95vw; height: 85vh; }
+            h1 { font-size: 1.5rem; }
+            .grid-layout { grid-template-columns: 1fr; }
+            .modal-content { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+    <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
+
+    <!-- LOGO (Única imagen externa permitida) -->
+    <div class="logo-container">
+        <img src="data:image/png;base64,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" alt="IBERO" class="logo-img">
+        <div class="logo-text">
+            <div>IBEROAMERICANA</div>
+            <div style="font-size:0.8rem; color:var(--secondary); font-weight:400;">CORPORACIÓN UNIVERSITARIA</div>
+        </div>
+    </div>
+
+    <!-- MENU -->
+    <div class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+    <div class="menu-overlay" id="menu">
+        <h2 style="font-size:1.5rem; margin-bottom:20px; border-bottom:1px solid var(--secondary);">Contenido</h2>
+    </div>
+
+    <!-- AVATAR (Restaurada la estructura para los ojos) -->
+    <div class="avatar-container">
+        <div class="avatar-bubble" id="avatar-msg">¡Hola! Soy tu guía.</div>
+        <div class="avatar">
+            <div class="avatar-head">
+                <div class="avatar-hair"></div>
+                <div class="avatar-eyes">
+                    <div class="eye"><div class="pupil"></div></div>
+                    <div class="eye"><div class="pupil"></div></div>
+                </div>
+                <div class="glasses"><span></span></div>
+            </div>
+            <div class="avatar-body"></div>
+        </div>
+    </div>
+
+    <!-- MODAL (Ventana Emergente - Ilustración SVG) -->
+    <div class="modal" id="modal-contexto">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <h2 style="color:var(--secondary)">Escenario: Aula Viva</h2>
+            <!-- ILUSTRACIÓN SVG DEL AULA -->
+            <svg viewBox="0 0 500 250" style="width:100%; border-radius:10px; margin-bottom:20px; border:2px solid var(--secondary);">
+                <!-- Fondo Aula -->
+                <rect width="500" height="250" fill="#232336"/>
+                <!-- Tablero -->
+                <rect x="150" y="20" width="200" height="60" fill="#1b4d2e" stroke="#5d4037" stroke-width="5"/>
+                <text x="180" y="55" font-family="monospace" font-size="14" fill="#ddd">CONVIVENCIA</text>
+                <!-- Escritorio Docente -->
+                <rect x="220" y="90" width="60" height="30" fill="#8d6e63" stroke="#5d4037"/>
+                <!-- Disposición Circular Estudiantes (Simbolizando Inclusión) -->
+                <g fill="none" stroke="#E4A900" stroke-width="2" stroke-dasharray="5,5">
+                    <circle cx="250" cy="180" r="50"/>
+                </g>
+                <circle cx="250" cy="180" r="10" fill="#00A9E0" opacity="0.8"/> <!-- Centro -->
+                <!-- Estudiantes -->
+                <circle cx="250" cy="130" r="12" fill="#E4A900"/>
+                <circle cx="300" cy="180" r="12" fill="#E4A900"/>
+                <circle cx="250" cy="230" r="12" fill="#E4A900"/>
+                <circle cx="200" cy="180" r="12" fill="#E4A900"/>
+                <circle cx="215" cy="145" r="12" fill="#E4A900"/>
+                <circle cx="285" cy="145" r="12" fill="#E4A900"/>
+                <circle cx="285" cy="215" r="12" fill="#E4A900"/>
+                <circle cx="215" cy="215" r="12" fill="#E4A900"/>
+            </svg>
+            <p>La disposición circular facilita el diálogo. El entorno físico debe reflejar nuestra intención pedagógica de inclusión y mediación.</p>
+        </div>
+    </div>
+
+    <!-- SLIDER -->
+    <div class="presentation-container">
+
+        <!-- SLIDE 1: PORTADA -->
+        <div class="slide active" data-guide="Bienvenidos a esta propuesta de transformación educativa.">
+            <div class="slide-content-wrapper" style="text-align: center; justify-content: center; display:flex; flex-direction:column;">
+                <h3 style="color:var(--secondary); letter-spacing: 3px; text-transform: uppercase;">Proyecto de Investigación</h3>
+                <h1 class="tilt-element">Fortalecimiento de la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B</h1>
+                
+                <div class="grid-layout">
+                    <div class="info-card">
+                        <!-- ICONO VECTORIAL INVESTIGADOR -->
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="40" r="20" fill="#E4A900"/>
+                            <path d="M20,90 Q50,60 80,90" fill="#00A9E0"/>
+                            <rect x="40" y="80" width="20" height="20" fill="#fff"/> <!-- Libro -->
+                        </svg>
+                        <h3>Mayra Zapata</h3> <p>Autora</p>
+                    </div>
+                    <div class="info-card">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="40" r="20" fill="#E4A900"/>
+                            <path d="M20,90 Q50,60 80,90" fill="#00A9E0"/>
+                            <path d="M35,35 L65,35" stroke="#333" stroke-width="3"/> <!-- Gafas -->
+                        </svg>
+                        <h3>Verónica Freile</h3> <p>Autora</p>
+                    </div>
+                    <div class="info-card">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="40" r="20" fill="#E4A900"/>
+                            <path d="M20,90 Q50,60 80,90" fill="#00A9E0"/>
+                            <path d="M40,55 Q50,65 60,55" fill="none" stroke="#333" stroke-width="2"/> <!-- Sonrisa -->
+                        </svg>
+                        <h3>José Marulanda</h3> <p>Autor</p>
+                    </div>
+                </div>
+                <div style="margin-top: 30px; font-size: 0.9rem;">
+                    <p>Maestría en Educación | Investigación Acción | Febrero 2026</p>
+                    <p style="color: var(--secondary);">Nodo 4: Tejido socioemocional</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: CONTEXTO (Con Modal) -->
+        <div class="slide" data-guide="El contexto es clave. Haz clic en 'Ver Escenario' para explorar.">
+            <div class="slide-content-wrapper">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>Contexto del Estudio</h2>
+                    <button onclick="openModal()" style="background:var(--secondary); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
+                        <i class="fas fa-eye"></i> Ver Escenario
+                    </button>
+                </div>
+                <ul style="list-style:none; margin-top:30px;">
+                    <li style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                        <svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#00A9E0"/></svg> La convivencia escolar como dimensión central.
+                    </li>
+                    <li style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                        <svg width="20" height="20"><rect x="2" y="2" width="16" height="16" fill="#E4A900"/></svg> Conflictos recurrentes como cotidianidad.
+                    </li>
+                    <li style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                        <svg width="20" height="20"><polygon points="10,0 20,20 0,20" fill="#00A9E0"/></svg> Contexto de diversidad étnico-cultural.
+                    </li>
+                    <li style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
+                        <svg width="20" height="20"><circle cx="10" cy="10" r="8" fill="#E4A900"/></svg> Normalización del conflicto.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: PROBLEMA (Con Tooltips) -->
+        <div class="slide" data-guide="Pasa el mouse sobre las tarjetas para ver el impacto.">
+            <div class="slide-content-wrapper">
+                <h2>Problema de Investigación</h2>
+                <div class="grid-layout">
+                    <div class="info-card tooltip-target" data-tooltip="Impacto: Clima tenso en clase" style="border-left: 4px solid #ff4444;">
+                        <p>Conflictos frecuentes entre estudiantes.</p>
+                        <!-- ICONO SVG TENSIÓN -->
+                        <svg viewBox="0 0 50 50" style="width:40px; height:40px; position:absolute; right:10px; bottom:10px; opacity:0.3;">
+                            <path d="M10,25 L20,10 L30,40 L40,25" stroke="#ff4444" stroke-width="3" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="info-card tooltip-target" data-tooltip="Causa: Falta de herramientas" style="border-left: 4px solid #ff4444;">
+                         <p>Dificultades en el manejo emocional.</p>
+                         <!-- ICONO SVG TRISTEZA -->
+                         <svg viewBox="0 0 50 50" style="width:40px; height:40px; position:absolute; right:10px; bottom:10px; opacity:0.3;">
+                             <circle cx="25" cy="25" r="20" stroke="#ff4444" stroke-width="2" fill="none"/>
+                             <path d="M15,35 Q25,25 35,35" stroke="#ff4444" stroke-width="2" fill="none"/>
+                         </svg>
+                    </div>
+                    <div class="info-card tooltip-target" data-tooltip="Efecto: Aislamiento social" style="border-left: 4px solid var(--secondary);">
+                         <p>Predominio de estrategias evasivas (silencio).</p>
+                         <!-- ICONO SVG SILENCIO -->
+                         <svg viewBox="0 0 50 50" style="width:40px; height:40px; position:absolute; right:10px; bottom:10px; opacity:0.3;">
+                             <rect x="15" y="10" width="20" height="30" stroke="#E4A900" stroke-width="2" fill="none"/>
+                             <line x1="10" y1="45" x2="40" y2="5" stroke="#E4A900" stroke-width="2"/>
+                         </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: PREGUNTA -->
+        <div class="slide" data-guide="Nuestra brújula de navegación.">
+            <div class="slide-content-wrapper" style="text-align:center;">
+                <h2>Pregunta de Investigación</h2>
+                <div class="quote-container tilt-element" style="font-size:1.5rem; font-style:italic; padding:30px; background:rgba(255,255,255,0.1); border-radius:20px; margin:20px 0;">
+                    "¿Cómo fortalecer la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B?"
+                </div>
+                <div style="display:flex; justify-content:center; gap:30px; margin-top:30px;">
+                    <div style="text-align:center;">
+                        <!-- SVG CORAZÓN CONECTADO -->
+                        <svg width="60" height="60" viewBox="0 0 100 100">
+                            <path d="M50,90 Q10,60 10,30 Q10,0 50,30 Q90,0 90,30 Q90,60 50,90" fill="none" stroke="#00A9E0" stroke-width="5"/>
+                            <circle cx="50" cy="50" r="10" fill="#E4A900"/>
+                        </svg>
+                        <p>Tejido Emocional</p>
+                    </div>
+                    <div style="text-align:center;">
+                        <!-- SVG LUZ -->
+                        <svg width="60" height="60" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="30" fill="none" stroke="#E4A900" stroke-width="4"/>
+                            <line x1="50" y1="10" x2="50" y2="90" stroke="#E4A900" stroke-width="4"/>
+                            <line x1="10" y1="50" x2="90" y2="50" stroke="#E4A900" stroke-width="4"/>
+                        </svg>
+                        <p>Oportunidad Pedagógica</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: REFERENTES (ILUSTRACIONES PROPIAS) -->
+        <div class="slide" data-guide="Conozcamos a los teóricos que nos inspiran.">
+            <div class="slide-content-wrapper">
+                <h2>Referentes Teóricos</h2>
+                <div class="grid-layout">
+                    <!-- Freire (Diálogo) -->
+                    <div class="info-card" style="text-align:center;">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#00A9E0" stroke-width="2"/>
+                            <!-- Speech Bubbles -->
+                            <path d="M30,40 Q30,20 50,20 Q70,20 70,40 Q70,55 50,55 L40,65 L45,55 Q30,55 30,40" fill="#00A9E0"/>
+                            <path d="M40,70 L50,80 L60,70" stroke="#fff" stroke-width="2" fill="none"/>
+                        </svg>
+                        <h3 style="color:var(--accent)">Paulo Freire</h3>
+                        <p style="font-size:0.9rem;">Pedagogía Crítica: Diálogo y humanización.</p>
+                    </div>
+                    <!-- Goleman (Cerebro/Corazón) -->
+                    <div class="info-card" style="text-align:center;">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#E4A900" stroke-width="2"/>
+                            <!-- Brain Left -->
+                            <path d="M25,50 Q25,25 50,25" fill="none" stroke="#E4A900" stroke-width="5"/>
+                            <!-- Heart Right -->
+                            <path d="M50,25 Q75,25 75,50 Q75,75 50,90" fill="none" stroke="#ff4444" stroke-width="5"/>
+                        </svg>
+                        <h3 style="color:var(--secondary)">Daniel Goleman</h3>
+                        <p style="font-size:0.9rem;">Inteligencia Emocional: Autorregulación.</p>
+                    </div>
+                    <!-- Giroux (Resistencia) -->
+                    <div class="info-card" style="text-align:center;">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#fff" stroke-width="2"/>
+                            <!-- Puño/Lápiz -->
+                            <rect x="45" y="20" width="10" height="60" fill="#fff"/>
+                            <polygon points="45,20 55,20 50,5" fill="#fff"/>
+                        </svg>
+                        <h3 style="color:var(--accent)">Henry Giroux</h3>
+                        <p style="font-size:0.9rem;">Escuela y Transformación Social.</p>
+                    </div>
+                    <!-- Aguado-Odina (Mundo) -->
+                    <div class="info-card" style="text-align:center;">
+                        <svg class="svg-icon" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" stroke="#E4A900" stroke-width="3" fill="none"/>
+                            <path d="M10,50 L90,50" stroke="#E4A900" stroke-width="2"/>
+                            <path d="M50,10 L50,90" stroke="#E4A900" stroke-width="2"/>
+                            <circle cx="50" cy="50" r="5" fill="#E4A900"/>
+                        </svg>
+                        <h3 style="color:var(--primary-light)">Aguado-Odina</h3>
+                        <p style="font-size:0.9rem;">Educación Intercultural e Inclusión.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: METODOLOGÍA -->
+        <div class="slide" data-guide="Investigación Acción: Reflexión y Práctica.">
+            <div class="slide-content-wrapper">
+                <h2>Enfoque y Metodología</h2>
+                <div style="display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; margin-top:30px;">
+                    <div class="info-card" style="width:200px; height:200px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border: 2px dashed var(--accent);">
+                        <!-- SVG LUPA -->
+                        <svg viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="20" cy="20" r="15" stroke="#fff" stroke-width="3" fill="none"/>
+                            <line x1="30" y1="30" x2="45" y2="45" stroke="#fff" stroke-width="4"/>
+                        </svg>
+                        <h4>Enfoque Cualitativo</h4>
+                    </div>
+                    <i class="fas fa-arrow-right fa-2x" style="color:var(--secondary)"></i>
+                    <div class="info-card" style="width:200px; height:200px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:rgba(228, 169, 0, 0.2); border: 2px solid var(--secondary);">
+                        <!-- SVG CICLO -->
+                        <svg viewBox="0 0 50 50" width="50" height="50">
+                            <path d="M25,10 A15,15 0 1,1 10,25" fill="none" stroke="#E4A900" stroke-width="3"/>
+                            <polygon points="10,25 5,15 15,15" fill="#E4A900"/>
+                        </svg>
+                        <h4>Investigación Acción</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: TÉCNICAS -->
+        <div class="slide" data-guide="Nuestras herramientas de recolección.">
+            <div class="slide-content-wrapper">
+                <h2>Técnicas e Instrumentos</h2>
+                <div class="grid-layout">
+                    <div class="info-card">
+                        <h3>Recolección</h3>
+                        <ul style="margin-left:20px; margin-top:10px;">
+                            <li>Entrevista semiestructurada.</li>
+                            <li>Observación directa.</li>
+                            <li>Análisis documental.</li>
+                        </ul>
+                    </div>
+                    <div class="info-card">
+                        <h3>Propósito</h3>
+                        <ul style="margin-left:20px; margin-top:10px;">
+                            <li>Identificar dinámicas.</li>
+                            <li>Analizar manejo emocional.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: RESULTADOS (Gráficos SVG) -->
+        <div class="slide" data-guide="Resultados: La inestabilidad es evidente.">
+            <div class="slide-content-wrapper">
+                <h2>Dimensión Convivencia</h2>
+                <div class="grid-layout">
+                    <div class="info-card">
+                        <div class="sticker">Alta Frecuencia</div>
+                        <h3>Convivencia Inestable</h3>
+                        <!-- Gráfico de barras SVG -->
+                        <svg width="100%" height="20" style="margin-top:10px;">
+                            <rect width="100%" height="20" fill="rgba(255,255,255,0.1)" rx="10"/>
+                            <rect width="85%" height="20" fill="var(--secondary)" rx="10"/>
+                        </svg>
+                        <p style="margin-top:10px; font-size:0.9rem;">Percibida por la mayoría de estudiantes.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Conflictos Normalizados</h3>
+                        <p>Burlas y tensiones diarias.</p>
+                        <!-- SVG ONDA -->
+                        <svg viewBox="0 0 100 20" style="position:absolute; bottom:10px; right:10px; width:50px; opacity:0.3;">
+                            <path d="M0,10 Q25,0 50,10 T100,10" fill="none" stroke="#fff" stroke-width="3"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: RESULTADOS 2 -->
+        <div class="slide" data-guide="El silencio es la estrategia principal.">
+            <div class="slide-content-wrapper">
+                <h2>Dimensión Socioemocional</h2>
+                <div class="grid-layout">
+                    <div class="info-card">
+                        <div class="sticker" style="background:#ff4444;">Alerta</div>
+                        <h3>Estrategias Evasivas</h3>
+                        <p>Uso predominante del silencio.</p>
+                    </div>
+                    <div class="info-card">
+                        <div class="sticker" style="background:#00C851;">Recurso</div>
+                        <h3>Apoyo entre Pares</h3>
+                        <p>Contención emocional espontánea.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: CONCLUSIONES -->
+        <div class="slide" data-guide="El conflicto es una oportunidad de aprendizaje.">
+            <div class="slide-content-wrapper">
+                <h2>Conclusiones</h2>
+                <ul style="list-style:none;">
+                    <li style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-left:4px solid var(--accent);">
+                        La convivencia es un proceso relacional y socioemocional.
+                    </li>
+                    <li style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-left:4px solid var(--secondary);">
+                        El conflicto es una <strong>oportunidad pedagógica</strong>.
+                    </li>
+                    <li style="background:rgba(255,255,255,0.05); padding:15px; margin-bottom:10px; border-left:4px solid var(--primary-light);">
+                        Las competencias socioemocionales deben cultivarse.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: APORTES -->
+        <div class="slide" data-guide="Nuestra contribución a la escuela.">
+            <div class="slide-content-wrapper">
+                <h2>Aportes</h2>
+                <div class="grid-layout">
+                    <div class="info-card" style="text-align:center;">
+                        <svg viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="10" fill="none" stroke="#fff" stroke-width="2"/>
+                            <path d="M25,10 A15,15 0 0,1 40,25" fill="none" stroke="#E4A900" stroke-width="2"/>
+                        </svg>
+                        <p>Visibilización Socioemocional</p>
+                    </div>
+                    <div class="info-card" style="text-align:center;">
+                        <svg viewBox="0 0 50 50" width="50" height="50">
+                            <rect x="15" y="15" width="20" height="20" fill="none" stroke="#fff" stroke-width="2"/>
+                            <line x1="25" y1="10" x2="25" y2="40" stroke="#fff" stroke-width="2"/>
+                        </svg>
+                        <p>Investigación Acción Escolar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: REFERENCIAS -->
+        <div class="slide" data-guide="Gracias por su atención.">
+            <div class="slide-content-wrapper">
+                <h2>Referencias</h2>
+                <div class="info-card">
+                    <ul style="font-size: 0.9rem; line-height: 1.8;">
+                        <li>Freire, P. (2005). <em>Pedagogía del oprimido.</em></li>
+                        <li>Goleman, D. (1995). <em>Inteligencia emocional.</em></li>
+                        <li>Aguado-Odina, M. T. (2023). <em>La escuela incluida.</em></li>
+                        <li>Giroux, H. (2013). <em>La pedagogía crítica.</em></li>
+                        <li>Hernández-Sampieri, R., et al. (2018). <em>Metodología.</em></li>
+                    </ul>
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    <h1 style="font-size: 3rem;">¡Muchas Gracias!</h1>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+        <button class="btn-nav" onclick="changeSlide(-1)">❮ Anterior</button>
+        <button class="btn-nav" onclick="changeSlide(1)">Siguiente ❯</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const progress = document.getElementById('progress');
+        const avatarMsg = document.getElementById('avatar-msg');
+        const menu = document.getElementById('menu');
+
+        function init() {
+            // Build Menu
+            slides.forEach((slide, i) => {
+                let title = slide.querySelector('h1, h2')?.innerText || `Slide ${i+1}`;
+                title = title.replace('Resultados: ', '').substring(0, 30) + '...';
+                let item = document.createElement('div');
+                item.className = 'menu-item';
+                item.innerHTML = `<i class="fas fa-chevron-right" style="font-size:0.8rem; margin-right:10px;"></i> ${title}`;
+                item.onclick = () => { goToSlide(i); toggleMenu(); };
+                menu.appendChild(item);
+            });
+            updateUI();
+        }
+
+        function changeSlide(dir) {
+            let next = currentSlide + dir;
+            if(next >= 0 && next < slides.length) goToSlide(next);
+        }
+
+        function goToSlide(index) {
+            slides[currentSlide].classList.remove('active', 'prev', 'next');
+            slides[currentSlide].classList.add(index > currentSlide ? 'prev' : 'next');
+            
+            currentSlide = index;
+            slides[currentSlide].classList.remove('prev', 'next');
+            slides[currentSlide].classList.add('active');
+            updateUI();
+        }
+
+        function updateUI() {
+            progress.style.width = `${((currentSlide+1)/slides.length)*100}%`;
+            // Avatar Update
+            let guide = slides[currentSlide].dataset.guide;
+            if(guide) {
+                avatarMsg.classList.remove('show');
+                setTimeout(() => {
+                    avatarMsg.innerText = guide;
+                    avatarMsg.classList.add('show');
+                }, 400);
+            }
+        }
+
+        function toggleMenu() { menu.classList.toggle('active'); }
+        
+        // Modal Logic
+        function openModal() { document.getElementById('modal-contexto').classList.add('open'); }
+        function closeModal() { document.getElementById('modal-contexto').classList.remove('open'); }
+
+        // MOUSE INTERACTION RESTORED (Eye Tracking + 3D Tilt + Particles)
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+            // 1. Avatar Eye Tracking
+            const pupils = document.querySelectorAll('.pupil');
+            pupils.forEach(pupil => {
+                // limit movement to keep pupils inside eyes
+                const moveX = x * 3;
+                const moveY = y * 3;
+                pupil.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+            });
+
+            // 2. 3D Tilt Effect on Cards
+            const activeCards = document.querySelectorAll('.slide.active .info-card, .slide.active .tilt-element');
+            activeCards.forEach(card => {
+                card.style.transform = `perspective(1000px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`;
+            });
+        });
+
+        // Particles Background
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null };
+
+        // Track mouse specifically for canvas
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.vx = (Math.random()-0.5); this.vy = (Math.random()-0.5);
+                this.size = Math.random()*2;
+                this.baseX = this.x; this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                
+                // Edge bounce
+                if(this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if(this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+                // Mouse interaction (Magnetism)
+                if (mouse.x) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx*dx + dy*dy);
+                    if (distance < 100) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (100 - distance) / 100;
+                        const directionX = forceDirectionX * force * this.density;
+                        const directionY = forceDirectionY * force * this.density;
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    }
+                }
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+        
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            
+            // Connect lines
+            particles.forEach((p, i) => {
+                particles.slice(i+1).forEach(p2 => {
+                    let d = Math.hypot(p.x-p2.x, p.y-p2.y);
+                    if(d < 100) {
+                        ctx.strokeStyle = `rgba(228,169,0,${1 - d/100})`;
+                        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+                    }
+                });
+            });
+            requestAnimationFrame(animate);
+        }
+
+        resize();
+        for(let i=0; i<80; i++) particles.push(new Particle());
+        animate();
+        init();
+        
+        document.addEventListener('keydown', e => {
+            if(e.key === 'ArrowRight') changeSlide(1);
+            if(e.key === 'ArrowLeft') changeSlide(-1);
+        });
+    </script>
+</body>
+</html>
