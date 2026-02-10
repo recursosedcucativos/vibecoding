@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Investigación IBERO - Experiencia Interactiva</title>
+
+    <!-- Librerías Externas -->
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+
+
+    <style>
+
+        :root {
+
+            --primary: #003366;
+
+            --primary-light: #004d99;
+
+            --secondary: #E4A900;
+
+            --secondary-glow: #ffd700;
+
+            --accent: #00A9E0;
+
+            --text: #ffffff;
+
+            --bg-dark: #02020a;
+
+            --glass: rgba(10, 20, 40, 0.85);
+
+            --glass-border: rgba(255, 255, 255, 0.1);
+
+            --font-main: 'Segoe UI', Roboto, sans-serif;
+
+        }
+
+
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+
+        body {
+
+            font-family: var(--font-main);
+
+            background-color: var(--bg-dark);
+
+            color: var(--text);
+
+            overflow: hidden;
+
+            height: 100vh;
+
+            width: 100vw;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+
+
+        /* --- BACKGROUND PARTICLES --- */
+
+        #canvas-bg {
+
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+
+            z-index: -1; background: radial-gradient(circle at center, #050515 0%, #000 100%);
+
+            display: block;
+
+        }
+
+
+
+        /* --- UI ELEMENTS --- */
+
+        .progress-container {
+
+            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+
+            background: rgba(255,255,255,0.05); z-index: 1000;
+
+        }
+
+        .progress-bar {
+
+            height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+
+            width: 0%; transition: width 0.3s;
+
+        }
+
+
+
+        .logo-container {
+
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+
+            display: flex; align-items: center; gap: 10px;
+
+        }
+
+        .logo-img { height: 50px; background: #fff; padding: 5px; border-radius: 5px; }
+
+
+
+        /* --- PRESENTATION SLIDES --- */
+
+        .presentation-frame {
+
+            width: 90vw; height: 85vh; position: relative;
+
+            perspective: 2000px;
+
+        }
+
+
+
+        .slide {
+
+            position: absolute; width: 100%; height: 100%;
+
+            background: var(--glass); border: 1px solid var(--glass-border);
+
+            border-radius: 20px; padding: 40px;
+
+            display: none; flex-direction: column;
+
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+
+            backdrop-filter: blur(15px);
+
+            overflow-y: auto;
+
+        }
+
+        .slide.active { display: flex; animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+
+
+        @keyframes slideIn {
+
+            from { opacity: 0; transform: rotateY(30deg) translateZ(-500px); }
+
+            to { opacity: 1; transform: rotateY(0) translateZ(0); }
+
+        }
+
+
+
+        /* --- TYPOGRAPHY --- */
+
+        h1 { font-size: 2.2rem; color: var(--secondary); margin-bottom: 20px; text-shadow: 0 0 10px rgba(228, 169, 0, 0.3); }
+
+        h2 { font-size: 1.8rem; color: var(--accent); margin-bottom: 15px; border-left: 5px solid var(--secondary); padding-left: 15px; }
+
+        p { line-height: 1.6; margin-bottom: 15px; }
+
+
+
+        /* --- INTERACTIVE CARDS --- */
+
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+
+       
+
+        .interactive-card {
+
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+
+            padding: 20px; border-radius: 15px; cursor: pointer; transition: all 0.3s ease;
+
+            position: relative; overflow: hidden;
+
+        }
+
+        .interactive-card:hover {
+
+            background: rgba(0, 169, 224, 0.1); border-color: var(--accent);
+
+            transform: translateY(-5px) scale(1.02);
+
+            box-shadow: 0 10px 20px rgba(0, 169, 224, 0.2);
+
+        }
+
+        .interactive-card i { font-size: 2rem; color: var(--secondary); margin-bottom: 15px; }
+
+       
+
+        /* --- REVEAL EFFECTS --- */
+
+        .reveal-item { opacity: 0; transform: translateY(20px); }
+
+
+
+        /* --- MODAL SYSTEM --- */
+
+        .modal {
+
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+
+            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
+
+            justify-content: center; align-items: center; backdrop-filter: blur(10px);
+
+        }
+
+        .modal-content {
+
+            background: #101020; width: 80%; max-width: 700px; padding: 40px;
+
+            border-radius: 20px; border: 2px solid var(--secondary);
+
+            position: relative; animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        }
+
+        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .close-modal { position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer; color: #fff; }
+
+
+
+        /* --- AVATAR NARRATOR --- */
+
+        .avatar-box {
+
+            position: absolute; bottom: 20px; left: 20px; display: flex; align-items: flex-end; gap: 15px; z-index: 500;
+
+        }
+
+        .avatar-bubble {
+
+            background: #fff; color: #000; padding: 12px 20px; border-radius: 20px 20px 20px 0;
+
+            font-size: 0.9rem; max-width: 250px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+
+            display: none;
+
+        }
+
+        .avatar-char {
+
+            width: 70px; height: 70px; background: var(--primary); border: 2px solid var(--secondary);
+
+            border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;
+
+        }
+
+
+
+        /* --- CONTROLS --- */
+
+        .controls {
+
+            position: absolute; bottom: 30px; right: 30px; display: flex; gap: 15px; z-index: 1000;
+
+        }
+
+        .btn {
+
+            background: var(--primary); color: #fff; border: 1px solid var(--accent);
+
+            padding: 12px 25px; border-radius: 50px; cursor: pointer; transition: 0.3s;
+
+            font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
+
+        }
+
+        .btn:hover { background: var(--secondary); color: var(--primary); transform: scale(1.1); }
+
+
+
+        /* --- SPECIFIC ELEMENTS --- */
+
+        .chart-container { width: 100%; max-width: 500px; margin: 0 auto; }
+
+        .quote-box {
+
+            font-size: 1.5rem; font-style: italic; text-align: center; color: var(--secondary);
+
+            padding: 40px; border: 2px dashed var(--accent); border-radius: 20px; margin: 20px 0;
+
+            background: rgba(0, 169, 224, 0.05);
+
+        }
+
+
+
+        /* Responsive */
+
+        @media (max-width: 768px) {
+
+            .slide { padding: 20px; }
+
+            h1 { font-size: 1.5rem; }
+
+            .avatar-box { display: none; }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
+
+   
+
+    <!-- FIX: Cambio de div a canvas -->
+
+    <canvas id="canvas-bg"></canvas>
+
+
+
+    <div class="logo-container">
+
+        <img src="data:image/png;base64,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" alt="IBERO" class="logo-img">
+
+        <div style="font-size: 0.8rem; font-weight: bold; color: var(--secondary);">NODO 4: TEJIDO SOCIOEMOCIONAL</div>
+
+    </div>
+
+
+
+    <div class="presentation-frame">
+
+
+
+        <!-- DIAPOSITIVA 1: PORTADA -->
+
+        <div class="slide active" id="slide-0">
+
+            <div style="text-align: center; margin-top: 50px;">
+
+                <h4 style="letter-spacing: 5px; color: var(--accent); margin-bottom: 10px;">MAESTRÍA EN EDUCACIÓN</h4>
+
+                <h1 style="font-size: 2.8rem; line-height: 1.2;" class="reveal-item">Fortalecimiento de la convivencia escolar en contextos étnico-culturales</h1>
+
+                <p style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;" class="reveal-item">Desarrollo de competencias socioemocionales en estudiantes de grado 7B</p>
+
+               
+
+                <div class="grid-layout" style="margin-top: 40px;">
+
+                    <div class="interactive-card reveal-item" onclick="showInfo('Autores', 'Mayra Zapata, Verónica Freile, José Marulanda<br><br>Investigadores comprometidos con la transformación social desde el aula.')">
+
+                        <i class="fas fa-users"></i>
+
+                        <h3>Investigadores</h3>
+
+                        <p>Clic para conocer equipo</p>
+
+                    </div>
+
+                    <div class="interactive-card reveal-item" onclick="showInfo('Modalidad', '<strong>Investigación Acción</strong><br><br>Un ciclo continuo de observación, reflexión y acción pedagógica para generar cambios reales.')">
+
+                        <i class="fas fa-microscope"></i>
+
+                        <h3>Metodología</h3>
+
+                        <p>Investigación Acción</p>
+
+                    </div>
+
+                    <div class="interactive-card reveal-item" onclick="showInfo('Contexto Temporal', 'Presentación para el simposio de <strong>Febrero 2026</strong>.<br><br>Enfoque: Tejido socioemocional y convivencia.')">
+
+                        <i class="fas fa-calendar-alt"></i>
+
+                        <h3>Fecha</h3>
+
+                        <p>Febrero 2026</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 2: CONTEXTO -->
+
+        <div class="slide" id="slide-1">
+
+            <h2>Contexto del Estudio</h2>
+
+            <p>La escuela no es solo un edificio; es un ecosistema de emociones y diversidad. Explora los pilares de nuestro contexto:</p>
+
+            <div class="grid-layout">
+
+                <div class="interactive-card reveal-item" onclick="showInfo('Dimensión Central', 'La convivencia escolar es el eje sobre el cual gira todo el proceso de enseñanza-aprendizaje.')">
+
+                    <i class="fas fa-school"></i>
+
+                    <h4>Convivencia como Eje</h4>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showInfo('Diversidad', 'Nuestro grado 7B es un crisol étnico-cultural que requiere miradas diferenciales.')">
+
+                    <i class="fas fa-globe-americas"></i>
+
+                    <h4>Diversidad Étnica</h4>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showInfo('Realidad del Conflicto', 'El conflicto se ha normalizado, perdiendo su potencial transformador y convirtiéndose en paisaje.')">
+
+                    <i class="fas fa-exclamation-triangle"></i>
+
+                    <h4>Conflictos Recurrentes</h4>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showInfo('Necesidad', 'Urge ir más allá de la norma y entender el sentir de los estudiantes.')">
+
+                    <i class="fas fa-heartbeat"></i>
+
+                    <h4>Sentir Pedagógico</h4>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 3: PROBLEMA -->
+
+        <div class="slide" id="slide-2">
+
+            <h2>Problema de Investigación</h2>
+
+            <div style="display: flex; gap: 30px; flex-wrap: wrap; align-items: center;">
+
+                <div style="flex: 1; min-width: 300px;">
+
+                    <div class="interactive-card reveal-item" style="border-left: 5px solid #ff4444;" onclick="playSound('error')">
+
+                        <i class="fas fa-bolt" style="color: #ff4444;"></i>
+
+                        <h3>Tensión en el Aula</h3>
+
+                        <p>Conflictos frecuentes y dificultades severas en el manejo emocional.</p>
+
+                    </div>
+
+                    <div class="interactive-card reveal-item" style="border-left: 5px solid var(--secondary); margin-top: 15px;">
+
+                        <i class="fas fa-comment-slash"></i>
+
+                        <h3>El Silencio Evasivo</h3>
+
+                        <p>Predominio de la evitación y el aislamiento como "solución" al conflicto.</p>
+
+                    </div>
+
+                </div>
+
+                <div style="flex: 1; min-width: 300px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px;">
+
+                    <h4>La Brecha</h4>
+
+                    <p>Existe una distancia crítica entre los lineamientos del <strong>Manual de Convivencia</strong> y lo que realmente sucede en el patio y el salón de clases.</p>
+
+                    <button class="btn" onclick="showInfo('Análisis de Brecha', 'Se identificó que el 70% de las intervenciones son punitivas y solo el 10% son formativas-socioemocionales.')">Ver Datos</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 4: PREGUNTA -->
+
+        <div class="slide" id="slide-3">
+
+            <div style="text-align: center; padding-top: 50px;">
+
+                <h4 style="color: var(--secondary);">EL CORAZÓN DE LA INVESTIGACIÓN</h4>
+
+                <div class="quote-box reveal-item" id="main-question">
+
+                    "¿Cómo fortalecer la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B?"
+
+                </div>
+
+                <div class="grid-layout" style="max-width: 600px; margin: 0 auto;">
+
+                    <div class="interactive-card" onclick="showInfo('Relación Nodo 4', 'La convivencia se entiende como un <strong>tejido relacional</strong>, no como un reglamento.')">
+
+                        <i class="fas fa-project-diagram"></i>
+
+                        <p>Tejido Relacional</p>
+
+                    </div>
+
+                    <div class="interactive-card" onclick="showInfo('Oportunidad', 'Convertir el conflicto en una <strong>lección de vida</strong> para la paz.')">
+
+                        <i class="fas fa-seedling"></i>
+
+                        <p>Oportunidad Pedagógica</p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 5: REFERENTES -->
+
+        <div class="slide" id="slide-4">
+
+            <h2>Referentes Teóricos</h2>
+
+            <p>Nuestra brújula conceptual se apoya en gigantes del pensamiento educativo:</p>
+
+            <div class="grid-layout">
+
+                <div class="interactive-card reveal-item" onclick="showAuthor('Freire')">
+
+                    <i class="fas fa-book-reader"></i>
+
+                    <h3>Paulo Freire</h3>
+
+                    <p>Pedagogía del Oprimido y Diálogo.</p>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showAuthor('Goleman')">
+
+                    <i class="fas fa-brain"></i>
+
+                    <h3>Daniel Goleman</h3>
+
+                    <p>Inteligencia Emocional.</p>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showAuthor('Aguado')">
+
+                    <i class="fas fa-users-cog"></i>
+
+                    <h3>Aguado-Odina</h3>
+
+                    <p>Interculturalidad e Inclusión.</p>
+
+                </div>
+
+                <div class="interactive-card reveal-item" onclick="showAuthor('Giroux')">
+
+                    <i class="fas fa-fist-raised"></i>
+
+                    <h3>Henry Giroux</h3>
+
+                    <p>Pedagogía Crítica.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 6: METODOLOGÍA -->
+
+        <div class="slide" id="slide-5">
+
+            <h2>Enfoque y Metodología</h2>
+
+            <div style="display: flex; justify-content: space-around; align-items: center; height: 100%;">
+
+                <div class="interactive-card" style="width: 300px; height: 300px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 3px dashed var(--secondary);" onclick="showInfo('Cualitativo', 'Buscamos comprender significados, no solo contar eventos. La voz del estudiante es nuestra materia prima.')">
+
+                    <i class="fas fa-search-plus"></i>
+
+                    <h3>Enfoque Cualitativo</h3>
+
+                </div>
+
+                <div class="interactive-card" style="width: 300px; height: 300px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: var(--primary);" onclick="showInfo('IA', 'Investigar para actuar. Actuar para transformar. Un ciclo infinito de mejora educativa.')">
+
+                    <i class="fas fa-sync-alt"></i>
+
+                    <h3>Investigación Acción</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 7: TÉCNICAS -->
+
+        <div class="slide" id="slide-6">
+
+            <h2>Herramientas de Recolección</h2>
+
+            <div class="grid-layout">
+
+                <div class="interactive-card" onclick="showInfo('Entrevistas', 'Charlas profundas con estudiantes para entender sus miedos y esperanzas.')">
+
+                    <i class="fas fa-microphone-alt"></i>
+
+                    <h3>Entrevista Semiestructurada</h3>
+
+                </div>
+
+                <div class="interactive-card" onclick="showInfo('Observación', 'Estar presente en el aula, registrar lo no dicho, los gestos y las micro-tensiones.')">
+
+                    <i class="fas fa-eye"></i>
+
+                    <h3>Observación Directa</h3>
+
+                </div>
+
+                <div class="interactive-card" onclick="showInfo('Análisis', 'Revisión crítica del manual de convivencia y bitácoras institucionales.')">
+
+                    <i class="fas fa-copy"></i>
+
+                    <h3>Análisis Documental</h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 8: RESULTADOS 1 -->
+
+        <div class="slide" id="slide-7">
+
+            <h2>Resultados: Dimensión Convivencia</h2>
+
+            <div style="display: flex; gap: 40px; align-items: center;">
+
+                <div style="flex: 1;">
+
+                    <p>La percepción de los estudiantes sobre la convivencia es de **inestabilidad**.</p>
+
+                    <div class="interactive-card" onclick="revealStats('convivencia')">
+
+                        <i class="fas fa-chart-line"></i>
+
+                        <h4>Ver Análisis de Estabilidad</h4>
+
+                        <p>Clic para graficar hallazgos</p>
+
+                    </div>
+
+                </div>
+
+                <div style="flex: 1;" class="chart-container">
+
+                    <canvas id="chartConvivencia"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 9: RESULTADOS 2 -->
+
+        <div class="slide" id="slide-8">
+
+            <h2>Resultados: Dimensión Socioemocional</h2>
+
+            <div style="display: flex; gap: 40px; align-items: center;">
+
+                <div style="flex: 1;" class="chart-container">
+
+                    <canvas id="chartEmocional"></canvas>
+
+                </div>
+
+                <div style="flex: 1;">
+
+                    <ul style="list-style: none;">
+
+                        <li class="interactive-card" style="margin-bottom: 10px;" onclick="showInfo('Silencio', 'El 65% de los estudiantes prefieren no hablar del conflicto por miedo a represalias o falta de confianza.')">
+
+                            <i class="fas fa-volume-mute"></i> Silencio como estrategia.
+
+                        </li>
+
+                        <li class="interactive-card" style="margin-bottom: 10px;" onclick="showInfo('Autorregulación', 'Existe una alta reactividad emocional ante ofensas mínimas.')">
+
+                            <i class="fas fa-angry"></i> Baja autorregulación.
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 10: RESULTADOS INTEGRADOS -->
+
+        <div class="slide" id="slide-9">
+
+            <h2>Lectura Integrada de Hallazgos</h2>
+
+            <div class="grid-layout">
+
+                <div class="interactive-card" onclick="showInfo('Normalización', 'El conflicto ya no sorprende; es parte de la rutina diaria.')">
+
+                    <i class="fas fa-check-circle"></i> Normalización.
+
+                </div>
+
+                <div class="interactive-card" onclick="showInfo('Individualismo', 'Predominan soluciones egoístas frente a la construcción de comunidad.')">
+
+                    <i class="fas fa-user-clock"></i> Individualismo.
+
+                </div>
+
+                <div class="interactive-card" onclick="showInfo('Docencia', 'El maestro es visto como árbitro, pero se necesita que sea mediador emocional.')">
+
+                    <i class="fas fa-chalkboard-teacher"></i> Rol Docente.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 11: CONCLUSIONES -->
+
+        <div class="slide" id="slide-10">
+
+            <h2>Conclusiones</h2>
+
+            <div style="background: rgba(0, 169, 224, 0.1); padding: 30px; border-radius: 20px;">
+
+                <p class="reveal-item">1. La convivencia es un **tejido vivo**, no un documento estático.</p>
+
+                <p class="reveal-item">2. El conflicto es la **materia prima** de la educación para la paz.</p>
+
+                <p class="reveal-item">3. Las competencias emocionales requieren **intencionalidad pedagógica**.</p>
+
+                <button class="btn" style="margin-top: 20px;" onclick="celebrate()">¡Finalizar Investigación!</button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- DIAPOSITIVA 12: REFERENCIAS -->
+
+        <div class="slide" id="slide-11">
+
+            <h2>Referencias Clave</h2>
+
+            <div class="grid-layout">
+
+                <div class="interactive-card">
+
+                    <p><strong>Freire, P. (2005)</strong><br>Pedagogía del oprimido.</p>
+
+                </div>
+
+                <div class="interactive-card">
+
+                    <p><strong>Goleman, D. (1995)</strong><br>Inteligencia emocional.</p>
+
+                </div>
+
+                <div class="interactive-card">
+
+                    <p><strong>Aguado, M. T. (2023)</strong><br>La escuela incluida.</p>
+
+                </div>
+
+                <div class="interactive-card">
+
+                    <p><strong>Giroux, H. (2013)</strong><br>Pedagogía crítica.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+
+    <!-- UI MODALS -->
+
+    <div class="modal" id="infoModal">
+
+        <div class="modal-content">
+
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+
+            <h2 id="modalTitle">Información</h2>
+
+            <div id="modalBody" style="font-size: 1.1rem; line-height: 1.8;"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- AVATAR -->
+
+    <div class="avatar-box">
+
+        <div class="avatar-bubble" id="avatarMsg"></div>
+
+        <div class="avatar-char">
+
+            <i class="fas fa-user-tie fa-2x" style="color: #fff;"></i>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="controls">
+
+        <button class="btn" onclick="prevSlide()">❮ Anterior</button>
+
+        <button class="btn" onclick="nextSlide()">Siguiente ❯</button>
+
+    </div>
+
+
+
+    <script>
+
+        let currentSlide = 0;
+
+        const slides = document.querySelectorAll('.slide');
+
+        const pBar = document.getElementById('pBar');
+
+
+
+        // --- SONIDOS ---
+
+        const sounds = {
+
+            click: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'] }),
+
+            transition: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'], volume: 0.5 }),
+
+            reveal: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'] }),
+
+            success: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/1433/1433-preview.mp3'] })
+
+        };
+
+
+
+        const avatarQuotes = [
+
+            "¡Bienvenidos! Exploren los paneles para profundizar.",
+
+            "El contexto es la raíz de toda conducta escolar.",
+
+            "¿Cómo se siente un estudiante de 7B ante un insulto?",
+
+            "Freire nos guía hacia una educación humanizadora.",
+
+            "La Investigación Acción es un compromiso con el cambio.",
+
+            "Los datos muestran que el silencio es una herida abierta.",
+
+            "¡Hemos llegado a las conclusiones finales!"
+
+        ];
+
+
+
+        // --- NAVEGACIÓN ---
+
+        function updateUI() {
+
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+
+            pBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+
+           
+
+            // Animación de revelado GSAP
+
+            gsap.fromTo('.active .reveal-item',
+
+                { opacity: 0, y: 30 },
+
+                { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }
+
+            );
+
+
+
+            // Avatar mensaje
+
+            const msg = avatarQuotes[currentSlide] || "Continuemos con la investigación.";
+
+            const bubble = document.getElementById('avatarMsg');
+
+            bubble.style.display = 'block';
+
+            bubble.innerText = msg;
+
+            gsap.fromTo(bubble, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4 });
+
+        }
+
+
+
+        function nextSlide() {
+
+            if (currentSlide < slides.length - 1) {
+
+                currentSlide++;
+
+                sounds.transition.play();
+
+                updateUI();
+
+            }
+
+        }
+
+
+
+        function prevSlide() {
+
+            if (currentSlide > 0) {
+
+                currentSlide--;
+
+                sounds.transition.play();
+
+                updateUI();
+
+            }
+
+        }
+
+
+
+        // --- INTERACCIONES ---
+
+        function showInfo(title, body) {
+
+            sounds.click.play();
+
+            document.getElementById('modalTitle').innerText = title;
+
+            document.getElementById('modalBody').innerHTML = body;
+
+            document.getElementById('infoModal').style.display = 'flex';
+
+        }
+
+
+
+        function closeModal() {
+
+            document.getElementById('infoModal').style.display = 'none';
+
+        }
+
+
+
+        function showAuthor(author) {
+
+            const data = {
+
+                'Freire': '<strong>Paulo Freire:</strong> Padre de la pedagogía crítica. Propone el diálogo como herramienta de humanización y liberación.',
+
+                'Goleman': '<strong>Daniel Goleman:</strong> Revolucionó la psicología con la Inteligencia Emocional: Autoconocimiento y Empatía.',
+
+                'Aguado': '<strong>Aguado-Odina:</strong> Defensora de la escuela inclusiva donde la diversidad es la norma, no la excepción.',
+
+                'Giroux': '<strong>Henry Giroux:</strong> Nos invita a ver la escuela como un espacio de resistencia y transformación política.'
+
+            };
+
+            showInfo('Referente Teórico', data[author]);
+
+        }
+
+
+
+        // --- GRÁFICOS INTERACTIVOS ---
+
+        let charts = {};
+
+
+
+        function revealStats(type) {
+
+            sounds.reveal.play();
+
+            if (type === 'convivencia') {
+
+                const ctx = document.getElementById('chartConvivencia').getContext('2d');
+
+                if (charts.c1) charts.c1.destroy();
+
+                charts.c1 = new Chart(ctx, {
+
+                    type: 'doughnut',
+
+                    data: {
+
+                        labels: ['Inestable', 'Estable', 'Conflictiva'],
+
+                        datasets: [{
+
+                            data: [65, 15, 20],
+
+                            backgroundColor: ['#E4A900', '#00A9E0', '#ff4444']
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        plugins: { legend: { labels: { color: '#fff' } } }
+
+                    }
+
+                });
+
+            }
+
+        }
+
+
+
+        // Gráfico inicial de Slide 9
+
+        function initEmocionalChart() {
+
+            const ctx = document.getElementById('chartEmocional').getContext('2d');
+
+            new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+
+                    labels: ['Empatía', 'Autorregulación', 'Mediación'],
+
+                    datasets: [{
+
+                        label: 'Nivel Identificado (%)',
+
+                        data: [40, 25, 15],
+
+                        backgroundColor: '#00A9E0'
+
+                    }]
+
+                },
+
+                options: {
+
+                    scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } } }
+
+                }
+
+            });
+
+        }
+
+
+
+        function celebrate() {
+
+            sounds.success.play();
+
+            confetti({
+
+                particleCount: 150,
+
+                spread: 70,
+
+                origin: { y: 0.6 },
+
+                colors: ['#E4A900', '#00A9E0', '#ffffff']
+
+            });
+
+            showInfo('¡Felicidades!', 'Has explorado toda la propuesta de investigación. El tejido socioemocional de la educación está en nuestras manos.');
+
+        }
+
+
+
+        // --- BACKGROUND PARTICLES ---
+
+        const canvas = document.getElementById('canvas-bg');
+
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+
+       
+
+        function initParticles() {
+
+            canvas.width = window.innerWidth;
+
+            canvas.height = window.innerHeight;
+
+            particles = []; // Limpiar antes de iniciar
+
+            for(let i=0; i<50; i++) {
+
+                particles.push({
+
+                    x: Math.random() * canvas.width,
+
+                    y: Math.random() * canvas.height,
+
+                    size: Math.random() * 2,
+
+                    speedX: (Math.random() - 0.5) * 0.5,
+
+                    speedY: (Math.random() - 0.5) * 0.5
+
+                });
+
+            }
+
+        }
+
+
+
+        function animateParticles() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+
+            particles.forEach(p => {
+
+                p.x += p.speedX; p.y += p.speedY;
+
+                if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+
+                if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+
+                ctx.beginPath();
+
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+
+                ctx.fill();
+
+            });
+
+            requestAnimationFrame(animateParticles);
+
+        }
+
+
+
+        // --- INIT ---
+
+        window.onload = () => {
+
+            initParticles();
+
+            animateParticles();
+
+            updateUI();
+
+            initEmocionalChart();
+
+           
+
+            // Intro GSAP
+
+            gsap.from('.presentation-frame', { scale: 0.9, opacity: 0, duration: 1.5, ease: "expo.out" });
+
+        };
+
+
+
+        // Escuchar cambios de tamaño de ventana para ajustar el canvas
+
+        window.addEventListener('resize', initParticles);
+
+
+
+        // Teclado
+
+        document.addEventListener('keydown', (e) => {
+
+            if (e.key === "ArrowRight") nextSlide();
+
+            if (e.key === "ArrowLeft") prevSlide();
+
+        });
+
+    </script>
+
+</body>
+
+</html>
