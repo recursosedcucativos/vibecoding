@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigación IBERO - Experiencia Inmersiva Nodo 4</title>
+    <!-- Librerías Externas -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #003366;
+            --primary-light: #004d99;
+            --secondary: #E4A900;
+            --secondary-glow: #ffd700;
+            --accent: #00A9E0;
+            --text: #ffffff;
+            --bg-dark: #02020a;
+            --glass: rgba(10, 20, 40, 0.88);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --font-main: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- BACKGROUND PARTICLES --- */
+        #canvas-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; background: radial-gradient(circle at center, #050515 0%, #000 100%);
+            display: block;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .progress-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 6px;
+            background: rgba(255,255,255,0.05); z-index: 1000;
+        }
+        .progress-bar {
+            height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            width: 0%; transition: width 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+        }
+
+        .logo-container {
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .logo-placeholder { 
+            height: 50px; width: 50px; background: #fff; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-weight: bold; font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        /* --- PRESENTATION FRAME --- */
+        .presentation-frame {
+            width: 92vw; height: 88vh; position: relative;
+            perspective: 2000px;
+        }
+
+        .slide {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 25px; padding: 45px;
+            display: none; flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary) transparent;
+        }
+        .slide::-webkit-scrollbar { width: 6px; }
+        .slide::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+        
+        .slide.active { 
+            display: flex; 
+            animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: rotateY(15deg) translateZ(-400px); }
+            to { opacity: 1; transform: rotateY(0) translateZ(0); }
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 { font-size: 2.3rem; color: var(--secondary); margin-bottom: 15px; text-shadow: 0 0 15px rgba(228, 169, 0, 0.35); line-height: 1.1; }
+        h2 { font-size: 1.9rem; color: var(--accent); margin-bottom: 20px; border-left: 6px solid var(--secondary); padding-left: 18px; }
+        h3 { color: var(--secondary); margin-bottom: 10px; font-weight: 600; }
+        p { line-height: 1.7; margin-bottom: 18px; font-size: 1.05rem; color: #ddd; }
+        strong { color: var(--secondary); }
+
+        /* --- INTERACTIVE CARDS --- */
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 25px; }
+        
+        .interactive-card {
+            background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+            padding: 25px; border-radius: 18px; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        .interactive-card:hover {
+            background: rgba(0, 169, 224, 0.12); border-color: var(--accent);
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 169, 224, 0.25);
+        }
+        .card-icon { font-size: 2.2rem; color: var(--secondary); margin-bottom: 18px; display: block; }
+        
+        /* --- SVGs ILUSTRATIVOS --- */
+        .svg-illustration { width: 100%; max-width: 400px; margin: 20px auto; display: block; filter: drop-shadow(0 0 10px rgba(0, 169, 224, 0.3)); }
+
+        /* --- REVEAL EFFECTS --- */
+        .reveal-item { opacity: 0; transform: translateY(30px); }
+
+        /* --- MODAL SYSTEM --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92); z-index: 2000; display: none;
+            justify-content: center; align-items: center; backdrop-filter: blur(12px);
+        }
+        .modal-content {
+            background: #0d0d1a; width: 85%; max-width: 750px; padding: 45px;
+            border-radius: 25px; border: 2px solid var(--secondary);
+            position: relative; animation: modalPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .close-modal { position: absolute; top: 25px; right: 25px; font-size: 2.5rem; cursor: pointer; color: #fff; transition: 0.3s; }
+        .close-modal:hover { color: var(--secondary); transform: rotate(90deg); }
+
+        /* --- AVATAR NARRATOR --- */
+        .avatar-box {
+            position: absolute; bottom: 30px; left: 30px; display: flex; align-items: flex-end; gap: 20px; z-index: 500;
+        }
+        .avatar-bubble {
+            background: #fff; color: #000; padding: 15px 22px; border-radius: 22px 22px 22px 0;
+            font-size: 0.95rem; max-width: 280px; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            display: none; font-weight: 500; line-height: 1.4;
+        }
+        .avatar-char {
+            width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary), var(--accent)); 
+            border: 3px solid var(--secondary); border-radius: 50%; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--secondary);
+            cursor: pointer; position: relative;
+        }
+        .avatar-char.talking {
+            animation: talkingPulse 0.5s infinite alternate;
+        }
+        @keyframes talkingPulse {
+            from { transform: scale(1); box-shadow: 0 0 20px var(--secondary); }
+            to { transform: scale(1.1); box-shadow: 0 0 40px var(--accent); }
+        }
+        .play-hint {
+            position: absolute; bottom: -25px; width: 150px; font-size: 0.8rem; color: var(--secondary);
+            text-align: center; left: -35px; opacity: 0.7;
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            position: absolute; bottom: 35px; right: 35px; display: flex; gap: 20px; z-index: 1000;
+        }
+        .btn {
+            background: rgba(0, 51, 102, 0.7); color: #fff; border: 1px solid var(--accent);
+            padding: 14px 30px; border-radius: 50px; cursor: pointer; transition: 0.4s;
+            font-weight: bold; text-transform: uppercase; letter-spacing: 1.5px;
+            backdrop-filter: blur(5px);
+        }
+        .btn:hover { background: var(--secondary); color: var(--primary); transform: scale(1.1); box-shadow: 0 0 20px var(--secondary-glow); }
+
+        /* --- ESPECÍFICOS --- */
+        .chart-container { width: 100%; max-width: 550px; margin: 0 auto; background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; position: relative; }
+        .quote-box {
+            font-size: 1.6rem; font-style: italic; text-align: center; color: var(--secondary);
+            padding: 45px; border: 3px dashed var(--accent); border-radius: 25px; margin: 25px 0;
+            background: rgba(0, 169, 224, 0.08); position: relative;
+        }
+        .quote-box::before { content: '"'; position: absolute; top: 10px; left: 20px; font-size: 5rem; opacity: 0.2; }
+
+        @media (max-width: 900px) {
+            .slide { padding: 25px; }
+            h1 { font-size: 1.7rem; }
+            .avatar-box { display: none; }
+            .controls { bottom: 20px; right: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-container"><div class="progress-bar" id="pBar"></div></div>
+    
+    <canvas id="canvas-bg"></canvas>
+
+    <div class="logo-container">
+        <!-- Reemplazo del base64 roto por un icono SVG limpio -->
+        <div class="logo-placeholder">
+            <i class="fas fa-university"></i>
+        </div>
+        <div style="font-size: 0.85rem; font-weight: bold; color: var(--secondary);">NODO 4: TEJIDO SOCIOEMOCIONAL</div>
+    </div>
+
+    <div class="presentation-frame">
+
+        <!-- DIAPOSITIVA 1: PORTADA -->
+        <div class="slide active" id="slide-0">
+            <div style="text-align: center; margin-top: 40px;">
+                <h4 style="letter-spacing: 6px; color: var(--accent); margin-bottom: 15px; font-weight: 400;">MAESTRÍA EN EDUCACIÓN</h4>
+                <h1 class="reveal-item" style="font-size: 2.5rem; max-width: 900px; margin: 0 auto 20px;">Fortalecimiento de la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B</h1>
+                
+                <div class="grid-layout" style="margin-top: 30px;">
+                    <div class="interactive-card reveal-item" onclick="showInfo('Equipo de Investigación', '<strong>Mayra Zapata, Verónica Freile, José Marulanda</strong><br><br>Maestría en Educación - Corporación Universitaria Iberoamericana.')">
+                        <i class="fas fa-user-graduate card-icon"></i>
+                        <h3>Autores</h3>
+                        <p>Clic para ver autores</p>
+                    </div>
+                    <div class="interactive-card reveal-item" onclick="showInfo('Nodo del Simposio', '<strong>Nodo 4: Tejido socioemocional y convivencia escolar.</strong><br><br>Este estudio aporta a la comprensión de los vínculos y la mediación en el aula.')">
+                        <i class="fas fa-project-diagram card-icon"></i>
+                        <h3>Eje Temático</h3>
+                        <p>Nodo 4</p>
+                    </div>
+                    <div class="interactive-card reveal-item" onclick="showInfo('Metodología Integral', '<strong>Investigación Acción</strong><br><br>Metodología participativa que busca transformar la práctica pedagógica desde adentro.')">
+                        <i class="fas fa-hand-holding-heart card-icon"></i>
+                        <h3>Metodología</h3>
+                        <p>Acción - Reflexión</p>
+                    </div>
+                </div>
+                <p style="margin-top: 30px; color: var(--accent); font-weight: bold;">Febrero de 2026</p>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 2: CONTEXTO -->
+        <div class="slide" id="slide-1">
+            <h2>Contexto del Estudio</h2>
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <p class="reveal-item">La convivencia escolar constituye una <strong>dimensión fundamental</strong> de la experiencia educativa, influyendo directamente en el bienestar emocional y el aprendizaje.</p>
+                    <div class="interactive-card reveal-item" onclick="showInfo('Diversidad Étnico-Cultural', 'Las relaciones entre pares están atravesadas por diferencias culturales y comunicativas únicas que inciden en la gestión del conflicto.')">
+                        <i class="fas fa-users-rays card-icon"></i>
+                        <h4>Crisol Cultural</h4>
+                        <p>Contexto diverso y plural.</p>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <!-- SVG Ilustración Ecosistema Aula -->
+                    <svg viewBox="0 0 200 120" class="svg-illustration reveal-item">
+                        <circle cx="100" cy="60" r="40" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4"/>
+                        <circle cx="100" cy="60" r="10" fill="var(--secondary)"/>
+                        <circle cx="60" cy="30" r="8" fill="var(--accent)"/>
+                        <circle cx="140" cy="30" r="8" fill="var(--accent)"/>
+                        <circle cx="60" cy="90" r="8" fill="var(--accent)"/>
+                        <circle cx="140" cy="90" r="8" fill="var(--accent)"/>
+                        <path d="M100,60 L60,30 M100,60 L140,30 M100,60 L60,90 M100,60 L140,90" stroke="var(--secondary)" opacity="0.5"/>
+                    </svg>
+                    <p style="font-size: 0.9rem; font-style: italic;">Se observa una <strong>normalización del conflicto</strong>, limitando su abordaje pedagógico y debilitando el tejido socioemocional (UNESCO, 2017).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 3: PROBLEMA -->
+        <div class="slide" id="slide-2">
+            <h2>Problema de Investigación</h2>
+            <div class="grid-layout">
+                <div class="interactive-card reveal-item" style="border-left: 5px solid #ff4444;" onclick="showInfo('Dificultades Persistentes', 'Se evidencia un limitado desarrollo de competencias socioemocionales, resultando en respuestas de silencio y evitación.')">
+                    <i class="fas fa-heart-crack card-icon" style="color:#ff4444;"></i>
+                    <h3>Respuestas Evasivas</h3>
+                    <p>Silencio y distanciamiento individual.</p>
+                </div>
+                <div class="interactive-card reveal-item" style="border-left: 5px solid var(--accent);" onclick="showInfo('Brecha Institucional', 'Distancia crítica entre lo que dice el Manual de Convivencia y las prácticas cotidianas del aula.')">
+                    <!-- SVG Balanza Desequilibrada -->
+                    <svg viewBox="0 0 100 60" style="width:60px; height:40px; margin-bottom:10px;">
+                        <line x1="10" y1="50" x2="90" y2="50" stroke="#fff" stroke-width="2"/>
+                        <path d="M50,50 L30,20 L70,40" fill="none" stroke="var(--secondary)" stroke-width="3"/>
+                        <circle cx="30" cy="20" r="5" fill="#ff4444"/>
+                        <circle cx="70" cy="40" r="5" fill="var(--accent)"/>
+                    </svg>
+                    <h3>Brecha de Práctica</h3>
+                    <p>Normativa vs. Realidad Cotidiana.</p>
+                </div>
+            </div>
+            <div class="quote-box reveal-item" style="font-size: 1.1rem; margin-top: 30px;">
+                "La normativa, por sí sola, no garantiza relaciones respetuosas ni un clima armónico en contextos diversos."
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 4: PREGUNTA -->
+        <div class="slide" id="slide-3">
+            <div style="text-align: center; padding-top: 30px;">
+                <h4 style="color: var(--secondary); letter-spacing: 2px;">INTERROGANTE PEDAGÓGICO</h4>
+                <div class="quote-box reveal-item" id="main-question">
+                    "¿Cómo fortalecer la convivencia escolar en contextos étnico-culturales a través del desarrollo de competencias socioemocionales en estudiantes del grado 7B?"
+                </div>
+                <div style="max-width: 800px; margin: 0 auto; text-align: left;" class="reveal-item">
+                    <p><i class="fas fa-link" style="color: var(--accent);"></i> <strong>Vínculo con Nodo 4:</strong> La convivencia se construye desde las emociones y la mediación, no solo desde el control normativo.</p>
+                    <p><i class="fas fa-lightbulb" style="color: var(--secondary);"></i> <strong>Oportunidad:</strong> El conflicto como motor de aprendizaje y diálogo crítico (Freire, 2005).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 5: REFERENTES -->
+        <div class="slide" id="slide-4">
+            <h2>Referentes Teóricos</h2>
+            <div class="grid-layout">
+                <div class="interactive-card reveal-item" onclick="showAuthor('FreireGiroux')">
+                    <i class="fas fa-landmark card-icon"></i>
+                    <h3>Pedagogía Crítica</h3>
+                    <p><strong>Freire & Giroux:</strong> Diálogo, humanización y escuela como espacio ético-político.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showAuthor('GolemanBisquerra')">
+                    <i class="fas fa-brain card-icon"></i>
+                    <h3>Ed. Socioemocional</h3>
+                    <p><strong>Goleman & Bisquerra:</strong> Autorregulación y empatía como procesos intencionados.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showAuthor('Aguado')">
+                    <i class="fas fa-handshake-angle card-icon"></i>
+                    <h3>Ed. Intercultural</h3>
+                    <p><strong>Aguado-Odina:</strong> Reconocimiento del otro y relaciones inclusivas en la diversidad.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 6: METODOLOGÍA -->
+        <div class="slide" id="slide-5">
+            <h2>Enfoque Metodológico</h2>
+            <div style="display: flex; gap: 40px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;" class="reveal-item">
+                    <p>Estudio de <strong>enfoque cualitativo</strong> mediante la metodología de <strong>Investigación Acción</strong>.</p>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Comprensión desde la experiencia de los actores.</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Ciclos de Observación - Reflexión - Acción.</li>
+                        <li style="margin-bottom: 12px;"><i class="fas fa-check-circle" style="color: var(--secondary);"></i> Transformación directa de la realidad escolar.</li>
+                    </ul>
+                </div>
+                <div style="flex: 1; min-width: 300px;" class="reveal-item">
+                    <!-- SVG Ciclo Investigación Acción -->
+                    <svg viewBox="0 0 100 100" class="svg-illustration">
+                        <path d="M50,10 A40,40 0 0,1 90,50" fill="none" stroke="var(--accent)" stroke-width="4" marker-end="url(#arrow)"/>
+                        <path d="M90,50 A40,40 0 0,1 50,90" fill="none" stroke="var(--secondary)" stroke-width="4"/>
+                        <path d="M50,90 A40,40 0 0,1 10,50" fill="none" stroke="var(--accent)" stroke-width="4"/>
+                        <path d="M10,50 A40,40 0 0,1 50,10" fill="none" stroke="var(--secondary)" stroke-width="4"/>
+                        <text x="50" y="55" font-size="8" fill="#fff" text-anchor="middle">TRANSFORMACIÓN</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 7: TÉCNICAS -->
+        <div class="slide" id="slide-6">
+            <h2>Técnicas e Instrumentos</h2>
+            <p>Construcción de una comprensión integral a través de la triangulación:</p>
+            <div class="grid-layout">
+                <div class="interactive-card reveal-item" onclick="showInfo('Entrevistas Semiestructuradas', 'Dirigidas a estudiantes para captar sus <strong>percepciones profundas</strong> sobre el conflicto y el clima del aula.')">
+                    <i class="fas fa-comments card-icon"></i>
+                    <h3>Entrevistas</h3>
+                    <p>Voces de los actores.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showInfo('Observación Directa', 'Registro sistemático in situ para identificar <strong>dinámicas relacionales y emocionales</strong> no verbalizadas.')">
+                    <i class="fas fa-video card-icon"></i>
+                    <h3>Observación</h3>
+                    <p>Realidad en vivo.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showInfo('Análisis Documental', 'Revisión crítica de <strong>lineamientos institucionales</strong> y manuales para contrastar con la práctica.')">
+                    <i class="fas fa-file-invoice card-icon"></i>
+                    <h3>Análisis Documental</h3>
+                    <p>Normativa vs. Hechos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 8: RESULTADOS 1 -->
+        <div class="slide" id="slide-7">
+            <h2>Resultados: Convivencia Escolar</h2>
+            <div style="display: flex; gap: 40px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;">
+                    <p class="reveal-item">Se identifican <strong>tensiones recurrentes</strong> y una preocupante normalización de prácticas de exclusión.</p>
+                    <div class="interactive-card reveal-item" onclick="revealStats('convivencia')">
+                        <i class="fas fa-chart-pie card-icon"></i>
+                        <h4>Evidencia del Clima</h4>
+                        <p>Clic para graficar percepciones.</p>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 300px;" class="chart-container reveal-item">
+                    <canvas id="chartConvivencia"></canvas>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-style: italic;" class="reveal-item"><i class="fas fa-warning" style="color:var(--secondary);"></i> La <strong>ausencia de mediación pedagógica</strong> sistemática favorece la repetición de ciclos de conflicto.</p>
+        </div>
+
+        <!-- DIAPOSITIVA 9: RESULTADOS 2 -->
+        <div class="slide" id="slide-8">
+            <h2>Resultados: Competencias Socioemocionales</h2>
+            <div style="display: flex; gap: 40px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 300px;" class="chart-container reveal-item">
+                    <canvas id="chartEmocional"></canvas>
+                </div>
+                <div style="flex: 1; min-width: 300px;">
+                    <p class="reveal-item">Los hallazgos confirman la necesidad de <strong>mediaciones pedagógicas explícitas</strong> (Bisquerra, 2016).</p>
+                    <ul style="list-style: none;">
+                        <li class="interactive-card reveal-item" onclick="showInfo('Apoyo entre Pares', 'Estrategia espontánea de contención que surge ante la crisis, pero que carece de estructura sistemática.')" style="margin-bottom: 15px;">
+                            <i class="fas fa-hands-helping" style="color:var(--accent);"></i> Apoyo Espontáneo.
+                        </li>
+                        <li class="interactive-card reveal-item" onclick="showInfo('Reactividad', 'Se observa una alta reactividad y dificultad para verbalizar el sentir emocional.')">
+                            <i class="fas fa-face-angry" style="color:#ff4444;"></i> Dificultad en Autorregulación.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 10: INTERPRETACIÓN -->
+        <div class="slide" id="slide-9">
+            <h2>Interpretación de los Hallazgos</h2>
+            <p class="reveal-item">Lectura integrada desde la perspectiva del <strong>Nodo 4</strong>:</p>
+            <div class="grid-layout">
+                <div class="interactive-card reveal-item" onclick="showInfo('Vínculo Emocional', 'La convivencia escolar está indisolublemente vinculada al manejo emocional. Si no hay tejido emocional, la norma es letra muerta.')">
+                    <i class="fas fa-dna card-icon"></i>
+                    <h3>Tejido Relacional</h3>
+                    <p>Emoción y Convivencia.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showInfo('Debilidad del Tejido', 'La normalización del conflicto desgasta la confianza y los lazos de respeto, fragmentando la comunidad.')">
+                    <i class="fas fa-mask card-icon"></i>
+                    <h3>Desgaste de Lazos</h3>
+                    <p>Impacto de la normalización.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="showInfo('Insuficiencia Normativa', 'El Manual no educa por sí solo; requiere una mediación humana, cálida y reflexiva para ser efectivo.')">
+                    <i class="fas fa-scale-unbalanced-flip card-icon"></i>
+                    <h3>Más allá de la Ley</h3>
+                    <p>Necesidad de reflexión colectiva.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIAPOSITIVA 11: CONCLUSIONES -->
+        <div class="slide" id="slide-10">
+            <h2>Conclusiones y Aportes</h2>
+            <div class="interactive-card reveal-item" style="background: rgba(0, 169, 224, 0.05); margin-bottom: 30px;">
+                <p><strong>Conclusión Central:</strong> El conflicto se convierte en <strong>oportunidad pedagógica</strong> cuando se aborda desde una perspectiva socioemocional e intercultural.</p>
+            </div>
+            <div class="grid-layout">
+                <div class="interactive-card reveal-item" onclick="celebrate()">
+                    <i class="fas fa-graduation-cap card-icon"></i>
+                    <h3>Visibilización</h3>
+                    <p>Se visibiliza la convivencia como proceso socioemocional.</p>
+                </div>
+                <div class="interactive-card reveal-item" onclick="celebrate()">
+                    <i class="fas fa-bridge card-icon"></i>
+                    <h3>Aporte Central</h3>
+                    <p>Integración de mediaciones pedagógicas intencionadas.</p>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 30px; font-weight: bold; color: var(--secondary);" class="reveal-item">Hacia una convivencia consciente y transformadora.</p>
+        </div>
+
+        <!-- DIAPOSITIVA 12: REFERENCIAS -->
+        <div class="slide" id="slide-11">
+            <h2>Referencias (APA 7.ª)</h2>
+            <div class="grid-layout">
+                <div class="interactive-card" style="font-size: 0.9rem;">
+                    <p><strong>Freire, P. (2005).</strong> Pedagogía del oprimido. Siglo XXI Editores.</p>
+                    <p><strong>Giroux, H. A. (2013).</strong> La pedagogía crítica en tiempos oscuros. Siglo XXI Editores.</p>
+                </div>
+                <div class="interactive-card" style="font-size: 0.9rem;">
+                    <p><strong>Goleman, D. (1995).</strong> Inteligencia emocional. Kairós.</p>
+                    <p><strong>Bisquerra, R. (2016).</strong> Educación emocional y bienestar. Wolters Kluwer.</p>
+                </div>
+                <div class="interactive-card" style="font-size: 0.9rem;">
+                    <p><strong>Aguado-Odina, M. T. (2023).</strong> La escuela incluida. Revista Complutense.</p>
+                    <p><strong>Hernández-Sampieri, R. (2018).</strong> Metodología de la investigación.</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <h1 style="font-size: 3.5rem;">¡Gracias!</h1>
+                <p>Por su atención en este Simposio - Nodo 4</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- UI MODALS -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="margin-bottom: 20px;">Información</h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- AVATAR -->
+    <div class="avatar-box">
+        <div class="avatar-bubble" id="avatarMsg"></div>
+        <div class="avatar-char" id="avatarChar" onclick="playCurrentSlideExplication()">
+            <i class="fas fa-chalkboard-user fa-2x" style="color: #fff;"></i>
+            <div class="play-hint">Haz clic para escuchar</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="prevSlide()">❮ Ant.</button>
+        <button class="btn" onclick="nextSlide()">Sig. ❯</button>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const pBar = document.getElementById('pBar');
+        
+        // Variable para controlar la voz nativa
+        let speechSynth = window.speechSynthesis;
+        let currentUtterance = null;
+        
+        // Objeto global para almacenar instancias de gráficos
+        let charts = {};
+
+        const sounds = {
+            click: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'], volume: 0.4 }),
+            transition: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'], volume: 0.3 }),
+            reveal: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'], volume: 0.5 }),
+            success: new Howl({ src: ['https://assets.mixkit.co/active_storage/sfx/1433/1433-preview.mp3'], volume: 0.6 })
+        };
+
+        const avatarQuotes = [
+            "Bienvenidos al Nodo 4. Iniciemos el recorrido por nuestra investigación.",
+            "El entorno étnico-cultural define la riqueza de nuestra aula.",
+            "El silencio individual es un síntoma de un tejido que necesita sanar.",
+            "Nuestra brújula: ¿Cómo fortalecer los vínculos desde la emoción?",
+            "Freire y Bisquerra iluminan este camino hacia la autorregulación.",
+            "Investigamos para transformar. La acción es el motor del cambio.",
+            "Escuchamos las voces de 7B para comprender su realidad.",
+            "La normalización del conflicto es nuestro mayor reto pedagógico.",
+            "Las emociones no se desarrollan solas; requieren mediación intencionada.",
+            "Sin tejido socioemocional, la normativa institucional es insuficiente.",
+            "¡Concluimos! El conflicto es, ante todo, una gran oportunidad.",
+            "Gracias por acompañarnos en este proceso transformador."
+        ];
+
+        // GUIONES PARA CADA DIAPOSITIVA (EXPLICACIÓN POR VOZ)
+        const explanations = [
+            "Damos la bienvenida a la presentación de nuestra tesis: Fortalecimiento de la convivencia escolar en contextos étnico-culturales. Este estudio explora cómo el desarrollo de competencias socioemocionales puede transformar el aula, enfocándonos específicamente en los estudiantes del grado séptimo B.",
+            "La convivencia escolar no es solo una regla, sino la base emocional de la educación. En nuestro contexto, observamos que la diversidad étnica enriquece el aula, pero también requiere una gestión de conflictos que vaya más allá de lo normativo para sanar el tejido social.",
+            "El problema central radica en la normalización del conflicto. Ante situaciones de tensión, los estudiantes suelen optar por el silencio o el aislamiento. Esta brecha entre el manual de convivencia y la realidad cotidiana nos exige repensar el manejo de las emociones.",
+            "Nuestra pregunta de investigación nos guía hacia el fortalecimiento de la convivencia mediante las competencias socioemocionales. Entendemos el conflicto no como un obstáculo, sino como una oportunidad pedagógica para construir vínculos auténticos basados en el diálogo.",
+            "Nuestra brújula teórica integra la pedagogía crítica de Freire y Giroux, con el enfoque socioemocional de Goleman y Bisquerra. Además, sumamos la perspectiva intercultural de Aguado Odina para reconocer la diversidad como un valor fundamental en la escuela.",
+            "Metodológicamente, este es un estudio cualitativo bajo la Investigación Acción. Este enfoque nos permite sumergirnos en la realidad del aula, promoviendo ciclos de observación, reflexión y acción participativa para transformar la práctica docente.",
+            "Para recolectar los hallazgos, utilizamos entrevistas semiestructuradas que nos dieron la voz de los estudiantes, observación directa para captar lo no dicho, y un análisis documental profundo de los lineamientos institucionales actuales.",
+            "Los resultados en convivencia muestran que las tensiones son frecuentes y a menudo se ignoran. Existe una normalización del distanciamiento entre pares, lo que demuestra que la ausencia de mediación pedagógica sistemática debilita el clima escolar.",
+            "En cuanto a lo socioemocional, predomina la evasión. Aunque surge un apoyo espontáneo entre compañeros, la autorregulación emocional es baja. Esto confirma que estas habilidades no son innatas; deben enseñarse y cultivarse intencionalmente en la escuela.",
+            "Interpretamos que la normativa es letra muerta si no hay un tejido socioemocional previo. El Nodo 4 nos enseña que la mediación pedagógica y el diálogo son las únicas vías para que la convivencia sea un proceso consciente y no un simple control de conductas.",
+            "Concluimos que fortalecer las competencias socioemocionales mejora radicalmente el clima escolar. Nuestro aporte principal es la propuesta de mediaciones intencionadas que integren la interculturalidad y la emoción como ejes de transformación pedagógica.",
+            "Agradecemos su atención. Presentamos aquí las referencias clave que sustentan científicamente este estudio. Estamos convencidos de que una escuela emocionalmente educada es el primer paso hacia una sociedad más justa e inclusiva. ¡Muchas gracias!"
+        ];
+
+        function updateUI() {
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+            pBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            
+            gsap.fromTo('.active .reveal-item', 
+                { opacity: 0, y: 35 }, 
+                { opacity: 1, y: 0, duration: 0.9, stagger: 0.15, ease: "power3.out" }
+            );
+
+            if (currentSlide === 8) {
+                setTimeout(() => {
+                    if (!charts.c2) initBarChart();
+                }, 100);
+            }
+
+            const msg = avatarQuotes[currentSlide] || "Exploremos juntos.";
+            const bubble = document.getElementById('avatarMsg');
+            bubble.style.display = 'block';
+            bubble.innerText = msg;
+            gsap.fromTo(bubble, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out" });
+
+            // Detener voz anterior si se cambia de slide
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+                document.getElementById('avatarChar').classList.remove('talking');
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                sounds.transition.play();
+                updateUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                sounds.transition.play();
+                updateUI();
+            }
+        }
+
+        function showInfo(title, body) {
+            sounds.click.play();
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function showAuthor(key) {
+            const data = {
+                'FreireGiroux': '<strong>Pedagogía Crítica:</strong> Freire (2005) propone el diálogo como humanización. Giroux (2013) ve la escuela como espacio de resistencia ética ante la exclusión.',
+                'GolemanBisquerra': '<strong>Educación Emocional:</strong> Goleman (1995) y Bisquerra (2016) postulan que la autorregulación y la empatía requieren procesos educativos sostenidos.',
+                'Aguado': '<strong>Interculturalidad:</strong> Aguado-Odina (2023) enfatiza que convivir en la diversidad exige reconocimiento del otro y respeto por la diferencia.'
+            };
+            showInfo('Fundamentación Teórica', data[key]);
+        }
+
+        // --- NATIVE TTS LOGIC ---
+        function playCurrentSlideExplication() {
+            const text = explanations[currentSlide];
+            const avatar = document.getElementById('avatarChar');
+            
+            // Si ya está hablando, detener
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+                avatar.classList.remove('talking');
+                return;
+            }
+
+            avatar.classList.add('talking');
+            
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            
+            // Intentar seleccionar voz en español
+            const voices = speechSynth.getVoices();
+            const esVoice = voices.find(v => v.lang.includes('es-ES') || v.lang.includes('es-MX') || v.lang.includes('es'));
+            if (esVoice) {
+                currentUtterance.voice = esVoice;
+            }
+            
+            // Ajustar parámetros
+            currentUtterance.rate = 1.0; // Velocidad normal
+            currentUtterance.pitch = 1.0; 
+
+            currentUtterance.onend = () => {
+                avatar.classList.remove('talking');
+            };
+
+            speechSynth.speak(currentUtterance);
+        }
+
+        // --- CHARTS ---
+        function revealStats(type) {
+            sounds.reveal.play();
+            if (type === 'convivencia') {
+                const canvas = document.getElementById('chartConvivencia');
+                if (!canvas.offsetParent) return; 
+
+                const ctx = canvas.getContext('2d');
+                if (charts.c1) charts.c1.destroy();
+                
+                charts.c1 = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tensión Recurrente', 'Prácticas de Exclusión', 'Normalización'],
+                        datasets: [{
+                            data: [45, 25, 30],
+                            backgroundColor: ['#E4A900', '#ff4444', '#00A9E0'],
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: { 
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { size: 12 } } } }
+                    }
+                });
+            }
+        }
+
+        function initBarChart() {
+            const canvas = document.getElementById('chartEmocional');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            if(charts.c2) charts.c2.destroy();
+
+            charts.c2 = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Evasión', 'Reactividad', 'Apoyo Pares'],
+                    datasets: [{
+                        label: 'Prevalencia Observada (%)',
+                        data: [70, 55, 30],
+                        backgroundColor: 'rgba(0, 169, 224, 0.6)',
+                        borderColor: 'var(--accent)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#fff' } },
+                        x: { ticks: { color: '#fff' } }
+                    },
+                    plugins: { legend: { labels: { color: '#fff' } } }
+                }
+            });
+        }
+
+        function celebrate() {
+            sounds.success.play();
+            confetti({
+                particleCount: 180, spread: 80, origin: { y: 0.6 },
+                colors: ['#E4A900', '#00A9E0', '#ffffff', '#003366']
+            });
+        }
+
+        // --- BACKGROUND ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            for(let i=0; i<60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2.5,
+                    speedX: (Math.random() - 0.5) * 0.4,
+                    speedY: (Math.random() - 0.5) * 0.4
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0, 169, 224, 0.25)';
+            
+            ctx.beginPath();
+            particles.forEach(p => {
+                p.x += p.speedX; p.y += p.speedY;
+                if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                
+                ctx.moveTo(p.x, p.y);
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            });
+            ctx.fill();
+            
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = () => {
+            initParticles();
+            animateParticles();
+            updateUI();
+            gsap.from('.presentation-frame', { duration: 1.2, scale: 0.95, opacity: 0, ease: "power4.out" });
+            
+            // Cargar voces (a veces no están listas inmediatamente en Chrome)
+            window.speechSynthesis.getVoices();
+        };
+
+        window.addEventListener('resize', initParticles);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") nextSlide();
+            if (e.key === "ArrowLeft") prevSlide();
+        });
+    </script>
+</body>
+</html>
