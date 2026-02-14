@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estrategia Lúdico-Pedagógica - Simposio 2025</title>
+    <style>
+        /* --- FUENTES & VARIABLES --- */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Space+Grotesk:wght@300;400;600&display=swap');
+
+        :root {
+            --bg-deep: #02020a;
+            --primary: #00f3ff;   /* Cyan Electrico */
+            --secondary: #bc13fe; /* Violeta Laser */
+            --tertiary: #ff0055;  /* Magenta Neon */
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- CANVA DE FONDO --- */
+        #bg-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            z-index: 0;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* --- CONTENEDOR 3D --- */
+        .deck {
+            position: relative;
+            width: 100%; height: 100%;
+            perspective: 1500px;
+            z-index: 2;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 2rem 4rem; /* Ajustado para más contenido */
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.8) translateZ(-500px);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            overflow-y: hidden; /* Evitar scroll global */
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateZ(0);
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* --- TIPOGRAFÍA --- */
+        h1, h2, h3, h4 { font-family: 'Outfit', sans-serif; text-transform: uppercase; }
+        
+        h1 {
+            font-size: 2.5rem; /* Ajustado para título largo */
+            line-height: 1.2;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(0, 243, 255, 0.3);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--primary);
+            padding-left: 20px;
+        }
+
+        p, li { font-size: 1.1rem; line-height: 1.6; color: #ddd; }
+
+        /* --- CLASES DE UTILIDAD --- */
+        .scroll-content {
+            overflow-y: auto;
+            max-height: 80vh;
+            padding-right: 10px;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* --- ESTILOS ESPECÍFICOS: ÁRBOL (SLIDE 2) --- */
+        .tree-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr 250px;
+            grid-template-rows: 1fr 1fr 1fr;
+            height: 80%;
+            position: relative;
+            align-items: center;
+            justify-items: center;
+        }
+
+        .tree-svg-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        .tree-node {
+            width: 200px;
+            padding: 15px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            backdrop-filter: blur(5px);
+            font-size: 0.9rem;
+        }
+
+        .tree-node:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 0 0 30px var(--primary);
+            transform: scale(1.1);
+        }
+
+        .tree-node.central {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--secondary);
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 0 50px rgba(188, 19, 254, 0.3);
+            animation: heartBeat 2s infinite;
+            grid-column: 2; grid-row: 2;
+            z-index: 10;
+        }
+
+        /* Panel de Detalle (Pop-up) */
+        .detail-panel {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 70%;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: rgba(10, 10, 20, 0.98);
+            border: 1px solid var(--tertiary);
+            padding: 3rem;
+            border-radius: 20px;
+            z-index: 100;
+            opacity: 0;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: left;
+            box-shadow: 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        .detail-panel.open {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* --- SLIDE 4: STEPPER --- */
+        .stepper-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch;
+            height: 65%;
+            gap: 20px;
+        }
+
+        .step-item {
+            flex: 1;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            cursor: pointer;
+            transition: 0.5s;
+            position: relative;
+        }
+
+        .step-item:hover, .step-item.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0,243,255,0.1);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .step-content {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.5;
+            filter: blur(2px);
+            transition: 0.5s;
+            font-size: 0.9rem;
+        }
+        
+        .step-item.active .step-content {
+            opacity: 1;
+            filter: blur(0);
+        }
+
+        /* --- SLIDE 5: RESULTADOS (GRID) --- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: 70%;
+        }
+
+        .result-box {
+            border: 1px solid var(--glass-border);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), transparent);
+            padding: 25px;
+            border-radius: 15px;
+            transition: 0.3s;
+        }
+
+        .result-box:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        /* --- SLIDE 6: FLIP CARDS --- */
+        .flip-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            height: 60%;
+            align-items: center;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            width: 300px;
+            height: 420px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%; height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+
+        .flip-front, .flip-back {
+            position: absolute;
+            width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .flip-front {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--secondary);
+        }
+
+        .flip-back {
+            background: var(--secondary);
+            color: white;
+            transform: rotateY(180deg);
+            border: 1px solid white;
+        }
+        
+        .flip-back p { color: white; margin-bottom: 10px; }
+
+        /* --- SLIDE 8: REFERENCIAS --- */
+        .ref-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ref-list li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            text-indent: -20px;
+            color: #aaa;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+        .ref-list li:hover { color: var(--primary); }
+
+        /* --- UTILS --- */
+        .btn-neon {
+            padding: 10px 20px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            font-family: 'Outfit';
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+        .btn-neon:hover {
+            background: var(--primary);
+            color: black;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); box-shadow: 0 0 50px rgba(188, 19, 254, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(188, 19, 254, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 0 50px rgba(188, 19, 254, 0.3); }
+        }
+
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem; right: 2rem;
+            display: flex; gap: 1rem;
+            z-index: 200;
+        }
+        .nav-btn {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid white;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--primary); border-color: var(--primary); color: black; }
+
+        .icon-lg { font-size: 2.5rem; margin-bottom: 0.5rem; display: block;}
+        
+        .planet {
+            transition: 0.3s;
+        }
+        .planet:hover {
+            z-index: 100;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="deck">
+
+        <!-- SLIDE 1: PORTADA -->
+        <div class="slide active" id="s1">
+            <div style="display: flex; height: 100%; align-items: center; justify-content: space-between;">
+                <div style="width: 65%;">
+                    <h3 style="color: var(--primary); letter-spacing: 2px; font-size: 1rem;">SIMPOSIO DE INVESTIGACIÓN – MAESTRÍA EN EDUCACIÓN</h3>
+                    <p style="color: var(--secondary); margin-bottom: 20px;">Línea de profundización: Inclusión</p>
+                    
+                    <h1>Estrategia Lúdico-Pedagógica Basadas en un ambiente armónico – colaborativo</h1>
+                    <p style="font-size: 1.2rem; color: #aaa; margin-bottom: 1rem;">Para fortalecer la convivencia escolar de los estudiantes del grado de aceleración del aprendizaje</p>
+                    
+                    <div style="margin-bottom: 20px; font-size: 0.9rem; color: #ccc;">
+                        <p><strong>Autora:</strong> Mirella Yaneth Rengifo Moreno</p>
+                        <p><strong>Asesora:</strong> Alba Sánchez</p>
+                        <p style="margin-top: 10px; font-style: italic;">Corporación Universitaria Iberoamericana - Facultad de Educación y Ciencias Humanas y Sociales (2025)</p>
+                    </div>
+
+                    <div style="display: flex; gap: 20px;">
+                        <button class="btn-neon" onclick="openDetail('Contexto del Estudio', '<strong>Institución Educativa:</strong> Santo Domingo Savio – Sede Melvins Jones<br><br><strong>Grado:</strong> Aceleración del aprendizaje<br><br><strong>Línea de investigación:</strong> Inclusión')">
+                            Ver Contexto
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="width: 30%; display: flex; justify-content: center;">
+                    <div style="width: 250px; height: 250px; border-radius: 50%; border: 1px dashed var(--secondary); animation: heartBeat 4s infinite; display: flex; align-items: center; justify-content: center; cursor: pointer; background: rgba(0,0,0,0.3);" onclick="changeSlide(1)">
+                        <span style="text-align: center; font-weight: bold;">CLICK PARA<br>INICIAR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: ÁRBOL DEL PROBLEMA -->
+        <div class="slide" id="s2">
+            <h2>Problema y Pregunta de Investigación</h2>
+            <p style="text-align: center; color: #888; margin-bottom: 10px;">Haz clic en los nodos para ver el detalle</p>
+            
+            <div class="tree-layout">
+                <svg class="tree-svg-layer" viewBox="0 0 1000 600" preserveAspectRatio="none">
+                    <path d="M500 300 C 500 100, 200 100, 200 150" stroke="var(--primary)" fill="none" stroke-width="2" />
+                    <path d="M500 300 C 500 100, 800 100, 800 150" stroke="var(--primary)" fill="none" stroke-width="2" />
+                    <path d="M500 300 C 500 500, 200 500, 200 450" stroke="var(--tertiary)" fill="none" stroke-width="2" />
+                    <path d="M500 300 C 500 500, 800 500, 800 450" stroke="var(--tertiary)" fill="none" stroke-width="2" />
+                </svg>
+
+                <!-- Arriba Izquierda: Descripción -->
+                <div class="tree-node" style="grid-column: 1; grid-row: 1;" 
+                     onclick="openDetail('Descripción del Problema', '<ul><li>Conflictos interpersonales reiterados en el aula.</li><li>Dificultades en la convivencia escolar.</li><li>Impacto negativo en el clima escolar y en el aprendizaje.</li><li>Necesidad de fortalecer relaciones colaborativas.</li></ul>')">
+                    <span class="icon-lg">📋</span>
+                    Descripción del Problema
+                </div>
+
+                <!-- Arriba Derecha: Pregunta -->
+                <div class="tree-node" style="grid-column: 3; grid-row: 1;" 
+                     onclick="openDetail('Pregunta Problema', '¿De qué manera las estrategias lúdico-pedagógicas basadas en trabajo colaborativo fortalecen la convivencia escolar en los estudiantes del grado de aceleración del aprendizaje de la I.E. Santo Domingo Savio – sede Melvins Jones?')">
+                    <span class="icon-lg">❓</span>
+                    Pregunta de Investigación
+                </div>
+
+                <!-- Centro -->
+                <div class="tree-node central" 
+                     onclick="openDetail('Núcleo de Investigación', 'El foco está en la transformación de la convivencia a través de la lúdica y la colaboración en un contexto de inclusión.')">
+                    CONVIVENCIA<br>ESCOLAR
+                </div>
+
+                <!-- Abajo Izquierda: Sustento 1 -->
+                <div class="tree-node" style="grid-column: 1; grid-row: 3; border-color: var(--tertiary);" 
+                     onclick="openDetail('Sustento Teórico 1', '<strong>González Flores (2013):</strong> La convivencia escolar es una construcción colectiva.<br><br><strong>Hirmas & Eroles (2008):</strong> La convivencia democrática previene la violencia escolar.')">
+                    <span class="icon-lg">📚</span>
+                    Construcción Colectiva
+                </div>
+
+                <!-- Abajo Derecha: Sustento 2 -->
+                <div class="tree-node" style="grid-column: 3; grid-row: 3; border-color: var(--tertiary);" 
+                     onclick="openDetail('Sustento Teórico 2', '<strong>Jares (2006):</strong> La pedagogía de la convivencia implica transformación de prácticas.')">
+                    <span class="icon-lg">🔄</span>
+                    Transformación de Prácticas
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: REFERENTES (SISTEMA SOLAR) -->
+        <div class="slide" id="s3">
+            <h2>Referentes Conceptuales Centrales</h2>
+            <div style="height: 80%; display: flex; justify-content: center; align-items: center; perspective: 1000px;">
+                <div style="position: relative; width: 550px; height: 550px;">
+                    
+                    <!-- Sol -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; height: 140px; background: var(--secondary); border-radius: 50%; box-shadow: 0 0 60px var(--secondary); display: grid; place-items: center; z-index: 10;">
+                        <strong style="color:white;">MARCO<br>TEÓRICO</strong>
+                    </div>
+
+                    <!-- Planeta 1: Estrategias Lúdicas -->
+                    <div class="planet" style="position: absolute; top: 0; left: 50%; width: 130px; height: 130px; background: rgba(0,0,0,0.8); border: 2px solid var(--primary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; padding: 10px;" 
+                         onclick="openDetail('Estrategias Lúdico-Pedagógicas', '<strong>Huizinga (1938):</strong> El juego como elemento cultural formativo.<br><br><strong>Guerrero et al. (2025):</strong> El juego fortalece la convivencia escolar.')">
+                        <span style="font-size: 1.5rem;">🎲</span>
+                        <small style="font-size: 0.7rem;">LÚDICA</small>
+                    </div>
+                    
+                    <!-- Planeta 2: Trabajo Colaborativo -->
+                    <div class="planet" style="position: absolute; bottom: 0; left: 50%; width: 130px; height: 130px; background: rgba(0,0,0,0.8); border: 2px solid var(--tertiary); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; padding: 10px;" 
+                         onclick="openDetail('Trabajo Colaborativo', '<strong>Johnson & Johnson (2014):</strong> Cooperación como estructura pedagógica.')">
+                        <span style="font-size: 1.5rem;">🤝</span>
+                        <small style="font-size: 0.7rem;">COLABORACIÓN</small>
+                    </div>
+
+                    <!-- Planeta 3: I.A.P. -->
+                    <div class="planet" style="position: absolute; top: 50%; left: 0; width: 130px; height: 130px; background: rgba(0,0,0,0.8); border: 2px solid white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; padding: 10px;" 
+                         onclick="openDetail('Investigación-Acción', '<strong>Kemmis & McTaggart (2005):</strong> Transformación educativa participativa.')">
+                        <span style="font-size: 1.5rem;">🔍</span>
+                        <small style="font-size: 0.7rem;">I.A.P.</small>
+                    </div>
+
+                      <!-- Planeta 4: Convivencia -->
+                      <div class="planet" style="position: absolute; top: 50%; right: 0; width: 130px; height: 130px; background: rgba(0,0,0,0.8); border: 2px solid white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; padding: 10px;" 
+                         onclick="openDetail('Convivencia Escolar', '<strong>González et al. (2022):</strong> Relación entre clima escolar y rendimiento académico.')">
+                         <span style="font-size: 1.5rem;">🕊️</span>
+                        <small style="font-size: 0.7rem;">CONVIVENCIA</small>
+                    </div>
+
+                    <!-- Orbit Ring -->
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 550px; height: 550px; border: 1px dashed rgba(255,255,255,0.2); border-radius: 50%; z-index: -1;"></div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: -30px;">Haz clic en los satélites para expandir los autores</p>
+        </div>
+
+        <!-- SLIDE 4: METODOLOGÍA (STEPPER) -->
+        <div class="slide" id="s4">
+            <h2>Ruta Metodológica</h2>
+            <div class="stepper-container">
+                
+                <div class="step-item" onclick="this.classList.toggle('active')">
+                    <h1 style="color: var(--primary); margin: 0;">1</h1>
+                    <h3 style="color: var(--primary)">Enfoque</h3>
+                    <div class="step-content">
+                        <p>Enfoque cualitativo</p>
+                        <p>Investigación-Acción</p>
+                        <p>Diseño participativo</p>
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 10px 0;">
+                        <p style="font-size: 0.8rem; color: #aaa;">Triangulación metodológica<br>(Benavides & Gómez-Restrepo, 2005)</p>
+                    </div>
+                </div>
+
+                <div class="step-item" onclick="this.classList.toggle('active')">
+                    <h1 style="color: var(--secondary); margin: 0;">2</h1>
+                    <h3 style="color: var(--secondary)">Instrumentos</h3>
+                    <div class="step-content">
+                        <p>Población: Estudiantes grado aceleración</p>
+                        <p>Observación participante</p>
+                        <p>Diarios de campo</p>
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 10px 0;">
+                        <p style="font-size: 0.8rem; color: #aaa;">Cuestionarios estructurados<br>(Ibarra et al., 2023)</p>
+                    </div>
+                </div>
+
+                <div class="step-item" onclick="this.classList.toggle('active')">
+                    <h1 style="color: var(--tertiary); margin: 0;">3</h1>
+                    <h3 style="color: var(--tertiary)">Análisis</h3>
+                    <div class="step-content">
+                        <p>Triangulación</p>
+                        <p>Categorización</p>
+                        <p>Resultados</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 5: RESULTADOS (NUEVA) -->
+        <div class="slide" id="s5">
+            <h2>Hallazgos Más Relevantes</h2>
+            <div class="results-grid">
+                
+                <div class="result-box">
+                    <h3 style="color: var(--primary);">Clima Escolar</h3>
+                    <ul>
+                        <li>Disminución de conflictos interpersonales.</li>
+                        <li>Ambiente más armónico en el aula.</li>
+                    </ul>
+                </div>
+
+                <div class="result-box">
+                    <h3 style="color: var(--secondary);">Trabajo Colaborativo</h3>
+                    <ul>
+                        <li>Incremento en cooperación y respeto.</li>
+                        <li>Resolución pacífica de conflictos.</li>
+                    </ul>
+                </div>
+
+                <div class="result-box">
+                    <h3 style="color: var(--tertiary);">Impacto Pedagógico</h3>
+                    <ul>
+                        <li>Mayor motivación.</li>
+                        <li>Participación activa en actividades académicas.</li>
+                    </ul>
+                </div>
+
+                <div class="result-box" style="border-color: white;">
+                    <h3 style="color: white;">Sustento Teórico</h3>
+                    <p>Juegos cooperativos fortalecen convivencia (Jaramillo, 2024).</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 6: NODO 4 (FLIP CARDS) -->
+        <div class="slide" id="s6">
+            <h2>Nodo 4: Tejido Socioemocional</h2>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <p><strong>Pregunta del nodo:</strong> ¿Es posible construir una cultura de paz duradera si no priorizamos la inteligencia emocional y el reconocimiento del “otro” como paso previo a cualquier conocimiento académico?</p>
+            </div>
+            
+            <div class="flip-grid">
+                
+                <!-- Card 1 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-front">
+                            <span class="icon-lg">🧠</span>
+                            <h3>Innovación<br>Conceptual</h3>
+                        </div>
+                        <div class="flip-back">
+                            <p>La alteridad se fortalece mediante experiencias lúdicas colaborativas.</p>
+                            <hr style="width: 50%; border-color: rgba(255,255,255,0.3);">
+                            <p><strong>El otro deja de ser rival y se convierte en compañero.</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-front" style="border-color: var(--primary);">
+                            <span class="icon-lg">⚙️</span>
+                            <h3>Innovación<br>Metodológica</h3>
+                        </div>
+                        <div class="flip-back" style="background: var(--primary); color: black;">
+                            <p style="color: black;">La I.A.P. permitió transformar prácticas reales de aula.</p>
+                             <hr style="width: 50%; border-color: rgba(0,0,0,0.3);">
+                            <p style="color: black;"><strong>Participación activa de los estudiantes en la construcción de normas.</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-front" style="border-color: var(--tertiary);">
+                            <span class="icon-lg">🎓</span>
+                            <h3>Innovación<br>Pedagógica</h3>
+                        </div>
+                        <div class="flip-back" style="background: var(--tertiary);">
+                            <p>La convivencia no se impone; se construye desde la cooperación.</p>
+                             <hr style="width: 50%; border-color: rgba(255,255,255,0.3);">
+                            <p><strong>El juego actúa como mediador relacional y ético.</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SLIDE 7: CIERRE -->
+        <div class="slide" id="s7">
+            <h2>Conclusión y Proyección</h2>
+            <div class="results-grid">
+                <div class="result-box" style="grid-column: span 2;">
+                    <h3 style="color: var(--primary);">Conclusiones</h3>
+                    <ul>
+                        <li>La estrategia lúdico-pedagógica fortaleció la convivencia escolar.</li>
+                        <li>Priorizar el reconocimiento del otro mejora el clima escolar.</li>
+                        <li>El aprendizaje fluye cuando hay relaciones armónicas.</li>
+                    </ul>
+                </div>
+                <div class="result-box" style="grid-column: span 2; border-color: var(--secondary);">
+                    <h3 style="color: var(--secondary);">Proyección</h3>
+                    <ul>
+                        <li>Modelo replicable en contextos inclusivos.</li>
+                        <li>Aporte a la construcción de cultura de paz desde la escuela.</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 3rem;">
+                <h1 style="font-size: 4rem;">GRACIAS</h1>
+                <p style="color: var(--secondary);">¿Preguntas?</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: REFERENCIAS (NUEVA) -->
+        <div class="slide" id="s8">
+            <h2>Referencias (APA 7)</h2>
+            <div class="scroll-content">
+                <ul class="ref-list">
+                    <li>Benavides, M. O., & Gómez-Restrepo, C. (2005). Métodos en investigación cualitativa: triangulación. <em>Revista Colombiana de Psiquiatría</em>, 34 (1), 118–124.</li>
+                    <li>González Flores, M. del C. (2013). Convivencia escolar: Una construcción colectiva. <em>Revista de Investigación Educativa</em>, 7 (1), 1–16.</li>
+                    <li>González, L. F., Baena, J. A., & Rodríguez, M. C. (2022). Relación entre clima escolar, convivencia y rendimiento académico. <em>Educación y Desarrollo Social</em>, 16 (2), 45–60.</li>
+                    <li>Guerrero Guerrero, A. M., Gómez García, J. D., & Escalona Linares, J. L. (2025). El juego como estrategia lúdico-pedagógica para fortalecer la convivencia.</li>
+                    <li>Hirmas Jahnsen, C., & Eroles Marín, C. (2008). Convivencia democrática, inclusión y cultura escolar.</li>
+                    <li>Huizinga, J. (1938). <em>Homo ludens</em>.</li>
+                    <li>Ibarra Sáiz, M. S., Rodríguez Gómez, G., & Gómez Ruiz, M. Á. (2023). <em>Diseño y uso de cuestionarios en investigación educativa</em>.</li>
+                    <li>Jaramillo Martínez, H. A. (2024). Incidencia de los juegos cooperativos en la convivencia escolar.</li>
+                    <li>Jares, X. R. (2006). <em>Pedagogía de la convivencia</em>.</li>
+                    <li>Johnson, D. W., & Johnson, R. T. (2014). <em>Cooperation in the classroom</em>.</li>
+                    <li>Kemmis, S., & McTaggart, R. (2005). Participatory action research.</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- NAVEGACIÓN -->
+    <div class="nav-controls">
+        <button class="nav-btn" onclick="changeSlide(-1)">❮</button>
+        <button class="nav-btn" onclick="changeSlide(1)">❯</button>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div class="detail-panel" id="mainModal">
+        <h3 id="detailTitle" style="color: var(--primary); font-size: 2rem; margin-bottom: 20px;"></h3>
+        <div id="detailText" style="font-size: 1.2rem; line-height: 1.8;"></div>
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn-neon" onclick="closeDetail()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // --- LÓGICA DE NAVEGACIÓN ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            
+            currentSlide += direction;
+            
+            if (currentSlide >= slides.length) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+            
+            slides[currentSlide].classList.add('active');
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'Escape') closeDetail();
+        });
+
+        // --- LÓGICA DEL MODAL ---
+        const modal = document.getElementById('mainModal');
+        const modalTitle = document.getElementById('detailTitle');
+        const modalText = document.getElementById('detailText');
+
+        function openDetail(title, textHTML) {
+            modalTitle.innerHTML = title;
+            modalText.innerHTML = textHTML; // Usamos innerHTML para soportar listas y negritas
+            modal.classList.add('open');
+        }
+
+        function closeDetail() {
+            modal.classList.remove('open');
+        }
+
+        // --- EFECTOS DE FONDO (CANVAS) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        
+        for(let i=0; i<60; i++){
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 1,
+                vy: (Math.random() - 0.5) * 1,
+                size: Math.random() * 2
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                ctx.fill();
+            });
+
+            // Conexiones
+            for(let i=0; i<particles.length; i++){
+                for(let j=i+1; j<particles.length; j++){
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if(dist < 100){
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${1 - dist/100})`;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+    </script>
+</body>
+</html>
