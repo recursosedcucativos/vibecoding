@@ -1,2038 +1,1209 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teoría Psicogenética de Jean Piaget</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #050a14;
-  --bg2: #0a1628;
-  --c1: #00f5c4;
-  --c2: #7c3aed;
-  --c3: #f59e0b;
-  --c4: #ef4444;
-  --c5: #3b82f6;
-  --c6: #10b981;
-  --text: #e2e8f0;
-  --text2: #94a3b8;
-  --font-head: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-}
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--text);
-  overflow: hidden;
-  width: 100vw;
-  height: 100vh;
-}
-
-/* ══════════ SLIDES ══════════ */
-.slides-wrapper {
-  width: 100%;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-.slide {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.1s;
-}
-
-.slide.active {
-  opacity: 1;
-  pointer-events: all;
-  animation: slideIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
-}
-
-.slide.exit {
-  animation: slideOut 0.5s cubic-bezier(0.7,0,1,0.5) forwards;
-  pointer-events: none;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(40px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes slideOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(-30px) scale(1.03); }
-}
-
-/* ══════════ NAVIGATION ══════════ */
-.nav {
-  position: fixed;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  z-index: 1000;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 50px;
-  padding: 0.6rem 1.2rem;
-}
-
-.nav-btn {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  border: 2px solid var(--c1);
-  background: transparent;
-  color: var(--c1);
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  display: flex; align-items: center; justify-content: center;
-}
-.nav-btn:hover { background: var(--c1); color: var(--bg); transform: scale(1.1); }
-
-.slide-counter {
-  font-family: var(--font-head);
-  font-size: 0.85rem;
-  color: var(--text2);
-  min-width: 60px;
-  text-align: center;
-}
-
-.nav-dots {
-  display: flex;
-  gap: 6px;
-}
-
-.nav-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.nav-dot.active {
-  background: var(--c1);
-  width: 20px;
-  border-radius: 4px;
-}
-
-/* ══════════ NOISE TEXTURE ══════════ */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-}
-
-/* ══════════ SLIDE 0: TITLE ══════════ */
-#s0 { background: radial-gradient(ellipse at 30% 40%, #0d1f40 0%, var(--bg) 70%); }
-
-.title-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.particle {
-  position: absolute;
-  border-radius: 50%;
-  animation: floatP var(--dur, 8s) ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-  opacity: 0.15;
-}
-@keyframes floatP {
-  0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.1; }
-  33%       { transform: translateY(-60px) translateX(30px) scale(1.2); opacity: 0.25; }
-  66%       { transform: translateY(30px) translateX(-20px) scale(0.8); opacity: 0.15; }
-}
-
-.title-badge {
-  font-family: var(--font-head);
-  font-size: 0.75rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--c1);
-  border: 1px solid var(--c1);
-  padding: 0.3rem 1rem;
-  border-radius: 50px;
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  animation: fadeUp 0.8s 0.3s ease forwards;
-}
-
-.title-main {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: clamp(2rem, 5vw, 3.8rem);
-  line-height: 1.1;
-  text-align: center;
-  max-width: 800px;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.5s ease forwards;
-}
-
-.title-main span { color: var(--c1); }
-.title-main em { color: var(--c3); font-style: normal; }
-
-.title-sub {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: var(--text2);
-  text-align: center;
-  margin-top: 1rem;
-  max-width: 600px;
-  line-height: 1.6;
-  opacity: 0;
-  animation: fadeUp 0.9s 0.8s ease forwards;
-}
-
-.brain-svg-wrapper {
-  position: absolute;
-  right: 5%;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  animation: fadeIn 1.2s 1s ease forwards;
-}
-
-.piaget-img {
-  position: absolute;
-  left: 5%;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  animation: fadeIn 1.2s 1s ease forwards;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* Brain pulse */
-.brain-path { animation: pulseBrain 2.5s ease-in-out infinite; }
-@keyframes pulseBrain {
-  0%, 100% { filter: drop-shadow(0 0 8px var(--c1)); }
-  50%       { filter: drop-shadow(0 0 25px var(--c1)) drop-shadow(0 0 50px var(--c2)); }
-}
-
-.synapse {
-  animation: synapsePulse var(--sd, 1.5s) ease-in-out infinite;
-  animation-delay: var(--sdelay, 0s);
-}
-@keyframes synapsePulse {
-  0%, 100% { opacity: 0.2; r: 3; }
-  50%       { opacity: 1; r: 6; }
-}
-
-/* ══════════ SLIDE 1: CONCEPTO ══════════ */
-#s1 { background: radial-gradient(ellipse at 70% 60%, #1a0533 0%, var(--bg) 70%); }
-
-.concept-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  max-width: 1000px;
-  width: 100%;
-  align-items: center;
-}
-
-.concept-text { }
-.section-tag {
-  display: inline-block;
-  font-family: var(--font-head);
-  font-size: 0.7rem;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--c2);
-  margin-bottom: 0.8rem;
-  position: relative;
-}
-.section-tag::before {
-  content: '';
-  position: absolute;
-  left: -1rem;
-  top: 50%;
-  width: 6px; height: 6px;
-  background: var(--c2);
-  border-radius: 50%;
-  transform: translateY(-50%);
-}
-
-.slide-title {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: clamp(1.5rem, 3vw, 2.4rem);
-  line-height: 1.15;
-  margin-bottom: 1.2rem;
-}
-
-.slide-title .accent { color: var(--c1); }
-
-.concept-def {
-  font-size: 1rem;
-  color: var(--text2);
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-}
-
-.key-idea {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  padding: 1rem 1.2rem;
-  background: rgba(0, 245, 196, 0.07);
-  border-left: 3px solid var(--c1);
-  border-radius: 0 8px 8px 0;
-  font-weight: 600;
-  color: var(--c1);
-  font-size: 1rem;
-}
-
-.key-idea .arrow { font-size: 1.3rem; animation: arrowPulse 1.5s ease-in-out infinite; }
-@keyframes arrowPulse {
-  0%, 100% { transform: translateX(0); }
-  50%       { transform: translateX(5px); }
-}
-
-/* Construction animation */
-.construction-svg { overflow: visible; }
-.brick {
-  animation: brickDrop var(--bd, 0.5s) cubic-bezier(0.34,1.56,0.64,1) forwards;
-  animation-delay: var(--bdelay, 0s);
-  opacity: 0;
-}
-@keyframes brickDrop {
-  from { opacity: 0; transform: translateY(-40px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.child-figure { animation: childBob 2s ease-in-out infinite; }
-@keyframes childBob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-5px); }
-}
-
-.thought-bubble { animation: thoughtAppear 3s ease-in-out infinite; }
-@keyframes thoughtAppear {
-  0%, 20% { opacity: 0; transform: scale(0.5); }
-  40%, 80% { opacity: 1; transform: scale(1); }
-  100%     { opacity: 0; transform: scale(1.1); }
-}
-
-/* ══════════ SLIDE 2: ETAPAS ══════════ */
-#s2 { background: radial-gradient(ellipse at 50% 0%, #001a3a 0%, var(--bg) 60%); }
-
-.stages-container { max-width: 1000px; width: 100%; }
-.stages-header { text-align: center; margin-bottom: 1.5rem; }
-.stages-header .slide-title { font-size: clamp(1.3rem, 2.5vw, 2rem); }
-
-.stages-timeline {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  position: relative;
-}
-
-.stages-timeline::before {
-  content: '';
-  position: absolute;
-  top: 60px;
-  left: 10%;
-  right: 10%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--c3), var(--c5), var(--c6), var(--c2));
-  z-index: 0;
-}
-
-.stage-card {
-  position: relative;
-  z-index: 1;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 1.2rem;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  animation: stageReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
-  animation-delay: var(--sdelay, 0s);
-  opacity: 0;
-}
-
-@keyframes stageReveal {
-  from { opacity: 0; transform: translateY(30px) scale(0.9); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.stage-card:hover {
-  transform: translateY(-8px) scale(1.04);
-  border-color: var(--stage-c, var(--c1));
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px color-mix(in srgb, var(--stage-c, var(--c1)) 20%, transparent);
-}
-
-.stage-card.expanded {
-  grid-column: span 4;
-  transform: scale(1.02);
-  border-color: var(--stage-c, var(--c1));
-}
-
-.stage-icon-wrap {
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--stage-c, var(--c1)) 15%, transparent);
-  border: 2px solid var(--stage-c, var(--c1));
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 0.8rem;
-  font-size: 1.6rem;
-  position: relative;
-}
-
-.stage-dot {
-  position: absolute;
-  top: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--stage-c, var(--c1));
-  border: 3px solid var(--bg);
-  box-shadow: 0 0 10px var(--stage-c, var(--c1));
-  animation: dotPulse 2s ease-in-out infinite;
-}
-
-@keyframes dotPulse {
-  0%, 100% { box-shadow: 0 0 10px var(--stage-c, var(--c1)); }
-  50%       { box-shadow: 0 0 25px var(--stage-c, var(--c1)); }
-}
-
-.stage-age {
-  font-family: var(--font-head);
-  font-size: 0.72rem;
-  letter-spacing: 1px;
-  color: var(--stage-c, var(--c1));
-  margin-bottom: 0.3rem;
-}
-
-.stage-name {
-  font-family: var(--font-head);
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-}
-
-.stage-bullets {
-  font-size: 0.82rem;
-  color: var(--text2);
-  line-height: 1.6;
-  text-align: left;
-}
-
-.stage-bullets li { list-style: none; padding-left: 1rem; position: relative; margin-bottom: 0.3rem; }
-.stage-bullets li::before { content: '▸'; position: absolute; left: 0; color: var(--stage-c, var(--c1)); font-size: 0.7rem; }
-
-/* ══════════ SLIDE 3: ADAPTACIÓN ══════════ */
-#s3 { background: radial-gradient(ellipse at 20% 80%, #0d3320 0%, var(--bg) 60%); }
-
-.adapt-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
-  gap: 1.5rem;
-  max-width: 1000px;
-  width: 100%;
-  align-items: center;
-}
-
-.adapt-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
-  padding: 1.8rem;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.4s;
-}
-
-.adapt-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ac, var(--c1)) 8%, transparent), transparent 60%);
-  pointer-events: none;
-}
-
-.adapt-card:hover { transform: translateY(-5px); border-color: var(--ac, var(--c1)); }
-
-.adapt-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  display: block;
-  animation: iconSpin 4s linear infinite;
-  transform-origin: center;
-}
-@keyframes iconSpin {
-  0%, 90%, 100% { transform: rotate(0deg); }
-  45%            { transform: rotate(15deg); }
-}
-
-.adapt-title {
-  font-family: var(--font-head);
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--ac, var(--c1));
-  margin-bottom: 0.8rem;
-}
-
-.adapt-desc { font-size: 0.95rem; color: var(--text2); line-height: 1.7; }
-
-.adapt-arrows-svg { overflow: visible; }
-
-.arrow-anim {
-  animation: arrowFlow 2s ease-in-out infinite;
-}
-.arrow-anim2 {
-  animation: arrowFlow 2s 0.5s ease-in-out infinite;
-}
-@keyframes arrowFlow {
-  0%   { stroke-dashoffset: 0; opacity: 0.4; }
-  50%  { opacity: 1; }
-  100% { stroke-dashoffset: -60; opacity: 0.4; }
-}
-
-.brain-adapt { animation: brainGrow 3s ease-in-out infinite; }
-@keyframes brainGrow {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.08); }
-}
-
-.key-quote {
-  grid-column: 1 / -1;
-  text-align: center;
-  font-family: var(--font-head);
-  font-size: 1.1rem;
-  color: var(--c1);
-  padding: 1rem;
-  border-top: 1px solid rgba(0, 245, 196, 0.2);
-}
-
-/* ══════════ SLIDE 4: EQUILIBRACIÓN ══════════ */
-#s4 { background: radial-gradient(ellipse at 80% 20%, #1a1a00 0%, var(--bg) 60%); }
-
-.equil-layout { display: flex; gap: 3rem; align-items: center; max-width: 900px; width: 100%; }
-
-.equil-text { flex: 1; }
-
-.equil-visual { flex: 0 0 380px; }
-
-.scale-svg { overflow: visible; }
-
-.beam-left, .beam-right {
-  transform-origin: center;
-  transition: transform 1s cubic-bezier(0.34,1.56,0.64,1);
-}
-
-.scale-beam {
-  animation: scaleTilt 4s ease-in-out infinite;
-  transform-origin: 190px 100px;
-}
-@keyframes scaleTilt {
-  0%, 100% { transform: rotate(-12deg); }
-  50%       { transform: rotate(12deg); }
-}
-
-.scale-pan-left { animation: panLeft 4s ease-in-out infinite; transform-origin: center; }
-.scale-pan-right { animation: panRight 4s ease-in-out infinite; transform-origin: center; }
-@keyframes panLeft {
-  0%, 100% { transform: translateY(30px); }
-  50%       { transform: translateY(-30px); }
-}
-@keyframes panRight {
-  0%, 100% { transform: translateY(-30px); }
-  50%       { transform: translateY(30px); }
-}
-
-.conflict-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.8rem 1.2rem;
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid var(--c3);
-  border-radius: 50px;
-  color: var(--c3);
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-top: 1rem;
-}
-
-.flow-steps {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.flow-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.flow-step-box {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.flow-arrow { font-size: 1.2rem; color: var(--text2); animation: arrowPulse 1.5s ease-in-out infinite; }
-
-/* ══════════ SLIDE 5: CARACTERÍSTICAS ══════════ */
-#s5 { background: radial-gradient(ellipse at 50% 50%, #10001a 0%, var(--bg) 65%); }
-
-.chars-container { max-width: 900px; width: 100%; }
-
-.chars-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-  margin-top: 1.2rem;
-}
-
-.char-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 1.2rem;
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-  transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  opacity: 0;
-  animation: cardReveal 0.6s ease forwards;
-  animation-delay: var(--cdelay, 0s);
-}
-
-@keyframes cardReveal {
-  from { opacity: 0; transform: scale(0.9) translateY(20px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-.char-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--cc, var(--c1));
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3), 0 0 20px color-mix(in srgb, var(--cc, var(--c1)) 15%, transparent);
-}
-
-.char-emoji {
-  font-size: 2rem;
-  min-width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: color-mix(in srgb, var(--cc, var(--c1)) 12%, transparent);
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--cc, var(--c1)) 30%, transparent);
-  animation: emojiPop 3s ease-in-out infinite;
-  animation-delay: var(--cdelay, 0s);
-}
-@keyframes emojiPop {
-  0%, 90%, 100% { transform: scale(1); }
-  45%            { transform: scale(1.15) rotate(5deg); }
-}
-
-.char-label {
-  font-family: var(--font-head);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--cc, var(--c1));
-  margin-bottom: 0.4rem;
-}
-
-.char-desc { font-size: 0.85rem; color: var(--text2); line-height: 1.6; }
-
-/* ══════════ SLIDE 6: APLICACIONES ══════════ */
-#s6 { background: radial-gradient(ellipse at 30% 70%, #001a12 0%, var(--bg) 60%); }
-
-.app-layout { display: grid; grid-template-columns: 1fr 1.3fr; gap: 2rem; max-width: 1000px; width: 100%; align-items: center; }
-
-.app-list { display: flex; flex-direction: column; gap: 0.8rem; }
-
-.app-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.9rem 1.2rem;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 12px;
-  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  opacity: 0;
-  animation: itemSlide 0.5s ease forwards;
-  animation-delay: var(--idelay, 0s);
-  cursor: default;
-}
-
-@keyframes itemSlide {
-  from { opacity: 0; transform: translateX(-30px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-.app-item:hover {
-  transform: translateX(8px);
-  border-color: var(--c6);
-  background: rgba(16, 185, 129, 0.07);
-}
-
-.app-num {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--c6);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-head);
-  font-size: 0.8rem;
-  font-weight: 800;
-  color: var(--c6);
-  flex-shrink: 0;
-}
-
-.app-text { font-size: 0.9rem; color: var(--text2); }
-.app-text strong { color: var(--text); display: block; font-size: 0.92rem; margin-bottom: 0.15rem; }
-
-.classroom-svg { overflow: visible; }
-
-/* Classroom animation */
-.student { animation: studentWave var(--sw, 2s) ease-in-out infinite; animation-delay: var(--swdelay, 0s); }
-@keyframes studentWave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-
-.teacher-arm { animation: teacherPoint 3s ease-in-out infinite; transform-origin: 20px 0px; }
-@keyframes teacherPoint { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
-
-.board-text { animation: boardWrite 4s ease-in-out infinite; }
-@keyframes boardWrite { 0%, 30% { opacity: 0; } 40%, 90% { opacity: 1; } 100% { opacity: 0; } }
-
-.app-key {
-  margin-top: 1.2rem;
-  padding: 0.9rem 1.2rem;
-  background: rgba(16, 185, 129, 0.08);
-  border-left: 3px solid var(--c6);
-  border-radius: 0 8px 8px 0;
-  font-size: 0.9rem;
-  color: var(--c6);
-  font-weight: 600;
-}
-
-/* ══════════ SLIDE 7: QUIZ ══════════ */
-#s7 { background: radial-gradient(ellipse at 50% 100%, #001533 0%, var(--bg) 60%); }
-
-.quiz-container { max-width: 700px; width: 100%; }
-
-.quiz-header { text-align: center; margin-bottom: 1.5rem; }
-
-.quiz-state { display: none; }
-.quiz-state.visible { display: block; }
-
-.quiz-q {
-  font-family: var(--font-head);
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  color: var(--text);
-  text-align: center;
-}
-
-.quiz-options { display: flex; flex-direction: column; gap: 0.7rem; }
-
-.quiz-opt {
-  width: 100%;
-  padding: 1rem 1.4rem;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  cursor: pointer;
-  text-align: left;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.quiz-opt::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--c1);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.quiz-opt:hover:not(:disabled) {
-  border-color: var(--c5);
-  transform: translateX(5px);
-}
-
-.quiz-opt.correct { border-color: var(--c6) !important; background: rgba(16,185,129,0.15) !important; color: var(--c6); }
-.quiz-opt.wrong   { border-color: var(--c4) !important; background: rgba(239, 68, 68, 0.1)  !important; color: var(--c4); }
-.quiz-opt:disabled { cursor: default; transform: none !important; }
-
-.quiz-feedback {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 12px;
-  font-weight: 600;
-  text-align: center;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.4s;
-  font-size: 0.95rem;
-}
-.quiz-feedback.show { opacity: 1; transform: translateY(0); }
-.quiz-feedback.ok  { background: rgba(16,185,129,0.12); border: 1px solid var(--c6); color: var(--c6); }
-.quiz-feedback.bad { background: rgba(239,68,68,0.1);   border: 1px solid var(--c4); color: var(--c4); }
-
-.quiz-next-btn, .quiz-restart {
-  display: block;
-  width: 100%;
-  margin-top: 1rem;
-  padding: 0.9rem;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--c2), var(--c5));
-  color: white;
-  font-family: var(--font-head);
-  font-weight: 700;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  opacity: 0;
-}
-.quiz-next-btn.show, .quiz-restart.show { opacity: 1; animation: fadeUp 0.4s ease; }
-.quiz-next-btn:hover, .quiz-restart:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(124,58,237,0.4); }
-
-.quiz-progress {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.q-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: all 0.3s;
-}
-.q-dot.done  { background: var(--c6); }
-.q-dot.current { background: var(--c1); width: 20px; border-radius: 4px; }
-
-.score-display {
-  text-align: center;
-  padding: 2rem;
-}
-.score-num {
-  font-family: var(--font-head);
-  font-size: 4rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--c1), var(--c2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.score-msg { font-size: 1.1rem; color: var(--text2); margin-top: 0.5rem; }
-
-/* Stage question: which stage? */
-.stage-quiz {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 0.8rem;
-  margin-top: 1rem;
-}
-
-.stage-q-btn {
-  padding: 1rem;
-  border-radius: 12px;
-  border: 2px solid transparent;
-  background: rgba(255,255,255,0.04);
-  color: var(--text);
-  font-family: var(--font-head);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  text-align: center;
-}
-.stage-q-btn:hover:not(:disabled) { border-color: var(--c5); transform: scale(1.03); }
-
-/* Animations for slide content */
-.anim-child { opacity: 0; animation: fadeUp 0.7s ease forwards; animation-delay: var(--achild, 0.1s); }
-
-/* ══════════ VIDEO MODAL ══════════ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(10px);
-  z-index: 9000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal-box {
-  background: var(--bg2);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 1.5rem;
-  max-width: 700px;
-  width: 90%;
-  transform: scale(0.9);
-  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
-}
-.modal-overlay.open .modal-box { transform: scale(1); }
-.modal-title {
-  font-family: var(--font-head);
-  font-weight: 800;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: var(--c1);
-}
-.modal-video-wrapper {
-  border-radius: 12px;
-  overflow: hidden;
-  background: #000;
-  aspect-ratio: 16/9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text2);
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 2rem;
-}
-.modal-close {
-  display: block;
-  margin-top: 1rem;
-  width: 100%;
-  padding: 0.7rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  transition: all 0.3s;
-}
-.modal-close:hover { background: rgba(255,255,255,0.07); color: var(--text); }
-
-/* ══════════ STAGE QUIZ MODAL ══════════ */
-.stage-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(15px);
-  z-index: 8000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s;
-}
-.stage-modal.open { opacity: 1; pointer-events: all; }
-.stage-modal-box {
-  background: var(--bg2);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 24px;
-  padding: 2rem;
-  max-width: 480px;
-  width: 90%;
-  transform: scale(0.85);
-  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
-}
-.stage-modal.open .stage-modal-box { transform: scale(1); }
-.stage-modal-q {
-  font-family: var(--font-head);
-  font-size: 1.1rem;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  color: var(--c3);
-}
-.stage-cards-row {
-  display: grid;
-  grid-template-columns: repeat(2,1fr);
-  gap: 0.8rem;
-}
-.stage-sel-card {
-  padding: 1.2rem;
-  border-radius: 14px;
-  border: 2px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.03);
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-  text-align: center;
-}
-.stage-sel-card:hover { border-color: var(--stage-c, var(--c1)); transform: translateY(-4px); }
-.stage-sel-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-.stage-sel-name { font-family: var(--font-head); font-size: 0.85rem; font-weight: 700; color: var(--stage-c, var(--c1)); }
-.stage-sel-age { font-size: 0.75rem; color: var(--text2); margin-top: 0.2rem; }
-.stage-result {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: 12px;
-  display: none;
-  animation: fadeUp 0.5s ease;
-}
-.stage-result.show { display: block; }
-.stage-result-title { font-family: var(--font-head); font-size: 1.4rem; font-weight: 800; }
-.stage-result-desc { font-size: 0.9rem; color: var(--text2); margin-top: 0.5rem; line-height: 1.6; }
-.stage-close {
-  display: block;
-  margin-top: 1rem;
-  width: 100%;
-  padding: 0.8rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: transparent;
-  color: var(--text2);
-  cursor: pointer;
-  font-family: var(--font-body);
-  transition: all 0.3s;
-}
-.stage-close:hover { background: rgba(255,255,255,0.07); color: var(--text); }
-
-/* ══════════ FOOTER / PROGRESS BAR ══════════ */
-.progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--c1), var(--c2));
-  transition: width 0.5s ease;
-  z-index: 9000;
-  box-shadow: 0 0 10px var(--c1);
-}
-
-/* ══════════ SLIDE HEADER ══════════ */
-.slide-header-bar {
-  position: fixed;
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-head);
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text2);
-  z-index: 500;
-  opacity: 0.6;
-}
-
-/* Responsive tweaks */
-@media (max-width: 768px) {
-  .concept-grid, .adapt-grid { grid-template-columns: 1fr; }
-  .stages-timeline { grid-template-columns: repeat(2,1fr); }
-  .stages-timeline::before { display: none; }
-  .equil-layout { flex-direction: column; }
-  .equil-visual { flex: 0 0 auto; width: 100%; max-width: 300px; }
-  .chars-grid { grid-template-columns: 1fr; }
-  .app-layout { grid-template-columns: 1fr; }
-  .brain-svg-wrapper { display: none; }
-  .piaget-img { display: none; }
-  .stage-cards-row { grid-template-columns: 1fr; }
-  .adapt-grid { grid-template-columns: 1fr; }
-  .adapt-grid > .adapt-arrows-svg-wrap { display: none; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría Psicogenética de Piaget - Presentación Interactiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        piaget: {
+                            purple: '#9333ea',
+                            yellow: '#eab308',
+                            green: '#10b981',
+                            orange: '#f97316',
+                            red: '#ef4444',
+                            blue: '#3b82f6',
+                            dark: '#1e293b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .slide {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: translateX(100px) scale(0.95);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 0;
+            padding-bottom: 100px;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) scale(1);
+            z-index: 10;
+        }
+
+        .slide.prev-slide {
+            transform: translateX(-100px) scale(0.95);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .scale-in {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .scale-in.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .svg-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(147, 51, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(147, 51, 234, 0); }
+        }
+
+        .arrow-flow::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: flow 2s infinite;
+        }
+        @keyframes flow {
+            100% { left: 100%; }
+        }
+
+        .bg-pattern {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(8px);
+            background-color: rgba(15, 23, 42, 0.6);
+            transition: opacity 0.3s ease;
+        }
+
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+        .slide::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+        }
+
+        /* Mejoras visuales adicionales */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-pattern text-gray-800 antialiased relative">
 
-<div class="progress-bar" id="progressBar"></div>
-<div class="slide-header-bar" id="slideHeaderBar">Teoría Psicogenética · Piaget</div>
+    <!-- Barra de progreso mejorada -->
+    <div class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-piaget-purple via-piaget-blue to-piaget-green z-[60] transition-all duration-500 ease-out shadow-lg" id="progressBar" style="width: 0%;"></div>
 
-<!-- ══════════════════════════════════════
-     SLIDE 0: TÍTULO
-══════════════════════════════════════ -->
-<div class="slides-wrapper" id="slidesWrapper">
-
-<div class="slide active" id="s0">
-  <div class="title-particles" id="particles"></div>
-
-  <!-- BRAIN SVG -->
-  <div class="brain-svg-wrapper">
-    <svg width="200" height="200" viewBox="0 0 200 200" class="brain-path">
-      <!-- Brain outline stylized -->
-      <g fill="none" stroke="var(--c1)" stroke-width="2">
-        <path class="brain-path" d="M100 30 C70 20, 40 45, 38 75 C36 95, 45 110, 50 120 C55 135, 50 150, 58 162 C65 172, 80 175, 100 172 C120 175, 135 172, 142 162 C150 150, 145 135, 150 120 C155 110, 164 95, 162 75 C160 45, 130 20, 100 30Z" stroke-width="2.5" opacity="0.8"/>
-        <path d="M100 30 C100 60, 100 80, 100 172" stroke-dasharray="3,5" opacity="0.4"/>
-        <path d="M65 60 C75 70, 80 85, 78 100 C76 115, 68 125, 65 140" opacity="0.5"/>
-        <path d="M135 60 C125 70, 120 85, 122 100 C124 115, 132 125, 135 140" opacity="0.5"/>
-        <path d="M50 90 C65 95, 80 98, 100 98 C120 98, 135 95, 150 90" opacity="0.5"/>
-        <path d="M48 115 C60 118, 78 115, 100 116 C122 115, 140 118, 152 115" opacity="0.4"/>
-      </g>
-      <!-- Synapses -->
-      <circle class="synapse" cx="70" cy="75" r="4" fill="var(--c1)" style="--sdelay:0s;--sd:1.8s"/>
-      <circle class="synapse" cx="130" cy="75" r="4" fill="var(--c2)" style="--sdelay:0.4s;--sd:2.1s"/>
-      <circle class="synapse" cx="60" cy="120" r="4" fill="var(--c3)" style="--sdelay:0.8s;--sd:1.6s"/>
-      <circle class="synapse" cx="140" cy="120" r="4" fill="var(--c5)" style="--sdelay:1.2s;--sd:2.3s"/>
-      <circle class="synapse" cx="100" cy="100" r="5" fill="var(--c1)" style="--sdelay:0.2s;--sd:2s"/>
-      <circle class="synapse" cx="85" cy="145" r="4" fill="var(--c6)" style="--sdelay:0.6s;--sd:1.9s"/>
-      <circle class="synapse" cx="115" cy="145" r="4" fill="var(--c4)" style="--sdelay:1s;--sd:2.2s"/>
-      <!-- Connection lines -->
-      <line x1="70" y1="75" x2="100" y2="100" stroke="var(--c1)" stroke-width="1" opacity="0.3" stroke-dasharray="3,3"/>
-      <line x1="130" y1="75" x2="100" y2="100" stroke="var(--c2)" stroke-width="1" opacity="0.3" stroke-dasharray="3,3"/>
-      <line x1="60" y1="120" x2="85" y2="145" stroke="var(--c6)" stroke-width="1" opacity="0.3" stroke-dasharray="3,3"/>
-      <line x1="140" y1="120" x2="115" y2="145" stroke="var(--c4)" stroke-width="1" opacity="0.3" stroke-dasharray="3,3"/>
-    </svg>
-  </div>
-
-  <div style="text-align:center; z-index:10; max-width: 650px;">
-    <div class="title-badge">Infografía Interactiva · Psicología del Desarrollo</div>
-    <h1 class="title-main">
-      ¿Cómo aprenden<br>los <span>niños</span>?<br>
-      <em>Jean Piaget</em>
-    </h1>
-    <p class="title-sub">
-      La teoría psicogenética y su aplicación en el aula.<br>
-      Explora el desarrollo cognitivo a través de sus etapas.
-    </p>
-    <div style="margin-top: 2rem; opacity:0; animation: fadeUp 0.8s 1.2s ease forwards; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
-      <button onclick="goToSlide(1)" style="padding:0.8rem 2rem;border-radius:50px;background:var(--c1);color:var(--bg);font-family:var(--font-head);font-weight:700;border:none;cursor:pointer;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Explorar →</button>
-      <button onclick="openVideo()" style="padding:0.8rem 2rem;border-radius:50px;background:transparent;color:var(--text);font-family:var(--font-head);font-weight:700;border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.borderColor='var(--c1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.2)'">▶ Ver Video</button>
-      <button onclick="openStageQuiz()" style="padding:0.8rem 2rem;border-radius:50px;background:transparent;color:var(--c3);font-family:var(--font-head);font-weight:700;border:2px solid var(--c3);cursor:pointer;font-size:1rem;transition:all 0.3s;" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='transparent'">🎯 ¿En qué etapa estás?</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SLIDE 1: CONCEPTO CENTRAL
-══════════════════════════════════════ -->
-<div class="slide" id="s1">
-  <div class="concept-grid">
-    <div class="concept-text">
-      <div class="section-tag anim-child" style="--achild:0.1s">Bloque 1</div>
-      <h2 class="slide-title anim-child" style="--achild:0.2s">¿Qué es la teoría <span class="accent">psicogenética</span>?</h2>
-      <p class="concept-def anim-child" style="--achild:0.35s">
-        La teoría psicogenética explica que el aprendizaje es un <strong style="color:var(--text)">proceso activo</strong> en el que el niño construye su conocimiento a partir de la interacción con el entorno. El desarrollo cognitivo ocurre por <strong style="color:var(--text)">etapas</strong> y depende de la capacidad del sujeto para adaptarse a nuevas experiencias.
-      </p>
-      <div class="key-idea anim-child" style="--achild:0.5s">
-        <span class="arrow">→</span>
-        El niño <em style="color:var(--c3)">no recibe</em> información, la <strong>construye</strong>
-      </div>
-      <div style="margin-top:1.2rem; display:flex; gap:1rem; flex-wrap:wrap;" class="anim-child" style="--achild:0.65s">
-        <div style="padding:0.6rem 1rem;background:rgba(124,58,237,0.1);border:1px solid var(--c2);border-radius:8px;font-size:0.85rem;color:var(--c2)">🧠 Constructivismo</div>
-        <div style="padding:0.6rem 1rem;background:rgba(0,245,196,0.08);border:1px solid var(--c1);border-radius:8px;font-size:0.85rem;color:var(--c1)">📶 Por Etapas</div>
-        <div style="padding:0.6rem 1rem;background:rgba(245,158,11,0.08);border:1px solid var(--c3);border-radius:8px;font-size:0.85rem;color:var(--c3)">🤸 Activo</div>
-      </div>
+    <!-- Indicador de navegación inicial -->
+    <div id="keyboard-hint" class="fixed top-6 right-6 bg-white/90 backdrop-blur px-4 py-3 rounded-2xl shadow-lg border border-purple-100 text-sm font-medium text-purple-700 z-50 animate-pulse transition-opacity duration-500 flex items-center gap-2">
+        <i class="fa-solid fa-keyboard text-lg"></i>
+        <span>Usa <kbd class="bg-gray-100 px-2 py-1 rounded font-sans border border-gray-300">←</kbd> <kbd class="bg-gray-100 px-2 py-1 rounded font-sans border border-gray-300">→</kbd> para navegar</span>
     </div>
 
-    <!-- Construction SVG -->
-    <div style="display:flex;align-items:center;justify-content:center;">
-      <svg width="300" height="280" viewBox="0 0 300 280" class="construction-svg">
-        <!-- Ground -->
-        <rect x="20" y="240" width="260" height="8" rx="4" fill="rgba(255,255,255,0.1)"/>
+    <div id="presentation-container" class="relative w-full h-full">
 
-        <!-- Building bricks -->
-        <!-- Row 1 -->
-        <rect class="brick" x="60" y="215" width="70" height="25" rx="4" fill="var(--c5)" opacity="0.8" style="--bdelay:0.5s;--bd:0.4s"/>
-        <rect class="brick" x="140" y="215" width="70" height="25" rx="4" fill="var(--c5)" opacity="0.8" style="--bdelay:0.7s;--bd:0.4s"/>
-        <!-- Row 2 -->
-        <rect class="brick" x="75" y="187" width="60" height="25" rx="4" fill="var(--c6)" opacity="0.85" style="--bdelay:1s;--bd:0.4s"/>
-        <rect class="brick" x="145" y="187" width="60" height="25" rx="4" fill="var(--c6)" opacity="0.85" style="--bdelay:1.2s;--bd:0.4s"/>
-        <!-- Row 3 -->
-        <rect class="brick" x="90" y="159" width="50" height="25" rx="4" fill="var(--c3)" opacity="0.9" style="--bdelay:1.5s;--bd:0.4s"/>
-        <rect class="brick" x="148" y="159" width="50" height="25" rx="4" fill="var(--c3)" opacity="0.9" style="--bdelay:1.7s;--bd:0.4s"/>
-        <!-- Top -->
-        <rect class="brick" x="105" y="131" width="80" height="25" rx="4" fill="var(--c2)" opacity="0.9" style="--bdelay:2s;--bd:0.5s"/>
-        <!-- Star -->
-        <text class="brick" x="137" y="120" fill="var(--c1)" font-size="20" style="--bdelay:2.5s;--bd:0.4s">⭐</text>
+        <!-- SLIDE 1: PORTADA -->
+        <header class="slide active flex flex-col justify-center items-center text-center p-6 relative bg-gradient-to-br from-white via-purple-50 to-blue-50">
+            <div class="absolute top-10 left-10 w-64 h-64 bg-piaget-purple/10 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-10 right-10 w-80 h-80 bg-piaget-blue/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+            <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-piaget-yellow/20 rounded-full blur-2xl"></div>
 
-        <!-- Child figure -->
-        <g class="child-figure" transform="translate(28,185)">
-          <!-- body -->
-          <circle cx="18" cy="8" r="10" fill="var(--c3)" opacity="0.9"/>
-          <rect x="11" y="18" width="14" height="22" rx="5" fill="var(--c3)" opacity="0.85"/>
-          <rect x="8" y="20" width="8" height="16" rx="4" fill="var(--c3)" opacity="0.7" transform="rotate(-20,12,28)"/>
-          <rect x="21" y="20" width="8" height="16" rx="4" fill="var(--c3)" opacity="0.7" transform="rotate(20,25,28)"/>
-          <!-- eyes -->
-          <circle cx="15" cy="7" r="2" fill="var(--bg)"/>
-          <circle cx="21" cy="7" r="2" fill="var(--bg)"/>
-        </g>
+            <div class="max-w-4xl mx-auto z-10 w-full px-4">
+                <div class="reveal mb-8 flex justify-center svg-float">
+                    <div class="relative">
+                        <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="url(#purpleGradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow-2xl">
+                            <defs>
+                                <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#9333ea" />
+                                    <stop offset="100%" stop-color="#3b82f6" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/>
+                            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/>
+                            <circle cx="12" cy="12" r="2.5" fill="#eab308" stroke="none" class="animate-pulse"/>
+                        </svg>
+                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-piaget-yellow rounded-full flex items-center justify-center text-white font-bold shadow-lg animate-bounce">?</div>
+                    </div>
+                </div>
+                
+                <h1 class="reveal font-heading text-5xl md:text-7xl font-extrabold text-piaget-dark mb-6 tracking-tight leading-tight">
+                    Teoría psicogenética de <span class="text-gradient">Jean Piaget</span>
+                </h1>
+                <h2 class="reveal text-xl md:text-2xl text-gray-600 font-medium max-w-3xl mx-auto leading-relaxed mb-8">
+                    Construcción del conocimiento: <br/> 
+                    <span class="text-piaget-purple font-bold">Cómo aprenden los estudiantes según su desarrollo cognitivo</span>
+                </h2>
+                
+                <div class="reveal flex gap-4 justify-center mb-12">
+                    <span class="px-4 py-2 bg-white/80 rounded-full text-sm font-medium text-gray-600 shadow-sm border border-gray-200">
+                        <i class="fa-solid fa-brain text-piaget-purple mr-2"></i>Constructivismo
+                    </span>
+                    <span class="px-4 py-2 bg-white/80 rounded-full text-sm font-medium text-gray-600 shadow-sm border border-gray-200">
+                        <i class="fa-solid fa-users text-piaget-blue mr-2"></i>Desarrollo Infantil
+                    </span>
+                    <span class="px-4 py-2 bg-white/80 rounded-full text-sm font-medium text-gray-600 shadow-sm border border-gray-200">
+                        <i class="fa-solid fa-graduation-cap text-piaget-green mr-2"></i>Psicología Educativa
+                    </span>
+                </div>
 
-        <!-- Thought bubble from child -->
-        <g class="thought-bubble">
-          <circle cx="55" cy="155" r="4" fill="rgba(0,245,196,0.3)" stroke="var(--c1)" stroke-width="1"/>
-          <circle cx="65" cy="140" r="6" fill="rgba(0,245,196,0.25)" stroke="var(--c1)" stroke-width="1"/>
-          <circle cx="82" cy="130" r="14" fill="rgba(0,245,196,0.15)" stroke="var(--c1)" stroke-width="1.5"/>
-          <text x="76" y="134" fill="var(--c1)" font-size="14">💡</text>
-        </g>
+                <div class="reveal mt-8 animate-bounce cursor-pointer" onclick="nextSlide()">
+                    <span class="bg-white p-4 rounded-full shadow-lg inline-block hover:bg-piaget-purple hover:text-white transition-all duration-300 border-2 border-piaget-purple/20 group">
+                        <i class="fa-solid fa-arrow-down text-2xl text-piaget-purple group-hover:text-white"></i>
+                    </span>
+                    <p class="text-sm text-gray-500 mt-2 font-medium">Comenzar presentación</p>
+                </div>
+            </div>
+        </header>
 
-        <!-- Labels -->
-        <text x="230" y="232" fill="var(--text2)" font-size="10" font-family="DM Sans, sans-serif">Experiencia</text>
-        <text x="230" y="203" fill="var(--c6)" font-size="10" font-family="DM Sans, sans-serif">Comprensión</text>
-        <text x="230" y="175" fill="var(--c3)" font-size="10" font-family="DM Sans, sans-serif">Abstracción</text>
-        <text x="240" y="148" fill="var(--c2)" font-size="10" font-family="DM Sans, sans-serif">Lógica</text>
-      </svg>
+        <!-- SLIDE 2: CONCEPTO CENTRAL (MEJORADO) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-white">
+            <div class="max-w-6xl mx-auto w-full">
+                <div class="flex flex-col lg:flex-row items-center gap-12">
+                    <div class="reveal lg:w-1/2">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-piaget-purple rounded-full text-sm font-bold mb-6">
+                            <i class="fa-solid fa-lightbulb"></i> FUNDAMENTO TEÓRICO
+                        </div>
+                        <h3 class="font-heading text-4xl md:text-5xl font-bold text-gray-800 mb-6">Concepto Central</h3>
+                        <p class="text-xl md:text-2xl text-gray-700 leading-relaxed font-light mb-6">
+                            El aprendizaje es un proceso <strong class="font-bold text-piaget-dark border-b-4 border-yellow-400">activo y constructivo</strong> donde el estudiante no es un receptor pasivo, sino un <span class="text-piaget-purple font-semibold">constructor de su propio conocimiento</span>.
+                        </p>
+                        <div class="bg-purple-50 border-l-4 border-piaget-purple p-6 rounded-r-2xl">
+                            <p class="text-gray-700 text-lg">
+                                <i class="fa-solid fa-quote-left text-piaget-purple/30 text-2xl mr-2"></i>
+                                El niño no es una copia pasiva de la realidad, sino que interactúa dinámicamente con su entorno para construir estructuras mentales.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="reveal scale-in lg:w-1/2 w-full">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-r from-piaget-purple to-piaget-blue rounded-3xl transform rotate-3 opacity-20"></div>
+                            <div class="bg-white p-8 rounded-3xl shadow-2xl border border-gray-100 relative">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div class="text-center p-4 bg-red-50 rounded-2xl">
+                                        <i class="fa-solid fa-xmark text-3xl text-red-400 mb-2"></i>
+                                        <p class="font-bold text-gray-800">Modelo Tradicional</p>
+                                        <p class="text-sm text-gray-600 mt-2">Aprendizaje pasivo<br>Memorización<br>Receptor vacío</p>
+                                    </div>
+                                    <div class="text-center p-4 bg-green-50 rounded-2xl border-2 border-green-200 transform scale-105 shadow-lg">
+                                        <i class="fa-solid fa-check text-3xl text-green-500 mb-2"></i>
+                                        <p class="font-bold text-piaget-green">Modelo Piaget</p>
+                                        <p class="text-sm text-gray-700 mt-2">Aprendizaje activo<br>Comprensión<br>Constructor</p>
+                                    </div>
+                                </div>
+                                <div class="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200 flex items-center gap-3">
+                                    <i class="fa-solid fa-key text-2xl text-yellow-600"></i>
+                                    <p class="text-gray-700 font-medium">El desarrollo cognitivo determina cómo y qué se aprende en cada etapa.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: ETAPAS DEL DESARROLLO (MEJORADO CON CONTENIDO COMPLETO) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-gray-50">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="reveal text-center mb-10">
+                    <span class="inline-block px-4 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold mb-4">4 ETAPAS CLAVE</span>
+                    <h3 class="font-heading text-4xl md:text-5xl font-bold text-gray-800">Etapas del Desarrollo Cognitivo</h3>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Cada etapa representa una forma cualitativamente diferente de pensar y entender el mundo. No se pueden saltar etapas.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Etapa 1: Sensoriomotora -->
+                    <div class="reveal scale-in bg-white rounded-2xl p-6 shadow-lg border-t-4 border-yellow-400 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">0-2 años</span>
+                            <i class="fa-solid fa-puzzle-piece text-3xl text-yellow-500"></i>
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-800 mb-2">Sensoriomotora</h4>
+                        <p class="text-gray-600 text-sm mb-4 flex-grow">Conocimiento a través de la acción física sobre objetos. Desarrollo del objeto permanente.</p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-yellow-400 mr-2"></i> Reflejos</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-yellow-400 mr-2"></i> Coordinación sensorial</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-yellow-400 mr-2"></i> Primeras acciones intencionales</li>
+                        </ul>
+                        <button onclick="openModal('modal-etapa-1')" class="w-full py-2 bg-yellow-100 hover:bg-yellow-400 hover:text-white text-yellow-700 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-regular fa-eye"></i> Ver ejemplo práctico
+                        </button>
+                    </div>
+
+                    <!-- Etapa 2: Preoperacional -->
+                    <div class="reveal scale-in bg-white rounded-2xl p-6 shadow-lg border-t-4 border-pink-400 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-pink-100 text-pink-800 text-xs font-bold px-3 py-1 rounded-full">2-7 años</span>
+                            <i class="fa-solid fa-brain text-3xl text-pink-500"></i>
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-800 mb-2">Preoperacional</h4>
+                        <p class="text-gray-600 text-sm mb-4 flex-grow">Pensamiento simbólico, egocentrismo y centración. No comprende la conservación.</p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-pink-400 mr-2"></i> Lenguaje emergente</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-pink-400 mr-2"></i> Juego simbólico</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-pink-400 mr-2"></i> Animismo (dar vida a objetos)</li>
+                        </ul>
+                        <button onclick="openModal('modal-etapa-2')" class="w-full py-2 bg-pink-100 hover:bg-pink-400 hover:text-white text-pink-700 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-regular fa-eye"></i> Ver ejemplo práctico
+                        </button>
+                    </div>
+
+                    <!-- Etapa 3: Operaciones Concretas -->
+                    <div class="reveal scale-in bg-white rounded-2xl p-6 shadow-lg border-t-4 border-blue-400 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">7-11 años</span>
+                            <i class="fa-solid fa-scale-balanced text-3xl text-blue-500"></i>
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-800 mb-2">Operaciones Concretas</h4>
+                        <p class="text-gray-600 text-sm mb-4 flex-grow">Lógica concreta, clasificación, seriación y comprensión de la conservación.</p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-blue-400 mr-2"></i> Reversibilidad</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-blue-400 mr-2"></i> Descentración</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-blue-400 mr-2"></i> Pensamiento operativo</li>
+                        </ul>
+                        <button onclick="openModal('modal-etapa-3')" class="w-full py-2 bg-blue-100 hover:bg-blue-500 hover:text-white text-blue-700 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-regular fa-eye"></i> Ver ejemplo práctico
+                        </button>
+                    </div>
+
+                    <!-- Etapa 4: Operaciones Formales -->
+                    <div class="reveal scale-in bg-white rounded-2xl p-6 shadow-lg border-t-4 border-purple-500 hover:-translate-y-2 transition-all duration-300 flex flex-col h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="bg-purple-100 text-purple-800 text-xs font-bold px-3 py-1 rounded-full">12+ años</span>
+                            <i class="fa-solid fa-rocket text-3xl text-purple-600"></i>
+                        </div>
+                        <h4 class="font-heading text-xl font-bold text-gray-800 mb-2">Operaciones Formales</h4>
+                        <p class="text-gray-600 text-sm mb-4 flex-grow">Pensamiento abstracto, hipotético-deductivo y razonamiento proposicional.</p>
+                        <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-purple-500 mr-2"></i> Razonamiento abstracto</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-purple-500 mr-2"></i> Pensamiento combinatorio</li>
+                            <li class="flex items-center"><i class="fa-solid fa-circle text-[6px] text-purple-500 mr-2"></i> Metacognición</li>
+                        </ul>
+                        <button onclick="openModal('modal-etapa-4')" class="w-full py-2 bg-purple-100 hover:bg-purple-500 hover:text-white text-purple-700 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-regular fa-eye"></i> Ver ejemplo práctico
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nota importante -->
+                <div class="reveal mt-8 bg-white rounded-2xl p-6 shadow-md border border-gray-200 flex items-start gap-4 max-w-4xl mx-auto">
+                    <i class="fa-solid fa-triangle-exclamation text-2xl text-orange-500 mt-1"></i>
+                    <div>
+                        <h5 class="font-bold text-gray-800 mb-1">Importante: Secuencialidad invariante</h5>
+                        <p class="text-gray-600 text-sm">Las etapas siempre ocurren en el mismo orden y ninguna se omite, aunque la edad puede variar según el contexto cultural y experiencias individuales.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: PROCESOS DE ADAPTACIÓN (MEJORADO CON INTERACTIVIDAD COMPLETA) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-piaget-dark text-white">
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+            
+            <div class="max-w-6xl mx-auto w-full relative z-10">
+                <div class="reveal text-center mb-12">
+                    <span class="inline-block px-4 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-bold mb-4 border border-green-500/30">MECANISMOS DE APRENDIZAJE</span>
+                    <h3 class="font-heading text-4xl md:text-5xl font-bold">Procesos de Adaptación</h3>
+                    <p class="text-gray-400 mt-4 text-xl">El ciclo constante que permite el crecimiento cognitivo</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- Asimilación -->
+                    <div class="reveal scale-in bg-gray-800 rounded-3xl p-8 border-2 border-piaget-green/30 relative overflow-hidden group hover:border-piaget-green transition-colors">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-piaget-green/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+                        <div class="relative z-10">
+                            <div class="w-16 h-16 bg-piaget-green rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-lg shadow-piaget-green/30">
+                                <i class="fa-solid fa-filter"></i>
+                            </div>
+                            <h4 class="font-heading text-3xl font-bold text-piaget-green mb-4">Asimilación</h4>
+                            <p class="text-gray-300 text-lg mb-4">Integrar nueva información dentro de los esquemas mentales ya existentes.</p>
+                            <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
+                                <p class="text-sm text-gray-400 italic">"Cuando un niño que conoce perros ve un gato y lo llama 'perrito pequeño', está asimilando el gato a su esquema de perro."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acomodación -->
+                    <div class="reveal scale-in bg-gray-800 rounded-3xl p-8 border-2 border-emerald-400/30 relative overflow-hidden group hover:border-emerald-400 transition-colors">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-400/10 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150"></div>
+                        <div class="relative z-10">
+                            <div class="w-16 h-16 bg-emerald-400 rounded-2xl flex items-center justify-center text-3xl text-gray-900 mb-6 shadow-lg shadow-emerald-400/30">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                            </div>
+                            <h4 class="font-heading text-3xl font-bold text-emerald-400 mb-4">Acomodación</h4>
+                            <p class="text-gray-300 text-lg mb-4">Modificar o crear nuevos esquemas mentales para incorporar información nueva que no encaja.</p>
+                            <div class="bg-gray-900/50 p-4 rounded-xl border border-gray-700">
+                                <p class="text-sm text-gray-400 italic">"Al darse cuenta de que el gato maúlla y no ladra, modifica su esquema para crear la categoría 'gato' distinta de 'perro'."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ciclo interactivo -->
+                <div class="reveal bg-gray-800/50 rounded-3xl p-8 border border-gray-700">
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-8">
+                        <div class="w-full md:w-1/3 text-center p-4 bg-piaget-green/20 rounded-2xl border border-piaget-green/30">
+                            <i class="fa-solid fa-database text-4xl text-piaget-green mb-2"></i>
+                            <p class="font-bold">Esquema Actual</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right text-3xl text-gray-600 hidden md:block"></i>
+                        <i class="fa-solid fa-arrow-down text-3xl text-gray-600 md:hidden"></i>
+                        <div class="w-full md:w-1/3 text-center p-4 bg-yellow-500/20 rounded-2xl border border-yellow-500/30">
+                            <i class="fa-solid fa-shock text-4xl text-yellow-400 mb-2"></i>
+                            <p class="font-bold">Nueva Experiencia</p>
+                        </div>
+                    </div>
+
+                    <button onclick="toggleAdaptacionExp()" class="w-full md:w-auto mx-auto block pulse-glow bg-gradient-to-r from-piaget-green to-emerald-500 hover:from-emerald-500 hover:to-green-400 text-white font-bold py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-xl shadow-piaget-green/30 flex items-center gap-3 text-lg">
+                        <i class="fa-solid fa-magnifying-glass"></i> Ver ejemplo detallado
+                    </button>
+
+                    <div id="panel-adaptacion" class="hidden mt-8 bg-gray-900 rounded-2xl p-6 border border-gray-700">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-piaget-green rounded-full flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-dog"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="text-white text-lg font-bold mb-2">Ejemplo: Aprendiendo sobre animales</h5>
+                                <div class="space-y-3">
+                                    <div class="flex gap-3">
+                                        <span class="bg-piaget-green text-white px-2 py-1 rounded text-xs font-bold mt-1">FASE 1</span>
+                                        <p class="text-gray-300 text-sm">El niño tiene un esquema mental: "Los animales con cuatro patas y pelos son perros" (Asimilación inicial).</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <span class="bg-yellow-500 text-gray-900 px-2 py-1 rounded text-xs font-bold mt-1">FASE 2</span>
+                                        <p class="text-gray-300 text-sm">Ve un gato y lo identifica como perro (intenta asimilar).</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <span class="bg-emerald-400 text-gray-900 px-2 py-1 rounded text-xs font-bold mt-1">FASE 3</span>
+                                        <p class="text-gray-300 text-sm">El gato no ladra, raspa, es más pequeño (desequilibrio cognitivo).</p>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <span class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold mt-1">FASE 4</span>
+                                        <p class="text-gray-300 text-sm">Crea nuevo esquema "gato" (acomodación) y equilibrio restaurado.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: EQUILIBRACIÓN (MEJORADO CON ANIMACIÓN FUNCIONAL) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-gradient-to-br from-white to-orange-50">
+            <div class="max-w-6xl mx-auto w-full flex flex-col lg:flex-row items-center gap-12">
+                
+                <div class="reveal scale-in w-full lg:w-1/2 flex justify-center">
+                    <div class="relative w-80 h-80">
+                        <!-- Base -->
+                        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-6 h-32 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-inner"></div>
+                        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-48 h-8 bg-gradient-to-b from-gray-400 to-gray-500 rounded-lg shadow-lg"></div>
+                        
+                        <!-- Balanza animada -->
+                        <div id="balance-beam" class="absolute top-24 left-1/2 -translate-x-1/2 w-72 h-3 bg-gradient-to-r from-orange-400 to-piaget-orange rounded-full origin-center transition-transform duration-1000 shadow-md flex items-center justify-between px-2">
+                            <!-- Plato izquierdo -->
+                            <div class="relative -bottom-20 w-20 h-24">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-20 bg-gray-400"></div>
+                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-8 bg-gradient-to-b from-gray-100 to-gray-300 rounded-b-full border-2 border-gray-300 shadow-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-gray-600">CONOCIDO</span>
+                                </div>
+                                <!-- Peso -->
+                                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-blue-400 rounded-lg shadow-md flex items-center justify-center text-white animate-pulse">
+                                    <i class="fa-solid fa-book"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Plato derecho -->
+                            <div class="relative -bottom-20 w-20 h-24">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-0.5 h-20 bg-gray-400"></div>
+                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-8 bg-gradient-to-b from-gray-100 to-gray-300 rounded-b-full border-2 border-gray-300 shadow-lg flex items-center justify-center">
+                                    <span class="text-xs font-bold text-gray-600">NUEVO</span>
+                                </div>
+                                <!-- Peso -->
+                                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-purple-400 rounded-lg shadow-md flex items-center justify-center text-white animate-pulse">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Centro -->
+                        <div class="absolute top-[5.5rem] left-1/2 -translate-x-1/2 w-10 h-10 bg-gradient-to-br from-piaget-orange to-orange-600 rounded-full border-4 border-white shadow-xl z-20 flex items-center justify-center">
+                            <i class="fa-solid fa-balance-scale text-white text-sm"></i>
+                        </div>
+
+                        <!-- Indicadores -->
+                        <div class="absolute -top-4 left-0 w-full flex justify-between px-8 text-sm font-bold text-gray-400">
+                            <span>Asimilación</span>
+                            <span>Acomodación</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full lg:w-1/2">
+                    <div class="reveal inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-piaget-orange text-white text-2xl mb-6 shadow-lg shadow-piaget-orange/40">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                    <h3 class="reveal font-heading text-4xl md:text-5xl font-bold text-gray-800 mb-6">Equilibración</h3>
+                    
+                    <div class="reveal space-y-4">
+                        <p class="text-xl text-gray-700 leading-relaxed">
+                            Es el proceso homeostático que mantiene el <span class="text-piaget-orange font-bold">equilibrio dinámico</span> entre los procesos de asimilación y acomodación.
+                        </p>
+                        
+                        <div class="bg-orange-50 border-l-4 border-piaget-orange p-6 rounded-r-2xl shadow-sm">
+                            <h4 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-arrows-spin text-piaget-orange"></i> Proceso continuo
+                            </h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start gap-3">
+                                    <span class="bg-piaget-orange text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+                                    <span><strong>Equilibrio:</strong> Estado momentáneo de coherencia cognitiva.</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="bg-piaget-orange text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+                                    <span><strong>Desequilibrio:</strong> Choque con información contradictoria (cognición en conflicto).</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="bg-piaget-orange text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+                                    <span><strong>Re-equilibrio:</strong> Reorganización de esquemas (aprendizaje real).</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-orange-100 to-yellow-100 p-4 rounded-xl border border-orange-200">
+                            <p class="text-gray-800 text-sm font-medium text-center">
+                                <i class="fa-solid fa-star text-yellow-500 mr-2"></i>
+                                Sin desequilibrio no hay desarrollo cognitivo
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: CARACTERÍSTICAS (MEJORADO CON DATOS COMPLETOS) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-gray-50">
+            <div class="max-w-5xl mx-auto w-full">
+                <div class="reveal text-center mb-10">
+                    <span class="inline-block px-4 py-1 bg-red-100 text-red-800 rounded-full text-sm font-bold mb-4">EVOLUCIÓN COGNITIVA</span>
+                    <h3 class="font-heading text-4xl md:text-5xl font-bold text-gray-800">Características del Pensamiento</h3>
+                    <p class="text-gray-600 mt-4">Cambios cualitativos en cada etapa del desarrollo</p>
+                </div>
+
+                <div class="reveal bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-200 mb-10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gradient-to-r from-red-500 to-rose-500 text-white">
+                                    <th class="py-5 px-6 font-heading font-semibold text-lg w-1/4">Etapa</th>
+                                    <th class="py-5 px-6 font-heading font-semibold text-lg w-1/4">Edad</th>
+                                    <th class="py-5 px-6 font-heading font-semibold text-lg w-1/2">Características Principales</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100 text-base">
+                                <tr class="hover:bg-yellow-50/50 transition-colors">
+                                    <td class="py-5 px-6 font-semibold text-gray-800 flex items-center gap-3">
+                                        <div class="w-3 h-3 rounded-full bg-yellow-400 shadow-sm"></div> 
+                                        Sensoriomotora
+                                    </td>
+                                    <td class="py-5 px-6 text-gray-600 font-medium">0 - 2 años</td>
+                                    <td class="py-5 px-6 text-gray-600">Inteligencia práctica, coordinación sensorimotora, objeto permanente, fin de los actos reflejos</td>
+                                </tr>
+                                <tr class="hover:bg-pink-50/50 transition-colors">
+                                    <td class="py-5 px-6 font-semibold text-gray-800 flex items-center gap-3">
+                                        <div class="w-3 h-3 rounded-full bg-pink-400 shadow-sm"></div> 
+                                        Preoperacional
+                                    </td>
+                                    <td class="py-5 px-6 text-gray-600 font-medium">2 - 7 años</td>
+                                    <td class="py-5 px-6 text-gray-600">Representación simbólica, egocentrismo verbal, animismo, artificialismo, no conservación</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 transition-colors">
+                                    <td class="py-5 px-6 font-semibold text-gray-800 flex items-center gap-3">
+                                        <div class="w-3 h-3 rounded-full bg-blue-400 shadow-sm"></div> 
+                                        Operaciones Concretas
+                                    </td>
+                                    <td class="py-5 px-6 text-gray-600 font-medium">7 - 11 años</td>
+                                    <td class="py-5 px-6 text-gray-600">Operaciones lógicas con objetos concretos, clasificación, seriación, conservación, descetración</td>
+                                </tr>
+                                <tr class="bg-red-50/30 hover:bg-red-50/70 transition-colors">
+                                    <td class="py-5 px-6 font-semibold text-gray-800 flex items-center gap-3">
+                                        <div class="w-3 h-3 rounded-full bg-purple-500 shadow-sm"></div> 
+                                        Operaciones Formales
+                                    </td>
+                                    <td class="py-5 px-6 text-gray-800 font-medium">12+ años</td>
+                                    <td class="py-5 px-6 text-gray-800 font-bold text-piaget-red">
+                                        Pensamiento hipotético-deductivo, razonamiento proposicional, abstracción, metacognición, pensamiento combinatorio
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quiz interactivo mejorado -->
+                <div class="reveal scale-in max-w-2xl mx-auto bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 shadow-2xl text-center border border-gray-700">
+                    <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-circle-question text-3xl text-yellow-400"></i>
+                    </div>
+                    <h4 class="text-2xl text-white font-bold mb-2">¿Retamos tu comprensión?</h4>
+                    <p class="text-gray-400 mb-8">Responde correctamente para verificar tu aprendizaje</p>
+                    
+                    <div id="quiz-container" class="text-left">
+                        <div class="bg-white/5 rounded-2xl p-6 mb-4 border border-white/10">
+                            <p class="text-white text-lg mb-4 font-medium">¿En qué etapa el niño comprende que la cantidad de líquido no cambia al cambiar de recipiente?</p>
+                            
+                            <div class="space-y-2" id="quiz-options">
+                                <button onclick="checkAnswer(this, false)" class="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition-all flex items-center gap-3 border border-transparent hover:border-white/20">
+                                    <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm">A</span>
+                                    <span>Preoperacional</span>
+                                </button>
+                                <button onclick="checkAnswer(this, true)" class="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition-all flex items-center gap-3 border border-transparent hover:border-white/20">
+                                    <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm">B</span>
+                                    <span>Operaciones Concretas</span>
+                                </button>
+                                <button onclick="checkAnswer(this, false)" class="w-full text-left p-4 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 transition-all flex items-center gap-3 border border-transparent hover:border-white/20">
+                                    <span class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm">C</span>
+                                    <span>Sensoriomotora</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="quiz-feedback" class="hidden p-4 rounded-xl text-center font-bold"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: APLICACIONES (MEJORADO CON CONTENIDO AMPLIADO) -->
+        <section class="slide flex flex-col justify-center p-6 md:p-12 bg-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-purple-100 rounded-full blur-3xl -mr-48 -mt-48 opacity-60"></div>
+            <div class="absolute bottom-0 left-0 w-72 h-72 bg-blue-100 rounded-full blur-3xl -ml-36 -mb-36 opacity-60"></div>
+            
+            <div class="max-w-7xl mx-auto w-full relative z-10">
+                <div class="reveal mb-10 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-piaget-purple text-white text-2xl mb-4 shadow-lg shadow-purple-500/40">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="font-heading text-4xl md:text-5xl font-bold text-gray-800">Aplicaciones Educativas</h3>
+                    <div class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-bold border border-red-200">
+                        <i class="fa-solid fa-star"></i> IMPLEMENTACIÓN PRÁCTICA EN EL AULA
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                    <!-- Lista de aplicaciones -->
+                    <div class="space-y-4">
+                        <div class="reveal bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all hover:border-purple-300 group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-piaget-purple flex items-center justify-center shrink-0 text-xl group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-child-reaching"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-1">Adaptación por edades</h4>
+                                    <p class="text-gray-600 text-sm">Diseñar actividades acordes a la etapa cognitiva, no forzar abstracciones en etapas concretas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reveal bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all hover:border-purple-300 group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-piaget-purple flex items-center justify-center shrink-0 text-xl group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-person-running"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-1">Aprendizaje activo</h4>
+                                    <p class="text-gray-600 text-sm">El estudiante debe manipular, explorar y descubrir, no solo escuchar y memorizar.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reveal bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all hover:border-purple-300 group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-piaget-purple flex items-center justify-center shrink-0 text-xl group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-cubes"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-1">Material concreto</h4>
+                                    <p class="text-gray-600 text-sm">Uso de manipulativos (bloques, fichas, modelos) especialmente en etapa de operaciones concretas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reveal bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all hover:border-purple-300 group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-100 text-piaget-purple flex items-center justify-center shrink-0 text-xl group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-compass"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-lg mb-1">Fomento de la exploración</h4>
+                                    <p class="text-gray-600 text-sm">Crear situaciones que generen desequilibrio cognitivo para impulsar el re-equilibrio (aprendizaje).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="reveal bg-gradient-to-r from-piaget-purple to-indigo-600 text-white p-6 rounded-2xl shadow-xl">
+                            <p class="text-lg flex items-center gap-3">
+                                <i class="fa-solid fa-hand-holding-heart text-3xl text-purple-200"></i>
+                                <span><strong>Rol del docente:</strong> Guía, facilitador y creador de ambientes ricos en estímulos, no transmisor de información.</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Ejemplo interactivo -->
+                    <div class="reveal scale-in bg-gray-50 rounded-3xl p-8 border-2 border-dashed border-gray-300 shadow-inner">
+                        <div class="text-center mb-6">
+                            <i class="fa-solid fa-chalkboard-user text-6xl text-gray-400 mb-4"></i>
+                            <h4 class="text-xl font-bold text-gray-800">Generador de ideas para el aula</h4>
+                            <p class="text-gray-600 text-sm mt-2">Haz clic para ver ejemplos específicos por nivel educativo</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 mb-6">
+                            <button onclick="showExample('inicial')" class="py-3 px-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-piaget-purple hover:text-piaget-purple transition-all text-sm font-medium text-gray-700">
+                                <i class="fa-solid fa-shapes mr-2"></i>Educación Inicial
+                            </button>
+                            <button onclick="showExample('primaria')" class="py-3 px-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-piaget-purple hover:text-piaget-purple transition-all text-sm font-medium text-gray-700">
+                                <i class="fa-solid fa-calculator mr-2"></i>Primaria
+                            </button>
+                            <button onclick="showExample('secundaria')" class="py-3 px-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-piaget-purple hover:text-piaget-purple transition-all text-sm font-medium text-gray-700">
+                                <i class="fa-solid fa-flask mr-2"></i>Secundaria
+                            </button>
+                            <button onclick="showExample('universidad')" class="py-3 px-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-piaget-purple hover:text-piaget-purple transition-all text-sm font-medium text-gray-700">
+                                <i class="fa-solid fa-microscope mr-2"></i>Universidad
+                            </button>
+                        </div>
+
+                        <div id="example-display" class="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-piaget-purple min-h-[140px] flex items-center justify-center">
+                            <p class="text-gray-500 text-center italic">Selecciona un nivel para ver el ejemplo práctico...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: CIERRE (MEJORADO) -->
+        <footer class="slide flex flex-col justify-center p-6 md:p-12 bg-piaget-dark text-white text-center relative overflow-hidden">
+            <div class="absolute inset-0 opacity-5 flex justify-center items-center pointer-events-none">
+                <i class="fa-solid fa-puzzle-piece text-[25rem]"></i>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-br from-piaget-purple/20 via-transparent to-piaget-blue/20"></div>
+            
+            <div class="max-w-4xl mx-auto w-full relative z-10">
+                <div class="reveal mb-8">
+                    <i class="fa-solid fa-quote-left text-4xl text-white/20 mb-4"></i>
+                </div>
+                
+                <h2 class="reveal scale-in font-heading text-4xl md:text-6xl font-extrabold mb-8 leading-tight">
+                    "El aprendizaje no se transmite,<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-teal-300 to-emerald-400">se construye."</span>
+                </h2>
+                
+                <div class="reveal w-24 h-1 bg-gradient-to-r from-piaget-purple to-piaget-green mx-auto mb-8 rounded-full"></div>
+                
+                <p class="reveal text-xl text-gray-400 mb-12">Jean Piaget (1896-1980)</p>
+
+                <div class="reveal bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20 inline-block text-left max-w-2xl">
+                    <h5 class="text-white font-bold mb-4 flex items-center gap-2 border-b border-white/20 pb-2">
+                        <i class="fa-solid fa-book text-blue-400"></i> Referencia Bibliográfica
+                    </h5>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        <strong>Piaget, J.</strong> (1952). <em>The origins of intelligence in children.</em> International Universities Press.<br><br>
+                        <strong>Terapia Cognitiva.</strong> (2015). Teoría del desarrollo cognitivo de Piaget. <em>Revista de Psicología Educativa.</em>
+                    </p>
+                </div>
+
+                <div class="reveal mt-12 flex justify-center gap-4">
+                    <button onclick="goToSlide(0)" class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-full text-sm font-medium transition-all flex items-center gap-2 border border-white/20">
+                        <i class="fa-solid fa-rotate-left"></i> Volver al inicio
+                    </button>
+                    <button onclick="window.print()" class="px-6 py-3 bg-piaget-purple hover:bg-purple-600 rounded-full text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-print"></i> Imprimir / PDF
+                    </button>
+                </div>
+            </div>
+        </footer>
+
     </div>
-  </div>
-</div>
 
-<!-- ══════════════════════════════════════
-     SLIDE 2: ETAPAS
-══════════════════════════════════════ -->
-<div class="slide" id="s2">
-  <div class="stages-container">
-    <div class="stages-header">
-      <div class="section-tag" style="margin: 0 auto 0.5rem; display:block; text-align:center; color:var(--c5)">Bloque 2</div>
-      <h2 class="slide-title">Etapas del <span class="accent" style="color:var(--c5)">Desarrollo Cognitivo</span></h2>
-      <p style="color:var(--text2);font-size:0.9rem">Haz clic en cada etapa para explorar sus características</p>
-    </div>
-
-    <div class="stages-timeline">
-      <!-- Sensoriomotora -->
-      <div class="stage-card" style="--stage-c:var(--c3);--sdelay:0.1s" onclick="toggleStage(this,0)">
-        <div class="stage-dot"></div>
-        <div class="stage-icon-wrap">🍼<div class="stage-dot" style="top:-28px"></div></div>
-        <div class="stage-age">0 – 2 años</div>
-        <div class="stage-name">Sensoriomotora</div>
-        <ul class="stage-bullets">
-          <li>Conocimiento por los sentidos</li>
-          <li>Permanencia del objeto</li>
-          <li>Primeros esquemas motores</li>
-        </ul>
-      </div>
-
-      <!-- Preoperacional -->
-      <div class="stage-card" style="--stage-c:var(--c4);--sdelay:0.25s" onclick="toggleStage(this,1)">
-        <div class="stage-dot"></div>
-        <div class="stage-icon-wrap">🎨</div>
-        <div class="stage-age">2 – 7 años</div>
-        <div class="stage-name">Preoperacional</div>
-        <ul class="stage-bullets">
-          <li>Pensamiento simbólico</li>
-          <li>Egocentrismo</li>
-          <li>Dificultad para ver otros puntos de vista</li>
-        </ul>
-      </div>
-
-      <!-- Concretas -->
-      <div class="stage-card" style="--stage-c:var(--c6);--sdelay:0.4s" onclick="toggleStage(this,2)">
-        <div class="stage-dot"></div>
-        <div class="stage-icon-wrap">🔢</div>
-        <div class="stage-age">7 – 11 años</div>
-        <div class="stage-name">Op. Concretas</div>
-        <ul class="stage-bullets">
-          <li>Pensamiento lógico</li>
-          <li>Causa y efecto</li>
-          <li>Conservación</li>
-        </ul>
-      </div>
-
-      <!-- Formales -->
-      <div class="stage-card" style="--stage-c:var(--c2);--sdelay:0.55s" onclick="toggleStage(this,3)">
-        <div class="stage-dot"></div>
-        <div class="stage-icon-wrap">🔭</div>
-        <div class="stage-age">12+ años</div>
-        <div class="stage-name">Op. Formales</div>
-        <ul class="stage-bullets">
-          <li>Pensamiento abstracto</li>
-          <li>Razonamiento hipotético</li>
-          <li>Pensamiento científico</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- Detail panel -->
-    <div id="stageDetail" style="display:none;margin-top:1.2rem;padding:1.2rem;background:rgba(255,255,255,0.04);border-radius:16px;border:1px solid rgba(255,255,255,0.1);animation:fadeUp 0.4s ease;"></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SLIDE 3: ADAPTACIÓN
-══════════════════════════════════════ -->
-<div class="slide" id="s3">
-  <div class="adapt-grid">
-    <!-- Asimilación -->
-    <div class="adapt-card anim-child" style="--ac:var(--c5);--achild:0.1s">
-      <span class="adapt-icon">🧲</span>
-      <div class="adapt-title">Asimilación</div>
-      <p class="adapt-desc">Integra <strong style="color:var(--text)">nueva información</strong> en esquemas existentes. El niño interpreta lo nuevo desde lo que ya conoce.</p>
-      <div style="margin-top:1rem;padding:0.6rem;background:rgba(59,130,246,0.08);border-radius:8px;font-size:0.8rem;color:var(--c5)">
-        Ejemplo: Un niño ve un perro y dice "¡gato!" porque usa su esquema existente.
-      </div>
-    </div>
-
-    <!-- Centro: arrows + brain -->
-    <div style="display:flex;align-items:center;justify-content:center;" class="anim-child" style="--achild:0.3s">
-      <svg width="220" height="280" viewBox="0 0 220 280" class="adapt-arrows-svg">
-        <!-- Brain -->
-        <g class="brain-adapt" transform="translate(110,140)">
-          <ellipse cx="0" cy="0" rx="50" ry="55" fill="none" stroke="var(--c1)" stroke-width="2" opacity="0.5"/>
-          <path d="M0,-55 C0,-30 0,-10 0,55" stroke="var(--c1)" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4"/>
-          <path d="M-50,0 C-20,0 20,0 50,0" stroke="var(--c1)" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.4"/>
-          <circle cx="0" cy="0" r="8" fill="var(--c1)" opacity="0.5"/>
-          <circle cx="-20" cy="-20" r="5" fill="var(--c2)" opacity="0.5"/>
-          <circle cx="20" cy="-20" r="5" fill="var(--c3)" opacity="0.5"/>
-          <circle cx="-20" cy="20" r="5" fill="var(--c5)" opacity="0.5"/>
-          <circle cx="20" cy="20" r="5" fill="var(--c6)" opacity="0.5"/>
-          <!-- Lines -->
-          <line x1="-20" y1="-20" x2="0" y2="0" stroke="var(--c2)" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
-          <line x1="20" y1="-20" x2="0" y2="0" stroke="var(--c3)" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
-          <line x1="-20" y1="20" x2="0" y2="0" stroke="var(--c5)" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
-          <line x1="20" y1="20" x2="0" y2="0" stroke="var(--c6)" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
-          <text x="-8" y="5" fill="var(--c1)" font-size="14" font-weight="bold" font-family="Syne,sans-serif">🧠</text>
-        </g>
-
-        <!-- Left arrow (Asimilación) -->
-        <path d="M30,140 L75,140" stroke="var(--c5)" stroke-width="2.5" marker-end="url(#arrowBlue)" stroke-dasharray="8,4" class="arrow-anim"/>
-        <!-- Right arrow (Acomodación) -->
-        <path d="M145,140 L190,140" stroke="var(--c4)" stroke-width="2.5" marker-end="url(#arrowRed)" stroke-dasharray="8,4" class="arrow-anim2"/>
-
-        <!-- Top label -->
-        <text x="110" y="30" fill="var(--c1)" font-size="11" text-anchor="middle" font-family="Syne,sans-serif" font-weight="bold">REORGANIZACIÓN</text>
-        <text x="110" y="46" fill="var(--text2)" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">del conocimiento</text>
-
-        <!-- Circular arrows around brain -->
-        <path d="M 80,100 A 40,40 0 0 1 140,100" fill="none" stroke="var(--c3)" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5"/>
-        <path d="M 140,180 A 40,40 0 0 1 80,180" fill="none" stroke="var(--c3)" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.5"/>
-
-        <defs>
-          <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--c5)"/>
-          </marker>
-          <marker id="arrowRed" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="var(--c4)"/>
-          </marker>
-        </defs>
-      </svg>
-    </div>
-
-    <!-- Acomodación -->
-    <div class="adapt-card anim-child" style="--ac:var(--c4);--achild:0.5s">
-      <span class="adapt-icon">🔄</span>
-      <div class="adapt-title">Acomodación</div>
-      <p class="adapt-desc">Modifica sus <strong style="color:var(--text)">esquemas existentes</strong> para adaptarse a lo nuevo. El conocimiento se reorganiza.</p>
-      <div style="margin-top:1rem;padding:0.6rem;background:rgba(239,68,68,0.08);border-radius:8px;font-size:0.8rem;color:var(--c4)">
-        Ejemplo: El niño crea un nuevo esquema para "perro" diferente de "gato".
-      </div>
-    </div>
-
-    <!-- Key quote full width -->
-    <div class="key-quote anim-child" style="--achild:0.7s">
-      ✨ Aprender implica <em style="color:var(--c3)">reorganizar</em> lo que ya se sabe
-    </div>
-  </div>
-  <div class="section-tag" style="position:absolute;top:1.5rem;left:50%;transform:translateX(-50%);color:var(--c6)">Bloque 3 · Procesos de Adaptación</div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SLIDE 4: EQUILIBRACIÓN
-══════════════════════════════════════ -->
-<div class="slide" id="s4">
-  <div class="section-tag" style="position:absolute;top:1.5rem;left:50%;transform:translateX(-50%);color:var(--c3)">Bloque 4 · Equilibración</div>
-  <div class="equil-layout">
-    <div class="equil-text">
-      <h2 class="slide-title anim-child" style="--achild:0.1s">
-        <span style="color:var(--c3)">Equilibración</span>
-      </h2>
-      <p class="concept-def anim-child" style="--achild:0.25s">
-        Es el proceso que permite al niño mantener un balance entre <strong style="color:var(--text)">lo que sabe</strong> y <strong style="color:var(--text)">lo que aprende</strong>. Actúa como un motor del desarrollo cognitivo.
-      </p>
-      <div class="conflict-badge anim-child" style="--achild:0.4s">
-        ⚡ Cuando hay desequilibrio → <strong>surge el aprendizaje</strong>
-      </div>
-
-      <div class="flow-steps anim-child" style="--achild:0.55s">
-        <div class="flow-step">
-          <div class="flow-step-box" style="background:rgba(239,68,68,0.12);border:1px solid var(--c4);color:var(--c4)">❓ Conflicto</div>
+    <!-- CONTROLES MEJORADOS -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[50] flex items-center gap-4 bg-white/95 backdrop-blur-md px-6 py-3 rounded-full shadow-2xl border border-gray-200">
+        <button onclick="prevSlide()" id="btn-prev" class="text-gray-400 hover:text-piaget-purple transition-all p-2 text-xl hover:scale-110 disabled:opacity-30 disabled:hover:scale-100" title="Anterior (←)">
+            <i class="fa-solid fa-circle-chevron-left"></i>
+        </button>
+        
+        <div class="flex flex-col items-center min-w-[80px]">
+            <span class="text-2xl font-bold text-gray-800 font-heading" id="slide-counter">1/8</span>
+            <div class="w-full h-1 bg-gray-200 rounded-full mt-1 overflow-hidden">
+                <div id="mini-progress" class="h-full bg-piaget-purple transition-all duration-300" style="width: 12.5%"></div>
+            </div>
         </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="flow-step-box" style="background:rgba(245,158,11,0.12);border:1px solid var(--c3);color:var(--c3)">⚙️ Ajuste</div>
+        
+        <button onclick="nextSlide()" id="btn-next" class="text-gray-400 hover:text-piaget-purple transition-all p-2 text-xl hover:scale-110 disabled:opacity-30 disabled:hover:scale-100" title="Siguiente (→)">
+            <i class="fa-solid fa-circle-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- MODALES CORREGIDOS -->
+    <div id="modal-container" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-gray-900/70 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop" onclick="closeModals()"></div>
+        
+        <!-- Modal Etapa 1 -->
+        <div id="modal-etapa-1" class="modal-content hidden relative bg-white rounded-3xl w-full max-w-lg mx-auto shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <div class="bg-gradient-to-r from-yellow-400 to-amber-500 p-8 text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 rotate-12 transform translate-y-1/2"></div>
+                <i class="fa-solid fa-puzzle-piece text-6xl mb-3 relative z-10"></i>
+                <h3 class="text-3xl font-bold font-heading relative z-10">Sensoriomotora</h3>
+                <p class="text-white/90 relative z-10 mt-2">0-2 años</p>
+            </div>
+            <div class="p-8">
+                <div class="bg-yellow-50 rounded-xl p-6 mb-6 border border-yellow-200">
+                    <h4 class="font-bold text-yellow-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check"></i> Actividad sugerida
+                    </h4>
+                    <p class="text-gray-700">Juego de "peek-a-boo" (cucú-tras) para desarrollar la permanencia del objeto. El bebé aprende que el objeto/persona sigue existiendo aunque no la vea.</p>
+                </div>
+                <div class="space-y-3 text-gray-600">
+                    <p><strong class="text-gray-800">Marcador clave:</strong> Coordinación visuomanual</p>
+                    <p><strong class="text-gray-800">Logro final:</strong> Internalización de esquemas</p>
+                </div>
+                <button onclick="closeModals()" class="mt-6 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors">Cerrar</button>
+            </div>
         </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="flow-step-box" style="background:rgba(16,185,129,0.12);border:1px solid var(--c6);color:var(--c6)">✅ Aprendizaje</div>
+
+        <!-- Modal Etapa 2 -->
+        <div id="modal-etapa-2" class="modal-content hidden relative bg-white rounded-3xl w-full max-w-lg mx-auto shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <div class="bg-gradient-to-r from-pink-400 to-rose-500 p-8 text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 rotate-12 transform translate-y-1/2"></div>
+                <i class="fa-solid fa-brain text-6xl mb-3 relative z-10"></i>
+                <h3 class="text-3xl font-bold font-heading relative z-10">Preoperacional</h3>
+                <p class="text-white/90 relative z-10 mt-2">2-7 años</p>
+            </div>
+            <div class="p-8">
+                <div class="bg-pink-50 rounded-xl p-6 mb-6 border border-pink-200">
+                    <h4 class="font-bold text-pink-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check"></i> Actividad sugerida
+                    </h4>
+                    <p class="text-gray-700">Juego simbólico con muñecos: el niño atribuye características humanas a objetos inanimados (animismo) y crea historias complejas.</p>
+                </div>
+                <div class="space-y-3 text-gray-600">
+                    <p><strong class="text-gray-800">Limitación:</strong> No comprende reversibilidad</p>
+                    <p><strong class="text-gray-800">Ejemplo clásico:</strong> Conservación del líquido (misma cantidad, vaso diferente)</p>
+                </div>
+                <button onclick="closeModals()" class="mt-6 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors">Cerrar</button>
+            </div>
         </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="flow-step-box" style="background:rgba(0,245,196,0.12);border:1px solid var(--c1);color:var(--c1)">⚖️ Equilibrio</div>
+
+        <!-- Modal Etapa 3 -->
+        <div id="modal-etapa-3" class="modal-content hidden relative bg-white rounded-3xl w-full max-w-lg mx-auto shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <div class="bg-gradient-to-r from-blue-400 to-indigo-500 p-8 text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 rotate-12 transform translate-y-1/2"></div>
+                <i class="fa-solid fa-scale-balanced text-6xl mb-3 relative z-10"></i>
+                <h3 class="text-3xl font-bold font-heading relative z-10">Operaciones Concretas</h3>
+                <p class="text-white/90 relative z-10 mt-2">7-11 años</p>
+            </div>
+            <div class="p-8">
+                <div class="bg-blue-50 rounded-xl p-6 mb-6 border border-blue-200">
+                    <h4 class="font-bold text-blue-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check"></i> Actividad sugerida
+                    </h4>
+                    <p class="text-gray-700">Clasificación de especies: usar tarjetas con animales y categorizarlos por hábitat, alimentación o taxonomía. Puede ordenar seriaciones (de menor a mayor).</p>
+                </div>
+                <div class="space-y-3 text-gray-600">
+                    <p><strong class="text-gray-800">Adquisición:</strong> Concepto de conservación</p>
+                    <p><strong class="text-gray-800">Pensamiento:</strong> Lógico pero vinculado a lo real/concreto</p>
+                </div>
+                <button onclick="closeModals()" class="mt-6 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors">Cerrar</button>
+            </div>
         </div>
-      </div>
 
-      <div style="margin-top:1.5rem;padding:1rem 1.2rem;background:rgba(245,158,11,0.07);border-radius:12px;font-size:0.88rem;color:var(--text2);line-height:1.7;" class="anim-child" style="--achild:0.7s">
-        💡 Piaget consideró la equilibración como el <strong style="color:var(--c3)">mecanismo regulador</strong> que integra la asimilación y la acomodación en el proceso de aprendizaje.
-      </div>
-    </div>
-
-    <!-- Balance scale SVG -->
-    <div class="equil-visual">
-      <svg width="380" height="280" viewBox="0 0 380 280" class="scale-svg">
-        <!-- Stand -->
-        <rect x="183" y="110" width="14" height="150" rx="5" fill="rgba(255,255,255,0.15)"/>
-        <ellipse cx="190" cy="258" rx="50" ry="10" fill="rgba(255,255,255,0.08)"/>
-        <!-- Pivot -->
-        <circle cx="190" cy="110" r="10" fill="var(--c3)" opacity="0.9"/>
-
-        <!-- Beam -->
-        <g class="scale-beam">
-          <rect x="80" y="107" width="220" height="6" rx="3" fill="rgba(255,255,255,0.3)"/>
-          <!-- Left pan -->
-          <g class="scale-pan-left">
-            <line x1="90" y1="113" x2="60" y2="145" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-            <line x1="90" y1="113" x2="120" y2="145" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-            <ellipse cx="90" cy="148" rx="35" ry="8" fill="rgba(239,68,68,0.4)" stroke="var(--c4)" stroke-width="2"/>
-            <!-- Weight icon -->
-            <text x="72" y="175" fill="var(--c4)" font-size="20">❓</text>
-            <text x="58" y="165" fill="var(--text2)" font-size="9" font-family="DM Sans,sans-serif">Lo nuevo</text>
-          </g>
-          <!-- Right pan -->
-          <g class="scale-pan-right">
-            <line x1="290" y1="113" x2="260" y2="145" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-            <line x1="290" y1="113" x2="320" y2="145" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-            <ellipse cx="290" cy="148" rx="35" ry="8" fill="rgba(16,185,129,0.4)" stroke="var(--c6)" stroke-width="2"/>
-            <!-- Weight icon -->
-            <text x="272" y="175" fill="var(--c6)" font-size="20">💡</text>
-            <text x="258" y="165" fill="var(--text2)" font-size="9" font-family="DM Sans,sans-serif">Lo sabido</text>
-          </g>
-        </g>
-
-        <!-- Labels -->
-        <text x="190" y="35" fill="var(--c3)" font-size="13" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800">⚖️ EQUILIBRACIÓN</text>
-        <text x="190" y="55" fill="var(--text2)" font-size="10" text-anchor="middle" font-family="DM Sans,sans-serif">Motor del aprendizaje cognitivo</text>
-
-        <!-- Sparkles -->
-        <circle cx="190" cy="110" r="20" fill="none" stroke="var(--c3)" stroke-width="1" stroke-dasharray="3,5" opacity="0.4">
-          <animateTransform attributeName="transform" type="rotate" values="0 190 110;360 190 110" dur="8s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SLIDE 5: CARACTERÍSTICAS
-══════════════════════════════════════ -->
-<div class="slide" id="s5">
-  <div class="chars-container">
-    <div class="section-tag" style="text-align:center;display:block;color:var(--c2)">Bloque 5 · Pensamiento Infantil</div>
-    <h2 class="slide-title" style="text-align:center;margin-bottom:0.3rem">Características del <span class="accent" style="color:var(--c2)">pensamiento infantil</span></h2>
-    <p style="text-align:center;color:var(--text2);font-size:0.88rem;margin-bottom:1rem">Según la etapa de desarrollo cognitivo</p>
-
-    <div class="chars-grid">
-      <div class="char-card" style="--cc:var(--c4);--cdelay:0.1s">
-        <div class="char-emoji" style="--cdelay:0.1s">👁️</div>
-        <div>
-          <div class="char-label">Egocentrismo</div>
-          <p class="char-desc">El niño no diferencia perspectivas. Ve el mundo únicamente desde su propio punto de vista (etapa preoperacional).</p>
+        <!-- Modal Etapa 4 -->
+        <div id="modal-etapa-4" class="modal-content hidden relative bg-white rounded-3xl w-full max-w-lg mx-auto shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            <div class="bg-gradient-to-r from-purple-500 to-fuchsia-600 p-8 text-white text-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-white/20 rotate-12 transform translate-y-1/2"></div>
+                <i class="fa-solid fa-rocket text-6xl mb-3 relative z-10"></i>
+                <h3 class="text-3xl font-bold font-heading relative z-10">Operaciones Formales</h3>
+                <p class="text-white/90 relative z-10 mt-2">12+ años</p>
+            </div>
+            <div class="p-8">
+                <div class="bg-purple-50 rounded-xl p-6 mb-6 border border-purple-200">
+                    <h4 class="font-bold text-purple-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check"></i> Actividad sugerida
+                    </h4>
+                    <p class="text-gray-700">Resolución de problemas científicos: formular hipótesis, diseñar experimentos para comprobar variables y razonar sobre resultados posibles antes de ejecutar.</p>
+                </div>
+                <div class="space-y-3 text-gray-600">
+                    <p><strong class="text-gray-800">Capacidad:</strong> Pensamiento hipotético-deductivo</p>
+                    <p><strong class="text-gray-800">Alcance:</strong> Metacognición (pensar sobre el propio pensamiento)</p>
+                </div>
+                <button onclick="closeModals()" class="mt-6 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-xl transition-colors">Cerrar</button>
+            </div>
         </div>
-      </div>
-
-      <div class="char-card" style="--cc:var(--c5);--cdelay:0.25s">
-        <div class="char-emoji" style="--cdelay:0.25s">🧱</div>
-        <div>
-          <div class="char-label">Pensamiento Concreto</div>
-          <p class="char-desc">El niño comprende mejor con objetos tangibles y situaciones reales que con conceptos abstractos.</p>
-        </div>
-      </div>
-
-      <div class="char-card" style="--cc:var(--c6);--cdelay:0.4s">
-        <div class="char-emoji" style="--cdelay:0.4s">📈</div>
-        <div>
-          <div class="char-label">Desarrollo Progresivo de la Lógica</div>
-          <p class="char-desc">El razonamiento lógico se construye gradualmente, desde operaciones simples hasta el pensamiento formal.</p>
-        </div>
-      </div>
-
-      <div class="char-card" style="--cc:var(--c1);--cdelay:0.55s">
-        <div class="char-emoji" style="--cdelay:0.55s">🏗️</div>
-        <div>
-          <div class="char-label">Construcción Activa del Conocimiento</div>
-          <p class="char-desc">El niño no es un receptor pasivo: experimenta, explora y construye su comprensión del mundo.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════
-     SLIDE 6: APLICACIONES EDUCATIVAS
-══════════════════════════════════════ -->
-<div class="slide" id="s6">
-  <div class="section-tag" style="position:absolute;top:1.5rem;left:50%;transform:translateX(-50%);color:var(--c6)">Bloque 6 · Aplicaciones en el Aula</div>
-  <div class="app-layout">
-    <div>
-      <h2 class="slide-title anim-child" style="--achild:0.1s">
-        Piaget en el <span style="color:var(--c6)">aula</span>
-      </h2>
-
-      <div class="app-list">
-        <div class="app-item" style="--idelay:0.2s">
-          <div class="app-num">01</div>
-          <div class="app-text"><strong>Adaptar la enseñanza</strong>Diseña actividades acordes a la etapa cognitiva del estudiante.</div>
-        </div>
-        <div class="app-item" style="--idelay:0.35s">
-          <div class="app-num">02</div>
-          <div class="app-text"><strong>Experiencias concretas</strong>Usa materiales manipulables y situaciones reales para enseñar.</div>
-        </div>
-        <div class="app-item" style="--idelay:0.5s">
-          <div class="app-num">03</div>
-          <div class="app-text"><strong>Aprendizaje activo</strong>El estudiante debe explorar, experimentar y descubrir por sí mismo.</div>
-        </div>
-        <div class="app-item" style="--idelay:0.65s">
-          <div class="app-num">04</div>
-          <div class="app-text"><strong>Fomentar la exploración</strong>Crea ambientes que generen curiosidad y desequilibrio cognitivo.</div>
-        </div>
-      </div>
-
-      <div class="app-key anim-child" style="--achild:0.8s">
-        👉 No todos los estudiantes aprenden igual ni al mismo ritmo
-      </div>
     </div>
 
-    <!-- Classroom SVG -->
-    <div style="display:flex;align-items:center;justify-content:center;">
-      <svg width="320" height="260" viewBox="0 0 320 260" class="classroom-svg">
-        <!-- Blackboard -->
-        <rect x="60" y="20" width="200" height="100" rx="8" fill="#1a3a2a" stroke="var(--c6)" stroke-width="2"/>
-        <rect x="65" y="25" width="190" height="90" rx="6" fill="#1f4a33"/>
-        <!-- Board text -->
-        <text class="board-text" x="100" y="55" fill="var(--c1)" font-size="11" font-family="DM Sans,sans-serif">Aprendizaje Activo</text>
-        <text class="board-text" x="105" y="73" fill="var(--text2)" font-size="10" font-family="DM Sans,sans-serif">Explorar · Construir</text>
-        <!-- Chalk line decoration -->
-        <line x1="80" y1="85" x2="240" y2="85" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
-        <text class="board-text" x="95" y="100" fill="var(--c3)" font-size="9" font-family="DM Sans,sans-serif">Piaget: Etapas del Desarrollo</text>
+    <script>
+        // Variables globales
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
 
-        <!-- Teacher -->
-        <g transform="translate(25,80)">
-          <circle cx="18" cy="0" r="12" fill="var(--c2)" opacity="0.9"/>
-          <rect x="11" y="12" width="14" height="28" rx="5" fill="var(--c2)" opacity="0.85"/>
-          <!-- Arm pointing -->
-          <g class="teacher-arm">
-            <rect x="24" y="14" width="22" height="8" rx="4" fill="var(--c2)" opacity="0.7"/>
-          </g>
-        </g>
+        function initPresentation() {
+            goToSlide(0);
+            
+            setTimeout(() => {
+                const hint = document.getElementById('keyboard-hint');
+                if(hint) {
+                    hint.style.opacity = '0';
+                    setTimeout(() => hint.remove(), 500);
+                }
+            }, 8000);
+        }
 
-        <!-- Students -->
-        <g class="student" style="--sw:1.8s;--swdelay:0s" transform="translate(80,165)">
-          <circle cx="15" cy="0" r="10" fill="var(--c3)" opacity="0.85"/>
-          <rect x="8" y="10" width="14" height="20" rx="4" fill="var(--c3)" opacity="0.75"/>
-          <!-- desk -->
-          <rect x="2" y="28" width="28" height="5" rx="2" fill="rgba(255,255,255,0.15)"/>
-        </g>
-        <g class="student" style="--sw:2.1s;--swdelay:0.3s" transform="translate(140,165)">
-          <circle cx="15" cy="0" r="10" fill="var(--c5)" opacity="0.85"/>
-          <rect x="8" y="10" width="14" height="20" rx="4" fill="var(--c5)" opacity="0.75"/>
-          <rect x="2" y="28" width="28" height="5" rx="2" fill="rgba(255,255,255,0.15)"/>
-        </g>
-        <g class="student" style="--sw:1.6s;--swdelay:0.6s" transform="translate(200,165)">
-          <circle cx="15" cy="0" r="10" fill="var(--c4)" opacity="0.85"/>
-          <rect x="8" y="10" width="14" height="20" rx="4" fill="var(--c4)" opacity="0.75"/>
-          <rect x="2" y="28" width="28" height="5" rx="2" fill="rgba(255,255,255,0.15)"/>
-        </g>
-        <g class="student" style="--sw:2.3s;--swdelay:0.9s" transform="translate(260,165)">
-          <circle cx="15" cy="0" r="10" fill="var(--c6)" opacity="0.85"/>
-          <rect x="8" y="10" width="14" height="20" rx="4" fill="var(--c6)" opacity="0.75"/>
-          <rect x="2" y="28" width="28" height="5" rx="2" fill="rgba(255,255,255,0.15)"/>
-        </g>
+        function goToSlide(index) {
+            if (index < 0 || index >= totalSlides) return;
+            
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active', 'prev-slide');
+                
+                if (i < index) {
+                    slide.classList.add('prev-slide');
+                }
+                if (i === index) {
+                    setTimeout(() => {
+                        slide.classList.add('active');
+                        animateSlideContent(slide);
+                    }, 50);
+                }
+            });
 
-        <!-- Floor -->
-        <rect x="20" y="210" width="280" height="4" rx="2" fill="rgba(255,255,255,0.08)"/>
+            currentSlide = index;
+            
+            // Actualizar controles
+            document.getElementById('slide-counter').innerText = `${currentSlide + 1}/${totalSlides}`;
+            document.getElementById('mini-progress').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+            
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            if(btnPrev) btnPrev.disabled = currentSlide === 0;
+            if(btnNext) btnNext.disabled = currentSlide === totalSlides - 1;
+            if(btnPrev) btnPrev.style.opacity = currentSlide === 0 ? '0.3' : '1';
+            if(btnNext) btnNext.style.opacity = currentSlide === totalSlides - 1 ? '0.3' : '1';
 
-        <!-- Thought bubbles from students -->
-        <circle cx="95" cy="150" r="5" fill="rgba(245,158,11,0.3)" stroke="var(--c3)" stroke-width="1" opacity="0.6">
-          <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="155" cy="148" r="5" fill="rgba(59,130,246,0.3)" stroke="var(--c5)" stroke-width="1" opacity="0.6">
-          <animate attributeName="r" values="5;7;5" dur="2.3s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="215" cy="150" r="5" fill="rgba(239,68,68,0.3)" stroke="var(--c4)" stroke-width="1" opacity="0.6">
-          <animate attributeName="r" values="5;7;5" dur="1.8s" repeatCount="indefinite"/>
-        </circle>
+            // Barra superior
+            const progress = (currentSlide / (totalSlides - 1)) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            // Resetear scroll
+            slides[currentSlide].scrollTop = 0;
+            
+            // Animar balanza si es slide 5 (índice 4)
+            if(index === 4) {
+                setTimeout(animateBalance, 600);
+            }
+        }
 
-        <!-- Label: different rhythms -->
-        <text x="160" y="248" fill="var(--text2)" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif">Cada estudiante a su propio ritmo</text>
-      </svg>
-    </div>
-  </div>
-</div>
+        function animateSlideContent(slideElement) {
+            const animElements = slideElement.querySelectorAll('.reveal, .scale-in');
+            
+            animElements.forEach(el => {
+                el.classList.remove('active');
+                el.style.opacity = '0';
+                el.style.transform = el.classList.contains('scale-in') ? 'scale(0.8)' : 'translateY(30px)';
+            });
 
-<!-- ══════════════════════════════════════
-     SLIDE 7: QUIZ INTERACTIVO
-══════════════════════════════════════ -->
-<div class="slide" id="s7">
-  <div class="quiz-container">
-    <div class="quiz-header">
-      <div class="section-tag" style="text-align:center;display:block;color:var(--c5)">Bloque 7 · Elemento Interactivo</div>
-      <h2 class="slide-title" style="text-align:center">Mini <span style="color:var(--c5)">Quiz</span> 🎯</h2>
-    </div>
+            animElements.forEach((el, i) => {
+                setTimeout(() => {
+                    el.classList.add('active');
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                }, i * 100 + 200);
+            });
+        }
 
-    <div class="quiz-progress" id="quizProgress">
-      <div class="q-dot current" id="qd0"></div>
-      <div class="q-dot" id="qd1"></div>
-      <div class="q-dot" id="qd2"></div>
-    </div>
+        function animateBalance() {
+            const beam = document.getElementById('balance-beam');
+            if(beam) {
+                beam.style.transform = 'translateX(-50%) rotate(-5deg)';
+                setTimeout(() => {
+                    beam.style.transform = 'translateX(-50%) rotate(5deg)';
+                    setTimeout(() => {
+                        beam.style.transform = 'translateX(-50%) rotate(0deg)';
+                    }, 1000);
+                }, 1000);
+            }
+        }
 
-    <!-- Q1 -->
-    <div class="quiz-state visible" id="q1">
-      <div class="quiz-q">¿A qué edad aproximada aparece el pensamiento abstracto?</div>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="answer(this,false,'q1')">A los 2 años</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q1')">A los 7 años</button>
-        <button class="quiz-opt" onclick="answer(this,true,'q1')">A partir de los 12 años ✓</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q1')">A los 5 años</button>
-      </div>
-      <div class="quiz-feedback" id="fb1"></div>
-      <button class="quiz-next-btn" id="next1" onclick="showQ(2)">Siguiente pregunta →</button>
-    </div>
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+        }
 
-    <!-- Q2 -->
-    <div class="quiz-state" id="q2">
-      <div class="quiz-q">¿Qué es la <em style="color:var(--c1)">asimilación</em> según Piaget?</div>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="answer(this,true,'q2')">Integrar nueva información en esquemas existentes ✓</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q2')">Modificar esquemas para adaptarse a lo nuevo</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q2')">El proceso de equilibrio cognitivo</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q2')">Aprender a través de los sentidos</button>
-      </div>
-      <div class="quiz-feedback" id="fb2"></div>
-      <button class="quiz-next-btn" id="next2" onclick="showQ(3)">Siguiente pregunta →</button>
-    </div>
+        function prevSlide() {
+            if (currentSlide > 0) goToSlide(currentSlide - 1);
+        }
 
-    <!-- Q3 -->
-    <div class="quiz-state" id="q3">
-      <div class="quiz-q">¿En qué etapa el niño desarrolla la <em style="color:var(--c3)">permanencia del objeto</em>?</div>
-      <div class="quiz-options">
-        <button class="quiz-opt" onclick="answer(this,true,'q3')">Sensoriomotora (0-2 años) ✓</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q3')">Preoperacional (2-7 años)</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q3')">Operaciones concretas (7-11 años)</button>
-        <button class="quiz-opt" onclick="answer(this,false,'q3')">Operaciones formales (12+ años)</button>
-      </div>
-      <div class="quiz-feedback" id="fb3"></div>
-      <button class="quiz-next-btn" id="next3" onclick="showScore()">Ver resultado →</button>
-    </div>
+        // Eventos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('modal-container').classList.contains('hidden')) {
+                if (e.key === 'Escape') closeModals();
+                return;
+            }
 
-    <!-- Score -->
-    <div class="quiz-state" id="qscore">
-      <div class="score-display">
-        <div class="score-num" id="scoreNum">0/3</div>
-        <div class="score-msg" id="scoreMsg"></div>
-      </div>
-      <button class="quiz-restart show" onclick="restartQuiz()">🔄 Intentar de nuevo</button>
-    </div>
-  </div>
-</div>
+            switch(e.key) {
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case ' ':
+                case 'PageDown':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                case 'PageUp':
+                    e.preventDefault();
+                    prevSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+            }
+        });
 
-</div><!-- end slides-wrapper -->
+        // Control de modales
+        const modalContainer = document.getElementById('modal-container');
+        const modalBackdrop = document.getElementById('modal-backdrop');
 
-<!-- ══════════════════════════════════════
-     NAVIGATION
-══════════════════════════════════════ -->
-<nav class="nav">
-  <button class="nav-btn" onclick="prevSlide()">‹</button>
-  <div class="nav-dots" id="navDots"></div>
-  <span class="slide-counter" id="slideCounter">1 / 8</span>
-  <button class="nav-btn" onclick="nextSlide()">›</button>
-</nav>
+        function openModal(modalId) {
+            // Ocultar todos primero
+            document.querySelectorAll('.modal-content').forEach(m => {
+                m.classList.add('hidden');
+                m.style.opacity = '0';
+                m.style.transform = 'scale(0.95)';
+            });
+            
+            modalContainer.classList.remove('hidden');
+            modalContainer.classList.add('flex');
+            
+            // Mostrar backdrop
+            setTimeout(() => {
+                modalBackdrop.style.opacity = '1';
+            }, 10);
+            
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            
+            setTimeout(() => {
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            }, 50);
+        }
 
-<!-- ══════════════════════════════════════
-     VIDEO MODAL
-══════════════════════════════════════ -->
-<div class="modal-overlay" id="videoModal" onclick="closeVideo(event)">
-  <div class="modal-box">
-    <div class="modal-title">🎬 Video: Teoría de Piaget</div>
-    <div class="modal-video-wrapper">
-      <div>
-        <div style="font-size:2rem;margin-bottom:1rem">▶️</div>
-        <p style="color:var(--text)">Para ver el video sobre la Teoría de Piaget,<br>visita el siguiente enlace:</p>
-        <a href="https://www.youtube.com/results?search_query=teoria+psicogenetica+piaget" target="_blank"
-           style="display:inline-block;margin-top:1rem;padding:0.7rem 1.5rem;background:var(--c2);color:white;border-radius:8px;text-decoration:none;font-family:var(--font-head);font-weight:700;">
-          🔗 Buscar en YouTube
-        </a>
-      </div>
-    </div>
-    <button class="modal-close" onclick="closeVideo()">✕ Cerrar</button>
-  </div>
-</div>
+        function closeModals() {
+            modalBackdrop.style.opacity = '0';
+            
+            document.querySelectorAll('.modal-content').forEach(m => {
+                m.style.opacity = '0';
+                m.style.transform = 'scale(0.95)';
+            });
+            
+            setTimeout(() => {
+                modalContainer.classList.add('hidden');
+                modalContainer.classList.remove('flex');
+                document.querySelectorAll('.modal-content').forEach(m => m.classList.add('hidden'));
+            }, 300);
+        }
 
-<!-- ══════════════════════════════════════
-     STAGE QUIZ MODAL
-══════════════════════════════════════ -->
-<div class="stage-modal" id="stageModal" onclick="closeStageModal(event)">
-  <div class="stage-modal-box">
-    <div class="stage-modal-q">🎯 ¿En qué etapa del desarrollo estás?<br><small style="color:var(--text2);font-weight:normal;font-size:0.8rem">Selecciona la que mejor te identifica</small></div>
-    <div class="stage-cards-row" id="stageCards">
-      <div class="stage-sel-card" style="--stage-c:var(--c3)" onclick="selectStage(0)">
-        <div class="stage-sel-icon">🍼</div>
-        <div class="stage-sel-name">Sensoriomotora</div>
-        <div class="stage-sel-age">0 – 2 años</div>
-      </div>
-      <div class="stage-sel-card" style="--stage-c:var(--c4)" onclick="selectStage(1)">
-        <div class="stage-sel-icon">🎨</div>
-        <div class="stage-sel-name">Preoperacional</div>
-        <div class="stage-sel-age">2 – 7 años</div>
-      </div>
-      <div class="stage-sel-card" style="--stage-c:var(--c6)" onclick="selectStage(2)">
-        <div class="stage-sel-icon">🔢</div>
-        <div class="stage-sel-name">Op. Concretas</div>
-        <div class="stage-sel-age">7 – 11 años</div>
-      </div>
-      <div class="stage-sel-card" style="--stage-c:var(--c2)" onclick="selectStage(3)">
-        <div class="stage-sel-icon">🔭</div>
-        <div class="stage-sel-name">Op. Formales</div>
-        <div class="stage-sel-age">12+ años</div>
-      </div>
-    </div>
-    <div class="stage-result" id="stageResult"></div>
-    <button class="stage-close" onclick="closeStageModal()">✕ Cerrar</button>
-  </div>
-</div>
+        // Panel de adaptación
+        function toggleAdaptacionExp() {
+            const panel = document.getElementById('panel-adaptacion');
+            
+            if(panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                panel.style.opacity = '0';
+                panel.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    panel.style.opacity = '1';
+                    panel.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                panel.style.opacity = '0';
+                panel.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    panel.classList.add('hidden');
+                }, 300);
+            }
+        }
 
-<script>
-// ══════════════════════════════════════
-// PARTICLES
-// ══════════════════════════════════════
-const colors = ['#00f5c4','#7c3aed','#f59e0b','#3b82f6','#ef4444','#10b981'];
-const pContainer = document.getElementById('particles');
-for(let i=0;i<30;i++){
-  const p = document.createElement('div');
-  p.className='particle';
-  const size = Math.random()*120+20;
-  p.style.cssText = `
-    width:${size}px;height:${size}px;
-    left:${Math.random()*100}%;top:${Math.random()*100}%;
-    background:${colors[Math.floor(Math.random()*colors.length)]};
-    --dur:${Math.random()*8+6}s;
-    --delay:${Math.random()*-8}s;
-    filter:blur(${size/2}px);
-  `;
-  pContainer.appendChild(p);
-}
+        // Quiz interactivo
+        function checkAnswer(btn, isCorrect) {
+            const container = document.getElementById('quiz-options');
+            const feedback = document.getElementById('quiz-feedback');
+            const buttons = container.querySelectorAll('button');
+            
+            buttons.forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-50');
+            });
+            
+            btn.classList.remove('opacity-50');
+            
+            if(isCorrect) {
+                btn.classList.remove('bg-white/5');
+                btn.classList.add('bg-green-500', 'border-green-400');
+                feedback.innerHTML = '<div class="flex items-center justify-center gap-2 text-green-400"><i class="fa-solid fa-check-circle text-2xl"></i><span>¡Correcto! En operaciones concretas el niño comprende la conservación.</span></div>';
+                feedback.className = 'mt-4 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-center';
+            } else {
+                btn.classList.remove('bg-white/5');
+                btn.classList.add('bg-red-500', 'border-red-400');
+                feedback.innerHTML = '<div class="flex items-center justify-center gap-2 text-red-400"><i class="fa-solid fa-xmark-circle text-2xl"></i><span>No exactamente. En la etapa preoperacional el niño aún no comprende la conservación.</span></div>';
+                feedback.className = 'mt-4 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-center';
+                
+                // Marcar la correcta
+                buttons[1].classList.remove('opacity-50');
+                buttons[1].classList.add('bg-green-500/50', 'border-green-400/50');
+            }
+            
+            feedback.classList.remove('hidden');
+        }
 
-// ══════════════════════════════════════
-// SLIDE SYSTEM
-// ══════════════════════════════════════
-let current = 0;
-const total = 8;
-const slidesW = document.getElementById('slidesWrapper');
-const slides = slidesW.querySelectorAll('.slide');
-const progressBar = document.getElementById('progressBar');
-const slideCounter = document.getElementById('slideCounter');
-const navDotsEl = document.getElementById('navDots');
-const slideHeaders = ['Inicio','Concepto Central','Etapas','Adaptación','Equilibración','Pensamiento Infantil','Aplicaciones','Mini Quiz'];
+        // Ejemplos por nivel educativo
+        const examples = {
+            inicial: {
+                icon: 'fa-shapes',
+                color: 'text-yellow-600',
+                bg: 'bg-yellow-50',
+                border: 'border-yellow-400',
+                title: 'Educación Inicial (0-5 años)',
+                content: 'Rincón de construcción con bloques de diferentes tamaños y texturas. Los niños exploran el empilamiento, caídas y equilibrios mediante la acción directa, desarrollando esquemas sensoriomotores y preoperativos.'
+            },
+            primaria: {
+                icon: 'fa-calculator',
+                color: 'text-blue-600',
+                bg: 'bg-blue-50',
+                border: 'border-blue-400',
+                title: 'Primaria (6-11 años)',
+                content: 'Uso de material concreto (regletas Cuisenaire) para operaciones matemáticas. Los alumnos manipulan físicamente para entender sumas y restas antes de pasar al cálculo abstracto. Actividades de clasificación biológica usando imágenes reales.'
+            },
+            secundaria: {
+                icon: 'fa-flask',
+                color: 'text-purple-600',
+                bg: 'bg-purple-50',
+                border: 'border-purple-400',
+                title: 'Secundaria (12-15 años)',
+                content: 'Laboratorios de química donde los estudiantes formulan hipótesis sobre reacciones, diseñan experimentos controlando variables y deducen leyes generales a partir de resultados específicos. Debates éticos con múltiples perspectivas.'
+            },
+            universidad: {
+                icon: 'fa-microscope',
+                color: 'text-indigo-600',
+                bg: 'bg-indigo-50',
+                border: 'border-indigo-400',
+                title: 'Universidad (16+ años)',
+                content: 'Investigación científica original, análisis crítico de teorías contradictorias, pensamiento sistemático sobre problemas globales complejos (cambio climático, economía) considerando múltiples variables interdependientes.'
+            }
+        };
 
-// Build nav dots
-for(let i=0;i<total;i++){
-  const d=document.createElement('div');
-  d.className='nav-dot'+(i===0?' active':'');
-  d.onclick=()=>goToSlide(i);
-  navDotsEl.appendChild(d);
-}
+        function showExample(level) {
+            const display = document.getElementById('example-display');
+            const data = examples[level];
+            
+            display.style.opacity = '0';
+            display.style.transform = 'translateY(10px)';
+            
+            setTimeout(() => {
+                display.className = `bg-white rounded-2xl p-6 shadow-lg border-l-4 ${data.border} min-h-[140px] transition-all duration-300`;
+                display.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 ${data.bg} ${data.color} rounded-xl flex items-center justify-center text-2xl shrink-0">
+                            <i class="fa-solid ${data.icon}"></i>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-gray-800 mb-2 ${data.color}">${data.title}</h5>
+                            <p class="text-gray-600 text-sm leading-relaxed">${data.content}</p>
+                        </div>
+                    </div>
+                `;
+                display.style.opacity = '1';
+                display.style.transform = 'translateY(0)';
+            }, 200);
+        }
 
-function updateNav(){
-  document.querySelectorAll('.nav-dot').forEach((d,i)=>{
-    d.classList.toggle('active',i===current);
-  });
-  slideCounter.textContent = `${current+1} / ${total}`;
-  progressBar.style.width = `${((current+1)/total)*100}%`;
-  document.getElementById('slideHeaderBar').textContent = slideHeaders[current] || 'Teoría de Piaget';
-}
-
-function goToSlide(n){
-  if(n===current||n<0||n>=total) return;
-  const prev = slides[current];
-  prev.classList.add('exit');
-  prev.classList.remove('active');
-  setTimeout(()=>{ prev.classList.remove('exit'); prev.style.opacity=0; },500);
-
-  current=n;
-  const next=slides[current];
-  next.style.opacity=0;
-  setTimeout(()=>{
-    next.classList.add('active');
-    triggerSlideAnimations(current);
-  },100);
-  updateNav();
-}
-
-function nextSlide(){ goToSlide(current+1); }
-function prevSlide(){ goToSlide(current-1); }
-
-function triggerSlideAnimations(idx){
-  const slide = slides[idx];
-  // Re-trigger anim-child elements
-  slide.querySelectorAll('.anim-child').forEach(el=>{
-    el.style.animation='none';
-    el.style.opacity='0';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
-  // Re-trigger brick animations
-  slide.querySelectorAll('.brick').forEach(el=>{
-    el.style.animation='none';
-    el.style.opacity='0';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
-  // Re-trigger stage cards
-  slide.querySelectorAll('.stage-card').forEach(el=>{
-    el.style.animation='none';
-    el.style.opacity='0';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
-  // Re-trigger char cards
-  slide.querySelectorAll('.char-card').forEach(el=>{
-    el.style.animation='none';
-    el.style.opacity='0';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
-  // Re-trigger app items
-  slide.querySelectorAll('.app-item').forEach(el=>{
-    el.style.animation='none';
-    el.style.opacity='0';
-    void el.offsetWidth;
-    el.style.animation='';
-  });
-}
-
-// Keyboard nav
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key==='ArrowDown') nextSlide();
-  if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
-});
-
-// ══════════════════════════════════════
-// STAGE CARDS (Slide 2)
-// ══════════════════════════════════════
-const stageDetails = [
-  {
-    title:'🍼 Sensoriomotora (0–2 años)',
-    color:'var(--c3)',
-    desc:'El bebé explora el mundo a través de los sentidos y la acción motora. Un logro clave es la permanencia del objeto: entender que los objetos siguen existiendo aunque no estén a la vista. Es la base de todos los aprendizajes posteriores.',
-    fun:'💡 Dato: ¡Un bebé de 8 meses ya sabe que su juguete escondido sigue ahí!'
-  },
-  {
-    title:'🎨 Preoperacional (2–7 años)',
-    color:'var(--c4)',
-    desc:'El niño desarrolla el lenguaje y el pensamiento simbólico. Puede representar objetos con palabras e imágenes. Sin embargo, el egocentrismo le impide ver la perspectiva de otros. El juego simbólico es característico de esta etapa.',
-    fun:'💡 Dato: Si le preguntas a un niño de 3 años qué ven sus amigos, dirá lo mismo que él ve.'
-  },
-  {
-    title:'🔢 Operaciones Concretas (7–11 años)',
-    color:'var(--c6)',
-    desc:'El pensamiento se vuelve más lógico y organizado. El niño comprende la conservación (cantidad no cambia aunque cambie la forma), la reversibilidad y la clasificación. Puede resolver problemas concretos de manera sistemática.',
-    fun:'💡 Dato: Un niño de 8 años sabe que el agua en un vaso alto no es "más" que en uno ancho.'
-  },
-  {
-    title:'🔭 Operaciones Formales (12+ años)',
-    color:'var(--c2)',
-    desc:'Aparece el pensamiento abstracto y el razonamiento hipotético-deductivo. El adolescente puede pensar en posibilidades, formular hipótesis y razonar sobre conceptos que no tienen referencia concreta inmediata.',
-    fun:'💡 Dato: Los adolescentes pueden debatir sobre justicia, libertad y conceptos filosóficos abstractos.'
-  }
-];
-
-let openStageIdx = -1;
-
-function toggleStage(el, idx){
-  const detail = document.getElementById('stageDetail');
-  if(openStageIdx===idx){
-    detail.style.display='none';
-    openStageIdx=-1;
-    return;
-  }
-  openStageIdx=idx;
-  const d=stageDetails[idx];
-  detail.style.display='block';
-  detail.style.borderColor=d.color;
-  detail.innerHTML=`
-    <div style="display:flex;align-items:center;gap:0.8rem;margin-bottom:0.8rem">
-      <div style="font-family:var(--font-head);font-size:1rem;font-weight:800;color:${d.color}">${d.title}</div>
-    </div>
-    <p style="font-size:0.9rem;color:var(--text2);line-height:1.7;margin-bottom:0.8rem">${d.desc}</p>
-    <div style="padding:0.6rem 1rem;background:color-mix(in srgb,${d.color} 8%,transparent);border-radius:8px;font-size:0.85rem;color:${d.color}">${d.fun}</div>
-  `;
-  detail.style.animation='none';
-  void detail.offsetWidth;
-  detail.style.animation='fadeUp 0.4s ease';
-}
-
-// ══════════════════════════════════════
-// QUIZ
-// ══════════════════════════════════════
-let quizScore = 0;
-let quizAnswered = [false,false,false];
-
-function answer(btn, correct, qId){
-  const num = parseInt(qId.replace('q',''));
-  if(quizAnswered[num-1]) return;
-  quizAnswered[num-1]=true;
-
-  const opts = btn.parentElement.querySelectorAll('.quiz-opt');
-  opts.forEach(o=>o.disabled=true);
-
-  const fb = document.getElementById('fb'+num);
-  const next = document.getElementById('next'+num);
-
-  if(correct){
-    btn.classList.add('correct');
-    fb.textContent='✅ ¡Correcto! Excelente comprensión de la teoría de Piaget.';
-    fb.className='quiz-feedback ok show';
-    quizScore++;
-  } else {
-    btn.classList.add('wrong');
-    opts.forEach(o=>{ if(o.onclick && o.getAttribute('onclick')&&o.getAttribute('onclick').includes('true')) o.classList.add('correct'); });
-    fb.textContent='❌ No es correcto. Revisa la respuesta marcada en verde.';
-    fb.className='quiz-feedback bad show';
-  }
-  next.classList.add('show');
-
-  // Update dot
-  const dots = document.querySelectorAll('.q-dot');
-  dots[num-1].classList.remove('current');
-  dots[num-1].classList.add('done');
-  if(num<3) dots[num].classList.add('current');
-}
-
-function showQ(n){
-  document.getElementById('q'+(n-1)).classList.remove('visible');
-  document.getElementById('q'+n).classList.add('visible');
-}
-
-function showScore(){
-  document.getElementById('q3').classList.remove('visible');
-  document.getElementById('qscore').classList.add('visible');
-  const msgs=[
-    'Sigue estudiando. ¡La teoría de Piaget es fascinante!',
-    'Bien, ¡ya vas captando los conceptos!',
-    '¡Muy bien! ¡Comprendes perfectamente a Piaget!',
-    '🏆 ¡Perfecto! ¡Eres un experto en psicología del desarrollo!'
-  ];
-  document.getElementById('scoreNum').textContent=`${quizScore}/3`;
-  document.getElementById('scoreMsg').textContent=msgs[quizScore];
-}
-
-function restartQuiz(){
-  quizScore=0;
-  quizAnswered=[false,false,false];
-  ['q1','q2','q3','qscore'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.classList.remove('visible');
-  });
-  document.getElementById('q1').classList.add('visible');
-  document.querySelectorAll('.quiz-opt').forEach(o=>{
-    o.disabled=false;
-    o.classList.remove('correct','wrong');
-  });
-  ['fb1','fb2','fb3'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.className='quiz-feedback';
-  });
-  ['next1','next2','next3'].forEach(id=>{
-    const el=document.getElementById(id);
-    el.classList.remove('show');
-  });
-  document.querySelectorAll('.q-dot').forEach((d,i)=>{
-    d.classList.remove('done','current');
-    if(i===0) d.classList.add('current');
-  });
-}
-
-// ══════════════════════════════════════
-// VIDEO MODAL
-// ══════════════════════════════════════
-function openVideo(){
-  document.getElementById('videoModal').classList.add('open');
-}
-function closeVideo(e){
-  if(!e||e.target===document.getElementById('videoModal')){
-    document.getElementById('videoModal').classList.remove('open');
-  }
-}
-
-// ══════════════════════════════════════
-// STAGE QUIZ MODAL
-// ══════════════════════════════════════
-const stageResultData = [
-  {
-    title:'🍼 Etapa Sensoriomotora',
-    color:'var(--c3)',
-    desc:'¡Un bebé explorador! En esta etapa todo se descubre tocando, viendo y escuchando. El mundo es un lugar nuevo lleno de sensaciones por descubrir.'
-  },
-  {
-    title:'🎨 Etapa Preoperacional',
-    color:'var(--c4)',
-    desc:'¡Imaginación sin límites! El pensamiento simbólico es tu superpoder. El juego, el lenguaje y la creatividad son los protagonistas de tu aprendizaje.'
-  },
-  {
-    title:'🔢 Etapa de Operaciones Concretas',
-    color:'var(--c6)',
-    desc:'¡Pensamiento lógico en acción! Puedes resolver problemas concretos, entender causas y efectos, y clasificar el mundo con precisión.'
-  },
-  {
-    title:'🔭 Etapa de Operaciones Formales',
-    color:'var(--c2)',
-    desc:'¡Pensador abstracto! Puedes razonar sobre posibilidades, formular hipótesis y explorar conceptos filosóficos y científicos complejos.'
-  }
-];
-
-function openStageQuiz(){
-  document.getElementById('stageResult').classList.remove('show');
-  document.getElementById('stageResult').innerHTML='';
-  document.getElementById('stageCards').style.display='grid';
-  document.getElementById('stageModal').classList.add('open');
-}
-
-function selectStage(idx){
-  document.getElementById('stageCards').style.display='none';
-  const d=stageResultData[idx];
-  const el=document.getElementById('stageResult');
-  el.style.background=`color-mix(in srgb,${d.color} 10%,transparent)`;
-  el.style.border=`1px solid ${d.color}`;
-  el.innerHTML=`
-    <div class="stage-result-title" style="color:${d.color}">${d.title}</div>
-    <p class="stage-result-desc">${d.desc}</p>
-  `;
-  el.classList.add('show');
-}
-
-function closeStageModal(e){
-  if(!e||e.target===document.getElementById('stageModal')){
-    document.getElementById('stageModal').classList.remove('open');
-  }
-}
-
-// Init
-updateNav();
-</script>
+        // Inicializar
+        window.addEventListener('load', initPresentation);
+        
+        // Prevenir scroll con espacio
+        window.addEventListener('keydown', function(e) {
+            if(e.keyCode === 32 && e.target === document.body) {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
