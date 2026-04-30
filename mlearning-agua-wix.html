@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>El Agua que Cuidamos Hoy | M-Learning Grado 3°</title>
+<link href="https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@300;400;500;700&family=Poppins:wght@300;400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --wix-blue:#116dff;
+  --wix-dark:#000624;
+  --wix-gray:#f7f8f8;
+  --wix-border:#dfe5eb;
+  --agua:#0077b6;
+  --agua-light:#90e0ef;
+  --agua-dark:#03045e;
+  --verde:#2d6a4f;
+  --verde-light:#d8f3dc;
+  --accent:#f77f00;
+  --white:#ffffff;
+  --text:#2d3436;
+  --text-light:#636e72;
+}
+
+/* ── WIX TOP BAR ─────────────────────────────────────────────────────────── */
+.wix-topbar{
+  position:fixed;top:0;left:0;right:0;z-index:9999;
+  background:#000624;height:48px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px;font-family:'DM Sans',sans-serif;
+}
+.wix-topbar-left{display:flex;align-items:center;gap:12px;}
+.wix-logo{
+  display:flex;align-items:center;gap:4px;
+  font-weight:700;font-size:22px;color:#fff;letter-spacing:-0.5px;
+  text-decoration:none;
+}
+.wix-logo span{color:#116dff;}
+.wix-site-name{
+  color:#b2becd;font-size:13px;font-weight:400;
+  border-left:1px solid #2d3748;padding-left:12px;
+}
+.wix-topbar-right{display:flex;align-items:center;gap:8px;}
+.wix-btn{
+  padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;border:none;transition:all .2s;font-family:'DM Sans',sans-serif;
+}
+.wix-btn-outline{
+  background:transparent;border:1px solid #4a5568;color:#b2becd;
+}
+.wix-btn-primary{background:#116dff;color:#fff;}
+.wix-btn-primary:hover{background:#0d5de0;}
+.wix-topbar-dots{display:flex;gap:6px;margin-right:4px;}
+.wix-topbar-dots span{
+  width:6px;height:6px;border-radius:50%;background:#4a5568;
+}
+
+/* ── SITE NAV ────────────────────────────────────────────────────────────── */
+.site-nav{
+  position:fixed;top:48px;left:0;right:0;z-index:9998;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--wix-border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:70px;
+}
+.site-brand{
+  display:flex;align-items:center;gap:10px;
+  font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:17px;color:var(--agua-dark);text-decoration:none;
+}
+.site-brand-icon{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--agua),var(--agua-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.nav-links{display:flex;gap:0;align-items:center;}
+.nav-links a{
+  padding:8px 16px;font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;color:var(--text);
+  text-decoration:none;border-radius:6px;transition:all .2s;
+  white-space:nowrap;
+}
+.nav-links a:hover,.nav-links a.active{
+  background:rgba(0,119,182,.08);color:var(--agua);
+}
+.nav-cta{
+  padding:9px 20px;background:var(--agua);color:#fff;
+  border-radius:25px;font-size:13px;font-weight:600;
+  font-family:'DM Sans',sans-serif;text-decoration:none;
+  transition:all .2s;
+}
+.nav-cta:hover{background:var(--agua-dark);transform:translateY(-1px);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px;}
+.hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s;}
+
+/* ── MAIN CONTENT ────────────────────────────────────────────────────────── */
+main{padding-top:118px;}
+
+/* ── HERO ────────────────────────────────────────────────────────────────── */
+.hero{
+  min-height:92vh;
+  background:linear-gradient(160deg,#03045e 0%,#023e8a 40%,#0077b6 75%,#00b4d8 100%);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:60px 40px;
+}
+.hero-bg-shapes{position:absolute;inset:0;pointer-events:none;}
+.hero-circle{
+  position:absolute;border-radius:50%;
+  background:rgba(144,224,239,.08);
+}
+.hero-circle:nth-child(1){width:600px;height:600px;top:-200px;right:-150px;}
+.hero-circle:nth-child(2){width:400px;height:400px;bottom:-100px;left:-80px;}
+.hero-circle:nth-child(3){width:200px;height:200px;top:30%;left:20%;}
+.hero-wave{
+  position:absolute;bottom:0;left:0;right:0;
+}
+.hero-wave svg{display:block;width:100%;}
+.hero-content{
+  max-width:800px;text-align:center;position:relative;z-index:2;
+  animation:fadeUp .8s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.2);border-radius:30px;
+  padding:8px 18px;font-size:12px;color:rgba(255,255,255,.9);
+  font-family:'DM Sans',sans-serif;font-weight:500;margin-bottom:28px;letter-spacing:.5px;text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Poppins',sans-serif;font-weight:800;
+  font-size:clamp(2.2rem,5vw,3.8rem);color:#fff;
+  line-height:1.15;margin-bottom:20px;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(90deg,#90e0ef,#caf0f8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-family:'DM Sans',sans-serif;font-size:1.1rem;
+  color:rgba(255,255,255,.82);line-height:1.7;margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto;
+}
+.hero-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.btn-hero-primary{
+  padding:14px 32px;background:#fff;color:var(--agua-dark);
+  border-radius:30px;font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:15px;text-decoration:none;transition:all .25s;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.btn-hero-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3);}
+.btn-hero-secondary{
+  padding:14px 32px;background:rgba(255,255,255,.15);color:#fff;
+  border:2px solid rgba(255,255,255,.4);border-radius:30px;
+  font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;
+  text-decoration:none;transition:all .25s;backdrop-filter:blur(6px);
+}
+.btn-hero-secondary:hover{background:rgba(255,255,255,.25);}
+.hero-stats{
+  display:flex;gap:40px;justify-content:center;margin-top:50px;flex-wrap:wrap;
+}
+.hero-stat{text-align:center;}
+.hero-stat-num{
+  font-family:'Poppins',sans-serif;font-weight:800;font-size:2rem;
+  color:#90e0ef;display:block;
+}
+.hero-stat-label{font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px;}
+
+/* ── SECTIONS COMMON ─────────────────────────────────────────────────────── */
+section{padding:90px 40px;}
+.section-tag{
+  display:inline-block;padding:5px 14px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  font-family:'DM Sans',sans-serif;margin-bottom:14px;
+}
+.section-title{
+  font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:clamp(1.8rem,3vw,2.5rem);color:var(--agua-dark);
+  margin-bottom:14px;line-height:1.2;
+}
+.section-subtitle{
+  font-family:'DM Sans',sans-serif;font-size:1.05rem;
+  color:var(--text-light);line-height:1.7;max-width:600px;
+}
+.section-header{max-width:700px;}
+.section-header.center{text-align:center;margin:0 auto 50px;}
+
+/* ── CANVAS SECTION ──────────────────────────────────────────────────────── */
+.canvas-section{background:var(--wix-gray);}
+.canvas-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;max-width:1100px;margin:50px auto 0;
+}
+.canvas-card{
+  background:#fff;border-radius:16px;padding:28px;
+  border:1px solid var(--wix-border);transition:all .25s;
+  box-shadow:0 2px 12px rgba(0,0,0,.04);
+}
+.canvas-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,119,182,.12);}
+.canvas-card-icon{font-size:2rem;margin-bottom:14px;}
+.canvas-card-title{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+  color:var(--agua-dark);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;
+}
+.canvas-card-text{
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);line-height:1.6;
+}
+.canvas-full{
+  max-width:1100px;margin:0 auto;background:#fff;
+  border-radius:16px;border:1px solid var(--wix-border);overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+}
+.canvas-header-bar{
+  background:var(--agua-dark);padding:18px 28px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;color:#fff;text-align:center;
+}
+
+/* ── RESOURCES SECTION ───────────────────────────────────────────────────── */
+.resources-section{background:#fff;}
+.resources-grid{
+  max-width:1100px;margin:0 auto;
+  display:flex;flex-direction:column;gap:60px;margin-top:50px;
+}
+.resource-block{
+  display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;
+}
+.resource-block.reverse{direction:rtl;}
+.resource-block.reverse > *{direction:ltr;}
+.resource-info{}
+.resource-num{
+  font-family:'Poppins',sans-serif;font-weight:800;font-size:4rem;
+  color:rgba(0,119,182,.1);line-height:1;margin-bottom:-20px;
+}
+.resource-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;
+}
+.resource-title{
+  font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:1.6rem;color:var(--agua-dark);margin-bottom:12px;line-height:1.3;
+}
+.resource-desc{
+  font-family:'DM Sans',sans-serif;font-size:1rem;
+  color:var(--text-light);line-height:1.7;margin-bottom:20px;
+}
+.resource-meta{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:22px;}
+.resource-meta-item{
+  display:flex;align-items:center;gap:6px;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text-light);
+}
+.resource-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:25px;font-family:'Poppins',sans-serif;
+  font-weight:600;font-size:14px;text-decoration:none;transition:all .25s;
+}
+.resource-embed{
+  border-radius:16px;overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,.12);
+  background:#000;position:relative;
+}
+.resource-embed iframe{width:100%;display:block;border:none;}
+.resource-embed-placeholder{
+  background:linear-gradient(135deg,var(--agua-dark),var(--agua));
+  padding:50px 30px;text-align:center;border-radius:16px;
+  color:#fff;font-family:'DM Sans',sans-serif;
+}
+.resource-embed-placeholder .big-icon{font-size:4rem;margin-bottom:16px;display:block;}
+.resource-embed-placeholder h3{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:10px;
+}
+.resource-embed-placeholder p{font-size:14px;opacity:.85;line-height:1.6;margin-bottom:20px;}
+.open-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;background:#fff;color:var(--agua-dark);
+  border-radius:25px;font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:14px;text-decoration:none;transition:all .2s;
+}
+.open-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+
+/* Colors per resource */
+.tag-video{background:rgba(67,56,202,.1);color:#4338ca;}
+.tag-audio{background:rgba(29,185,84,.1);color:#1db954;}
+.tag-texto{background:rgba(249,115,22,.1);color:#ea6c00;}
+.tag-interactivo{background:rgba(0,119,182,.1);color:var(--agua);}
+.tag-evaluacion{background:rgba(239,68,68,.1);color:#dc2626;}
+.btn-video{background:#4338ca;color:#fff;}
+.btn-video:hover{background:#3730a3;transform:translateY(-2px);}
+.btn-audio{background:#1db954;color:#fff;}
+.btn-audio:hover{background:#169c46;transform:translateY(-2px);}
+.btn-texto{background:var(--accent);color:#fff;}
+.btn-texto:hover{background:#e06d00;transform:translateY(-2px);}
+.btn-interactivo{background:var(--agua);color:#fff;}
+.btn-interactivo:hover{background:var(--agua-dark);transform:translateY(-2px);}
+.btn-evaluacion{background:#dc2626;color:#fff;}
+.btn-evaluacion:hover{background:#b91c1c;transform:translateY(-2px);}
+
+/* ── OBJETIVO SECTION ────────────────────────────────────────────────────── */
+.objetivo-section{
+  background:linear-gradient(135deg,var(--agua-dark) 0%,var(--agua) 100%);
+  color:#fff;text-align:center;
+}
+.objetivo-section .section-title{color:#fff;}
+.objetivo-section .section-subtitle{color:rgba(255,255,255,.85);margin:0 auto;}
+.objetivo-inner{max-width:750px;margin:0 auto;}
+.objetivo-quote{
+  font-family:'Poppins',sans-serif;font-style:italic;font-weight:300;
+  font-size:clamp(1.3rem,2.5vw,1.8rem);color:#90e0ef;
+  border-left:4px solid rgba(255,255,255,.3);padding-left:24px;
+  margin:40px auto;text-align:left;line-height:1.5;
+}
+
+/* ── PROCESS SECTION ─────────────────────────────────────────────────────── */
+.process-section{background:var(--wix-gray);}
+.process-steps{
+  max-width:900px;margin:50px auto 0;
+  display:flex;flex-direction:column;gap:0;
+}
+.process-step{
+  display:flex;gap:24px;align-items:flex-start;padding:30px 0;
+  border-bottom:1px solid var(--wix-border);
+}
+.process-step:last-child{border-bottom:none;}
+.step-num{
+  width:48px;height:48px;flex-shrink:0;border-radius:50%;
+  background:var(--agua);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;
+  margin-top:2px;
+}
+.step-content{}
+.step-title{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:1.1rem;
+  color:var(--agua-dark);margin-bottom:6px;
+}
+.step-desc{
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-light);line-height:1.6;
+}
+.step-resource{
+  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+  font-size:12px;font-weight:600;color:var(--agua);font-family:'DM Sans',sans-serif;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────────────────── */
+footer{
+  background:var(--agua-dark);color:rgba(255,255,255,.7);
+  padding:50px 40px 30px;
+}
+.footer-inner{max-width:1100px;margin:0 auto;}
+.footer-top{
+  display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;
+  padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:30px;
+}
+.footer-brand{font-family:'DM Sans',sans-serif;}
+.footer-brand h3{
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:1.1rem;
+  color:#fff;margin-bottom:12px;
+}
+.footer-brand p{font-size:13px;line-height:1.7;}
+.footer-col h4{
+  font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;
+  color:#fff;margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px;
+}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:10px;}
+.footer-col ul li a{
+  font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.6);
+  text-decoration:none;transition:color .2s;
+}
+.footer-col ul li a:hover{color:#fff;}
+.footer-bottom{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:gap;
+  font-family:'DM Sans',sans-serif;font-size:12px;
+}
+.footer-bottom-right{display:flex;align-items:center;gap:10px;}
+.wix-footer-logo{
+  font-family:'Helvetica Neue',sans-serif;font-weight:700;font-size:18px;
+  color:rgba(255,255,255,.5);
+}
+.wix-footer-logo span{color:#116dff;}
+
+/* ── WIX FLOATING BADGE ──────────────────────────────────────────────────── */
+.wix-badge{
+  position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:#000624;color:#fff;padding:10px 16px;
+  border-radius:30px;display:flex;align-items:center;gap:8px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);cursor:pointer;
+  text-decoration:none;
+}
+.wix-badge-logo{font-weight:700;font-size:16px;}
+.wix-badge-logo span{color:#116dff;}
+.wix-badge-text{font-size:11px;opacity:.8;}
+
+/* ── MOBILE NAV DROPDOWN ─────────────────────────────────────────────────── */
+.mobile-menu{
+  display:none;position:fixed;top:118px;left:0;right:0;z-index:9997;
+  background:#fff;padding:20px;border-bottom:1px solid var(--wix-border);
+  flex-direction:column;gap:4px;
+}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{
+  padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:15px;
+  color:var(--text);text-decoration:none;border-radius:8px;
+}
+.mobile-menu a:hover{background:var(--wix-gray);}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────────────── */
+@media(max-width:900px){
+  .resource-block{grid-template-columns:1fr;}
+  .resource-block.reverse{direction:ltr;}
+  section{padding:60px 20px;}
+  .site-nav{padding:0 20px;}
+  .nav-links{display:none;}
+  .nav-cta{display:none;}
+  .hamburger{display:flex;}
+  .footer-top{grid-template-columns:1fr;}
+  .hero-stats{gap:24px;}
+}
+@media(max-width:600px){
+  .hero{padding:40px 20px;}
+  .canvas-grid{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;gap:16px;text-align:center;}
+  .wix-topbar-dots{display:none;}
+  .wix-site-name{display:none;}
+}
+
+/* ── SCROLL ANIMATIONS ───────────────────────────────────────────────────── */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- WIX TOP BAR -->
+<div class="wix-topbar">
+  <div class="wix-topbar-left">
+    <div class="wix-topbar-dots">
+      <span></span><span style="background:#116dff"></span><span></span>
+    </div>
+    <a href="#" class="wix-logo">W<span>ix</span></a>
+    <span class="wix-site-name">anyi-chantre.wixsite.com/mlearning-agua</span>
+  </div>
+  <div class="wix-topbar-right">
+    <button class="wix-btn wix-btn-outline">Editar sitio</button>
+    <button class="wix-btn wix-btn-primary">Publicado ✓</button>
+  </div>
+</div>
+
+<!-- SITE NAVIGATION -->
+<nav class="site-nav" id="siteNav">
+  <a href="#inicio" class="site-brand">
+    <div class="site-brand-icon">💧</div>
+    El Agua que Cuidamos Hoy
+  </a>
+  <div class="nav-links">
+    <a href="#inicio" class="active">Inicio</a>
+    <a href="#estrategia">Estrategia</a>
+    <a href="#video">Video</a>
+    <a href="#audio">Audio</a>
+    <a href="#texto">Texto</a>
+    <a href="#interactividad">Interactividad</a>
+    <a href="#evaluacion">Evaluación</a>
+  </div>
+  <a href="#evaluacion" class="nav-cta">Ir al Quiz →</a>
+  <div class="hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#inicio" onclick="closeMenu()">🏠 Inicio</a>
+  <a href="#estrategia" onclick="closeMenu()">📋 Estrategia</a>
+  <a href="#video" onclick="closeMenu()">🎬 Video</a>
+  <a href="#audio" onclick="closeMenu()">🎙️ Audio</a>
+  <a href="#texto" onclick="closeMenu()">📄 Texto</a>
+  <a href="#interactividad" onclick="closeMenu()">🎮 Interactividad</a>
+  <a href="#evaluacion" onclick="closeMenu()">📝 Evaluación</a>
+</div>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg-shapes">
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+    <div class="hero-circle"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">💧 Estrategia M-Learning · Grado 3° · Básica Primaria</div>
+    <h1>El agua que<br/><em>cuidamos hoy</em></h1>
+    <p class="hero-sub">
+      Una estrategia de aprendizaje móvil para que los estudiantes de grado 3° comprendan el ciclo del agua y desarrollen hábitos de conservación desde su propia realidad cotidiana.
+    </p>
+    <div class="hero-buttons">
+      <a href="#video" class="btn-hero-primary">🎬 Comenzar a aprender</a>
+      <a href="#estrategia" class="btn-hero-secondary">Ver la estrategia</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">5</span>
+        <span class="hero-stat-label">Recursos digitales</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">60'</span>
+        <span class="hero-stat-label">Sesión de aprendizaje</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">3°</span>
+        <span class="hero-stat-label">Grado / 8–10 años</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">📱</span>
+        <span class="hero-stat-label">100% desde móvil</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#f7f8f8"/>
+    </svg>
+  </div>
+</section>
+
+<!-- OBJETIVO -->
+<section class="objetivo-section" id="estrategia">
+  <div class="objetivo-inner reveal">
+    <div class="section-tag" style="background:rgba(255,255,255,.15);color:#90e0ef;">🎯 Objetivo de aprendizaje</div>
+    <h2 class="section-title">¿Qué aprenderán los estudiantes?</h2>
+    <blockquote class="objetivo-quote">
+      "Que los niños comprendan el ciclo hidrológico desde su cotidianidad y que esa comprensión los lleve a cambiar al menos un hábito de consumo de agua en casa."
+    </blockquote>
+    <p class="section-subtitle">
+      Diseñada con enfoque m-learning, esta estrategia aprovecha los dispositivos móviles que los estudiantes ya tienen en sus manos para generar aprendizaje situado, autónomo y con impacto real.
+    </p>
+  </div>
+</section>
+
+<!-- CANVAS / ESTRATEGIA -->
+<section class="canvas-section">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-header reveal">
+      <div class="section-tag" style="background:rgba(0,119,182,.1);color:var(--agua);">📋 Formato CANVAS</div>
+      <h2 class="section-title">Diseño de la estrategia m-learning</h2>
+      <p class="section-subtitle">El CANVAS organiza todos los componentes tecnológicos y didácticos que hacen posible esta experiencia de aprendizaje móvil.</p>
+    </div>
+    <div class="canvas-grid reveal">
+      <div class="canvas-card">
+        <div class="canvas-card-icon">🎯</div>
+        <div class="canvas-card-title">Objetivo</div>
+        <div class="canvas-card-text">Desarrollar conciencia ambiental sobre el cuidado del agua mediante recursos digitales móviles interactivos.</div>
+      </div>
+      <div class="canvas-card">
+        <div class="canvas-card-icon">👦</div>
+        <div class="canvas-card-title">Población</div>
+        <div class="canvas-card-text">25 estudiantes de grado 3°, entre 8 y 10 años. Tabletas Android y smartphones con conectividad intermitente.</div>
+      </div>
+      <div class="canvas-card">
+        <div class="canvas-card-icon">🧠</div>
+        <div class="canvas-card-title">Estrategia</div>
+        <div class="canvas-card-text">Aprendizaje situado + microcontenidos. Los recursos van de lo general (video) a lo específico (quiz). Sin tecnicismos.</div>
+      </div>
+      <div class="canvas-card">
+        <div class="canvas-card-icon">🌍</div>
+        <div class="canvas-card-title">Inclusión</div>
+        <div class="canvas-card-text">Materiales en español sencillo, audio narrado para estudiantes con dificultades lectoras. Recursos pre-cargables sin conexión.</div>
+      </div>
+      <div class="canvas-card">
+        <div class="canvas-card-icon">📱</div>
+        <div class="canvas-card-title">Plataforma WIX</div>
+        <div class="canvas-card-text">Sitio optimizado en modo responsive. Proporciones adaptadas a pantallas de 360–414px (gama media en Colombia).</div>
+      </div>
+      <div class="canvas-card">
+        <div class="canvas-card-icon">✅</div>
+        <div class="canvas-card-title">Evaluación</div>
+        <div class="canvas-card-text">Reporte automático en Quizizz por pregunta. Registro de participación en Educaplay. Retroalimentación inmediata.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS / SECUENCIA -->
+<section class="process-section">
+  <div style="max-width:900px;margin:0 auto;">
+    <div class="section-header reveal">
+      <div class="section-tag" style="background:rgba(0,119,182,.1);color:var(--agua);">📐 Secuencia didáctica</div>
+      <h2 class="section-title">¿Cómo se usa este sitio?</h2>
+      <p class="section-subtitle">Sigue el recorrido en orden. Cada paso prepara el siguiente.</p>
+    </div>
+    <div class="process-steps reveal">
+      <div class="process-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">🎬 Exploración — Ver el video</div>
+          <div class="step-desc">Observa el video sobre el ciclo del agua sin tomar apuntes todavía. Solo deja que las imágenes cuenten la historia.</div>
+          <span class="step-resource">⏱ 10 minutos · YouTube — Happy Learning</span>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">🎙️ Profundización — Escuchar el audio</div>
+          <div class="step-desc">Escucha el spot ambiental colombiano y anota 2 cosas que te llamen la atención sobre el desperdicio del agua.</div>
+          <span class="step-resource">⏱ 15 minutos · SoundCloud — APC Colombia</span>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">📄 Comprensión — Leer el documento</div>
+          <div class="step-desc">Abre la presentación con imágenes del ciclo hidrológico e identifica las fases: evaporación, condensación, precipitación.</div>
+          <span class="step-resource">⏱ 15 minutos · Google Slides</span>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">🎮 Práctica — Jugar en Educaplay</div>
+          <div class="step-desc">Resuelve el cuestionario interactivo. Intenta al menos dos veces para mejorar tu puntaje.</div>
+          <span class="step-resource">⏱ 10 minutos · Educaplay</span>
+        </div>
+      </div>
+      <div class="process-step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">📝 Cierre — Completar el quiz</div>
+          <div class="step-desc">Responde las 10 preguntas del quiz. Revisa las que fallaste antes de salir: la retroalimentación aparece inmediatamente.</div>
+          <span class="step-resource">⏱ 10 minutos · Quizizz</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESOURCES -->
+<section class="resources-section" id="video">
+  <div style="max-width:1100px;margin:0 auto;">
+    <div class="section-header center reveal">
+      <div class="section-tag" style="background:rgba(0,119,182,.1);color:var(--agua);">🎓 Contenidos digitales</div>
+      <h2 class="section-title">Los 5 recursos de aprendizaje</h2>
+      <p class="section-subtitle">Cada recurso fue seleccionado pensando en que funcione bien desde un celular con conexión básica.</p>
+    </div>
+
+    <div class="resources-grid">
+
+      <!-- VIDEO -->
+      <div class="resource-block reveal">
+        <div class="resource-info">
+          <div class="resource-num">01</div>
+          <span class="resource-tag tag-video">🎬 Video</span>
+          <h3 class="resource-title">El Ciclo del Agua para niños</h3>
+          <p class="resource-desc">Animación de 2 minutos 30 segundos que explica el ciclo hidrológico con lenguaje cercano a los niños. Narración pausada, vocabulario adecuado para grado 3°, sin tecnicismos innecesarios.</p>
+          <div class="resource-meta">
+            <span class="resource-meta-item">⏱ 2 min 30 seg</span>
+            <span class="resource-meta-item">🎥 Happy Learning 2024</span>
+            <span class="resource-meta-item">📱 Funciona en móvil</span>
+          </div>
+          <a href="https://www.youtube.com/watch?v=x-Em4JGD8pQ" target="_blank" class="resource-btn btn-video">
+            ▶ Ver en YouTube
+          </a>
+        </div>
+        <div class="resource-embed">
+          <iframe src="https://www.youtube.com/embed/x-Em4JGD8pQ" height="280" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" loading="lazy"></iframe>
+        </div>
+      </div>
+
+      <!-- AUDIO -->
+      <div class="resource-block reverse reveal" id="audio">
+        <div class="resource-info">
+          <div class="resource-num">02</div>
+          <span class="resource-tag tag-audio">🎙️ Audio — Podcast</span>
+          <h3 class="resource-title">No Desperdicies el Agua</h3>
+          <p class="resource-desc">Spot ambiental colombiano producido por APC Aguas de Teorama. Habla del desperdicio del agua en Colombia — algo que sucede aquí, no en otro país. Menos de 4 minutos, directo y con urgencia real.</p>
+          <div class="resource-meta">
+            <span class="resource-meta-item">⏱ Menos de 4 min</span>
+            <span class="resource-meta-item">🇨🇴 APC Colombia</span>
+            <span class="resource-meta-item">🔊 SoundCloud</span>
+          </div>
+          <a href="https://soundcloud.com/donjhonnyrojas/spot-no-desperdicies-el-agua" target="_blank" class="resource-btn btn-audio">
+            🔊 Escuchar en SoundCloud
+          </a>
+        </div>
+        <div class="resource-embed-placeholder" style="background:linear-gradient(135deg,#1a5c2e,#1db954);">
+          <span class="big-icon">🎙️</span>
+          <h3>Spot: No Desperdicies El Agua</h3>
+          <p>Campaña ambiental colombiana sobre conservación hídrica — APC Aguas de Teorama</p>
+          <a href="https://soundcloud.com/donjhonnyrojas/spot-no-desperdicies-el-agua" target="_blank" class="open-btn">
+            🔊 Abrir en SoundCloud
+          </a>
+        </div>
+      </div>
+
+      <!-- TEXTO -->
+      <div class="resource-block reveal" id="texto">
+        <div class="resource-info">
+          <div class="resource-num">03</div>
+          <span class="resource-tag tag-texto">📄 Texto</span>
+          <h3 class="resource-title">El Ciclo del Agua — Presentación</h3>
+          <p class="resource-desc">Presentación pública de Google Slides con imágenes del ciclo hidrológico, esquemas de las 4 fases, vocabulario básico e ilustraciones. Abre directo en el navegador desde el celular, sin necesidad de descarga ni cuenta de Google.</p>
+          <div class="resource-meta">
+            <span class="resource-meta-item">📄 2 páginas de contenido</span>
+            <span class="resource-meta-item">🖼️ Incluye imágenes</span>
+            <span class="resource-meta-item">📱 Sin descarga</span>
+          </div>
+          <a href="https://docs.google.com/presentation/d/1lg773_e8zkKe5iTR6-czdlnnsy4PKyyvSPnEMk9FuLY/htmlpresent" target="_blank" class="resource-btn btn-texto">
+            📄 Abrir presentación
+          </a>
+        </div>
+        <div class="resource-embed-placeholder" style="background:linear-gradient(135deg,#c55a11,#f77f00);">
+          <span class="big-icon">📄</span>
+          <h3>Presentación: El Ciclo del Agua</h3>
+          <p>Google Slides público con imágenes, esquemas de las fases y vocabulario clave para grado 3°</p>
+          <a href="https://docs.google.com/presentation/d/1lg773_e8zkKe5iTR6-czdlnnsy4PKyyvSPnEMk9FuLY/htmlpresent" target="_blank" class="open-btn">
+            📄 Abrir en Google Slides
+          </a>
+        </div>
+      </div>
+
+      <!-- INTERACTIVIDAD -->
+      <div class="resource-block reverse reveal" id="interactividad">
+        <div class="resource-info">
+          <div class="resource-num">04</div>
+          <span class="resource-tag tag-interactivo">🎮 Interactividad</span>
+          <h3 class="resource-title">Cuestionario: Ciclo del Agua</h3>
+          <p class="resource-desc">Actividad interactiva de Educaplay diseñada para 3° de primaria. Con más de 5.500 participaciones, el nivel es el adecuado: ni tan fácil que aburra, ni tan difícil que frustre. Se puede repetir cuantas veces sea necesario.</p>
+          <div class="resource-meta">
+            <span class="resource-meta-item">🏆 +5.500 jugadas</span>
+            <span class="resource-meta-item">📚 3° Primaria</span>
+            <span class="resource-meta-item">🔁 Repetible</span>
+          </div>
+          <a href="https://es.educaplay.com/recursos-educativos/1746474-cuestionario_ciclo_del_agua.html" target="_blank" class="resource-btn btn-interactivo">
+            🎮 Ir a Educaplay
+          </a>
+        </div>
+        <div class="resource-embed-placeholder" style="background:linear-gradient(135deg,#03045e,#0077b6);">
+          <span class="big-icon">🎮</span>
+          <h3>Cuestionario Ciclo del Agua</h3>
+          <p>Test interactivo para 3° de primaria · Educaplay · +5.500 participaciones · Accesible desde móvil</p>
+          <a href="https://es.educaplay.com/recursos-educativos/1746474-cuestionario_ciclo_del_agua.html" target="_blank" class="open-btn">
+            🎮 Abrir en Educaplay
+          </a>
+        </div>
+      </div>
+
+      <!-- EVALUACIÓN -->
+      <div class="resource-block reveal" id="evaluacion">
+        <div class="resource-info">
+          <div class="resource-num">05</div>
+          <span class="resource-tag tag-evaluacion">📝 Evaluación</span>
+          <h3 class="resource-title">Quiz: El Ciclo del Agua</h3>
+          <p class="resource-desc">10 preguntas de selección múltiple en Quizizz con retroalimentación inmediata después de cada respuesta. El estudiante no tiene que esperar al día siguiente para saber si entendió — el error se convierte en aprendizaje en el momento.</p>
+          <div class="resource-meta">
+            <span class="resource-meta-item">❓ 10 preguntas</span>
+            <span class="resource-meta-item">⚡ Retroalimentación inmediata</span>
+            <span class="resource-meta-item">📊 Sin registro</span>
+          </div>
+          <a href="https://quizizz.com/admin/quiz/5c59d22d1c5b20001ba69b8d/el-ciclo-del-agua-2-primaria" target="_blank" class="resource-btn btn-evaluacion">
+            📝 Ir al Quiz
+          </a>
+        </div>
+        <div class="resource-embed-placeholder" style="background:linear-gradient(135deg,#7f1d1d,#dc2626);">
+          <span class="big-icon">📝</span>
+          <h3>Quiz: El Ciclo del Agua</h3>
+          <p>10 preguntas de selección múltiple · Retroalimentación inmediata · Sin necesidad de crear cuenta</p>
+          <a href="https://quizizz.com/admin/quiz/5c59d22d1c5b20001ba69b8d/el-ciclo-del-agua-2-primaria" target="_blank" class="open-btn">
+            📝 Abrir en Quizizz
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h3>💧 El agua que cuidamos hoy</h3>
+        <p>Estrategia m-learning sobre Educación Ambiental para estudiantes de grado 3° de Básica Primaria.<br/><br/>Corporación Universitaria Iberoamericana<br/>Electiva — Mobile Learning · Abril 2026</p>
+      </div>
+      <div class="footer-col">
+        <h4>Recursos</h4>
+        <ul>
+          <li><a href="#video">🎬 Video</a></li>
+          <li><a href="#audio">🎙️ Audio</a></li>
+          <li><a href="#texto">📄 Texto</a></li>
+          <li><a href="#interactividad">🎮 Interactividad</a></li>
+          <li><a href="#evaluacion">📝 Evaluación</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Información</h4>
+        <ul>
+          <li><a href="#estrategia">Estrategia CANVAS</a></li>
+          <li><a href="#inicio">Objetivo de aprendizaje</a></li>
+          <li><a href="#inicio">Grado 3° — 8 a 10 años</a></li>
+          <li><a href="#">Docente: Anyi Chantre G.</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Anyi Chantre Gurrute · Todos los derechos reservados</span>
+      <div class="footer-bottom-right">
+        <span style="font-size:11px;opacity:.5">Creado con</span>
+        <div class="wix-footer-logo">W<span>ix</span></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WIX FLOATING BADGE -->
+<a href="https://www.wix.com" target="_blank" class="wix-badge">
+  <span class="wix-badge-logo">W<span>ix</span></span>
+  <div>
+    <div style="font-size:13px;font-weight:600;">Crear un sitio web</div>
+    <div class="wix-badge-text">anyi-chantre.wixsite.com</div>
+  </div>
+</a>
+
+<script>
+// ── MOBILE MENU ───────────────────────────────────────────────────────────
+function toggleMenu(){
+  const m = document.getElementById('mobileMenu');
+  m.classList.toggle('open');
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// ── ACTIVE NAV ────────────────────────────────────────────────────────────
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if(window.scrollY >= s.offsetTop - 160) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+// ── SCROLL REVEAL ─────────────────────────────────────────────────────────
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+
+// ── SMOOTH SCROLL ─────────────────────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({ behavior:'smooth', block:'start' }); }
+  });
+});
+</script>
+</body>
+</html>
