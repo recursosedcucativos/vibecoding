@@ -1257,7 +1257,7 @@ function sendToWhatsAppAndDownload() {
     msg+=`\n🏆 *Total:* ${done} de ${storiesData.length} misiones\n\n✨ _Generado por EVA - Aventura Lectora_ ✨`;
     const encoded=encodeURIComponent(msg);
     showModal('¡Enviando al Profe!','1. Tu archivo .eva fue descargado como respaldo.<br><br>2. Abriremos WhatsApp para enviar el reporte.<br><br>💡 <i>Busca el archivo en Descargas.</i>','success',
-        ()=>{ window.open('https://api.whatsapp.com/send?text='+encoded,'_blank'); });
+        ()=>{ window.open('https://wa.me/573004323504?text='+encoded,'_blank'); });
 }
 
 function exportTeacherReport() {
