@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVA - IED San Vicente de Paúl | Aventura Lectora</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700;900&display=swap');
+body{font-family:'Fredoka',sans-serif;background-color:#e0f2fe;background-image:radial-gradient(circle at 15% 50%,rgba(255,255,255,.4) 0%,transparent 50%),radial-gradient(circle at 85% 30%,rgba(255,255,255,.4) 0%,transparent 50%);background-attachment:fixed;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,h4,.font-black{font-family:'Quicksand',sans-serif}
+.progress-bar{transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+
+/* === LEO ANIMATIONS === */
+@keyframes leo-dance{0%,100%{transform:rotate(-3deg) translateY(0)}25%{transform:rotate(3deg) translateY(-7px)}50%{transform:rotate(-2deg) translateY(-11px)}75%{transform:rotate(4deg) translateY(-4px)}}
+@keyframes leoArm{0%,100%{transform:rotate(-55deg)}50%{transform:rotate(-15deg)}}
+@keyframes bubble-pop{0%{transform:scale(.5) translateY(10px);opacity:0}70%{transform:scale(1.06) translateY(-2px)}100%{transform:scale(1) translateY(0);opacity:1}}
+.leo-dance{animation:leo-dance 2.5s ease-in-out infinite}
+.bubble-pop{animation:bubble-pop .35s cubic-bezier(.34,1.56,.64,1) forwards}
+#leo-wave-arm{transform-origin:56px 52px;animation:leoArm .9s ease-in-out infinite}
+
+/* === GENERAL ANIMATIONS === */
+@keyframes float-char{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-10px) rotate(3deg)}}
+.animate-float{animation:float-char 4s ease-in-out infinite}
+@keyframes pop-in{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+.animate-pop{animation:pop-in .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake .4s ease-in-out}
+@keyframes unlock-pulse{0%{box-shadow:0 0 0 0 rgba(59,130,246,.7)}70%{box-shadow:0 0 0 16px rgba(59,130,246,0)}100%{box-shadow:0 0 0 0 rgba(59,130,246,0)}}
+.just-unlocked{animation:unlock-pulse 1.8s ease-out}
+@keyframes star-pop{0%{transform:scale(0) rotate(0)}80%{transform:scale(1.4) rotate(20deg)}100%{transform:scale(1) rotate(0)}}
+.star-pop{animation:star-pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slide-in-up{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.slide-in-up{animation:slide-in-up .4s ease-out forwards}
+@keyframes tts-pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.tts-playing{animation:tts-pulse 1.5s ease-in-out infinite}
+@keyframes reflection-in{from{transform:scale(.8) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.reflection-in{animation:reflection-in .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{animation:spin 1s linear infinite;display:inline-block}
+.confetti{position:fixed;width:12px;height:12px;z-index:1000;top:-10px;animation:fall 3s ease-in forwards}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes module-slide{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* === UI COMPONENTS === */
+.modal-overlay{background:rgba(15,23,42,.82);backdrop-filter:blur(8px)}
+.btn-magic{background:linear-gradient(135deg,#f59e0b 0%,#ea580c 100%);box-shadow:0 8px 0 #c2410c,0 10px 15px rgba(234,88,12,.3);transition:transform .1s,box-shadow .1s;border:4px solid white}
+.btn-magic:active{transform:translateY(6px);box-shadow:0 2px 0 #c2410c}
+.btn-primary{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);box-shadow:0 8px 0 #1d4ed8;transition:transform .1s,box-shadow .1s;border:3px solid white}
+.btn-primary:active{transform:translateY(6px);box-shadow:0 2px 0 #1d4ed8}
+.btn-whatsapp{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);box-shadow:0 8px 0 #15803d;transition:transform .1s,box-shadow .1s;border:3px solid white}
+.btn-whatsapp:active{transform:translateY(6px);box-shadow:0 2px 0 #15803d}
+.btn-purple{background:linear-gradient(135deg,#8b5cf6 0%,#7c3aed 100%);box-shadow:0 5px 0 #6d28d9;transition:transform .1s,box-shadow .1s;border:2px solid white}
+.btn-purple:active{transform:translateY(4px);box-shadow:0 1px 0 #6d28d9}
+.btn-cancel{background:#f1f5f9;box-shadow:0 6px 0 #cbd5e1;transition:transform .1s,box-shadow .1s;border:3px solid white;color:#475569}
+.btn-cancel:active{transform:translateY(4px);box-shadow:0 2px 0 #cbd5e1}
+.avatar-option{transition:all .2s ease}
+.avatar-selected{border-color:#3b82f6!important;background-color:#eff6ff!important;transform:scale(1.15);box-shadow:0 10px 25px rgba(59,130,246,.4)}
+.custom-scrollbar::-webkit-scrollbar{width:8px}
+.custom-scrollbar::-webkit-scrollbar-track{background:#f1f5f9;border-radius:10px}
+.custom-scrollbar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;border:2px solid #f1f5f9}
+.module-container{background:rgba(255,255,255,.7);border-radius:2rem;padding:1.5rem;border:4px dashed rgba(255,255,255,.8);margin-bottom:2rem}
+@media(min-width:768px){.module-container{border-radius:3rem;padding:2rem;margin-bottom:3rem}}
+.color-icon{font-size:3.5rem;line-height:1;filter:drop-shadow(0px 8px 10px rgba(0,0,0,.15))}
+.reflection-btn{transition:all .2s ease;border:4px solid #e2e8f0;background:#f8fafc}
+.reflection-btn.selected{transform:scale(1.2);border-color:#fbbf24;box-shadow:0 0 0 4px rgba(251,191,36,.3)}
+
+/* === LEO BUBBLE TAIL === */
+.bubble-tail::after{content:'';position:absolute;bottom:-11px;left:12px;width:0;height:0;border-left:10px solid transparent;border-right:0;border-top:11px solid #3b82f6}
+.bubble-tail::before{content:'';position:absolute;bottom:-7px;left:16px;width:0;height:0;border-left:7px solid transparent;border-right:0;border-top:8px solid white;z-index:1}
+</style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+<!-- ==================== LEO MASCOT ==================== -->
+<div id="leo-container" class="fixed bottom-3 left-3 z-[200] hidden select-none" style="width:88px">
+  <div id="leo-speech" class="hidden absolute bubble-tail" style="bottom:118px;left:0;z-index:10;background:white;border:3px solid #3b82f6;border-radius:18px 18px 18px 4px;padding:10px 12px;min-width:165px;max-width:210px;box-shadow:0 8px 20px rgba(0,0,0,.15)">
+    <span id="leo-text" style="font-size:12px;font-weight:700;color:#1e40af;line-height:1.4;display:block">¡Hola!</span>
+  </div>
+  <div class="leo-dance cursor-pointer" id="leo-char" onclick="toggleLeoBubble()" title="Toca a Leo para ayuda" role="button" aria-label="Leo tu guía de aventuras">
+    <svg viewBox="0 0 80 112" xmlns="http://www.w3.org/2000/svg" style="width:88px;height:100px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.22))">
+      <path d="M16 30 Q16 7 40 7 Q64 7 64 30 Q60 13 40 15 Q20 13 16 30Z" fill="#4A3728"/>
+      <ellipse cx="40" cy="28" rx="24" ry="24" fill="#F5C09A"/>
+      <ellipse cx="16" cy="30" rx="4.5" ry="6" fill="#E8A87C"/>
+      <ellipse cx="64" cy="30" rx="4.5" ry="6" fill="#E8A87C"/>
+      <path d="M16 30 Q13 40 18 49 Q15 37 19 32Z" fill="#4A3728"/>
+      <path d="M64 30 Q67 40 62 49 Q65 37 61 32Z" fill="#4A3728"/>
+      <path d="M24 19 Q31 15 37 19" fill="none" stroke="#4A3728" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M43 19 Q49 15 56 19" fill="none" stroke="#4A3728" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="31" cy="26" rx="7" ry="8" fill="white"/>
+      <ellipse cx="49" cy="26" rx="7" ry="8" fill="white"/>
+      <circle id="lp" cx="32" cy="27" r="4.5" fill="#2D1B00"/>
+      <circle id="rp" cx="50" cy="27" r="4.5" fill="#2D1B00"/>
+      <circle cx="34" cy="24.5" r="1.8" fill="white"/>
+      <circle cx="52" cy="24.5" r="1.8" fill="white"/>
+      <ellipse cx="40" cy="34" rx="2.5" ry="2" fill="#D98C5F"/>
+      <path id="leo-m" d="M32 40 Q40 48 48 40" fill="#EB6B4A" stroke="#C4502E" stroke-width="1.5" stroke-linecap="round"/>
+      <path id="leo-teeth" d="M34 41 Q40 46 46 41" fill="white"/>
+      <circle cx="23" cy="36" r="5.5" fill="#FFB5A0" opacity="0.45"/>
+      <circle cx="57" cy="36" r="5.5" fill="#FFB5A0" opacity="0.45"/>
+      <rect x="24" y="49" width="32" height="33" rx="10" fill="#3B82F6"/>
+      <polygon points="36,49 40,58 44,49" fill="white"/>
+      <rect x="38" y="58" width="5" height="23" rx="2" fill="white" opacity="0.7"/>
+      <rect x="26" y="54" width="13" height="9" rx="3" fill="#1D4ED8"/>
+      <text x="32.5" y="61.5" font-size="4.5" fill="white" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">SVP</text>
+      <rect x="6" y="52" width="20" height="9" rx="5" fill="#3B82F6" transform="rotate(25 16 56)"/>
+      <circle cx="9" cy="65" r="5.5" fill="#F5C09A"/>
+      <g id="leo-wave-arm">
+        <rect x="56" y="48" width="18" height="8" rx="4" fill="#3B82F6"/>
+        <circle cx="74" cy="52" r="5.5" fill="#F5C09A"/>
+      </g>
+      <rect x="24" y="80" width="32" height="5" rx="2" fill="#1D4ED8"/>
+      <rect x="27" y="84" width="12" height="20" rx="6" fill="#2563EB"/>
+      <rect x="41" y="84" width="12" height="20" rx="6" fill="#2563EB"/>
+      <ellipse cx="33" cy="104" rx="10" ry="6" fill="#1E293B"/>
+      <ellipse cx="47" cy="104" rx="10" ry="6" fill="#1E293B"/>
+      <ellipse cx="31" cy="102" rx="6" ry="3.5" fill="#334155"/>
+      <ellipse cx="45" cy="102" rx="6" ry="3.5" fill="#334155"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ==================== CUSTOM ALERT ==================== -->
+<div id="custom-alert" class="fixed inset-0 z-[500] modal-overlay hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+  <div class="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300 border-4 md:border-8 border-blue-100" id="custom-alert-box">
+    <div id="alert-icon" class="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 animate-bounce border-4 border-blue-200">
+      <span style="font-size:2.5rem">ℹ️</span>
+    </div>
+    <h3 id="alert-title" class="text-2xl md:text-3xl font-black mb-3 text-slate-800">Mensaje</h3>
+    <p id="alert-message" class="text-slate-600 font-bold text-base md:text-lg mb-6"></p>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <button onclick="closeAlert()" id="btn-alert-ok" class="btn-primary flex-1 py-4 rounded-[1.5rem] text-white font-black text-lg md:text-xl">¡ENTENDIDO!</button>
+      <button onclick="cancelAlert()" id="btn-alert-cancel" class="hidden btn-cancel flex-1 py-4 rounded-[1.5rem] font-black text-lg md:text-xl">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== AUTH SCREEN ==================== -->
+<div id="auth-screen" class="fixed inset-0 z-[300] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center p-2 md:p-4">
+  <div class="bg-white/95 backdrop-blur-md rounded-[2rem] md:rounded-[4rem] shadow-2xl p-6 md:p-12 w-full max-w-5xl flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-10 border-4 md:border-8 border-white animate-pop max-h-[98vh] overflow-y-auto custom-scrollbar">
+    <div class="flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-4 border-dashed border-slate-200 pb-8 md:pb-0 md:pr-10 text-center md:text-left">
+      <div class="flex items-center gap-4 mb-6 justify-center md:justify-start">
+        <div class="text-5xl animate-float select-none">🦁</div>
+        <div class="bg-blue-50 border-4 border-blue-200 rounded-2xl rounded-tl-none px-4 py-3 text-sm font-bold text-blue-800 text-left" style="max-width:220px">
+          ¡Hola! Soy <b>Leo</b> 🎒 ¡Tu guía de aventuras! ¿Cómo te llamas?
+        </div>
+      </div>
+      <input type="text" id="input-name" placeholder="Tu Nombre Aquí" autocomplete="given-name" aria-label="Escribe tu nombre"
+        class="w-full px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] border-4 border-slate-100 focus:border-blue-400 outline-none text-xl md:text-2xl font-bold mb-6 text-center md:text-left shadow-inner"
+        onkeypress="if(event.key==='Enter') startNewSession()">
+      <p class="text-xs md:text-sm font-bold text-slate-400 mb-3 uppercase tracking-widest text-center md:text-left">Elige tu Avatar</p>
+      <div class="flex justify-center md:justify-start flex-wrap gap-3 mb-8" id="avatar-selection" role="group" aria-label="Selección de avatar">
+        <button class="avatar-option avatar-selected p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🐶',this)" aria-label="Avatar perro"><span class="text-3xl md:text-4xl">🐶</span></button>
+        <button class="avatar-option p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🐱',this)" aria-label="Avatar gato"><span class="text-3xl md:text-4xl">🐱</span></button>
+        <button class="avatar-option p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🦊',this)" aria-label="Avatar zorro"><span class="text-3xl md:text-4xl">🦊</span></button>
+        <button class="avatar-option p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🦁',this)" aria-label="Avatar leo"><span class="text-3xl md:text-4xl">🦁</span></button>
+        <button class="avatar-option p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🐧',this)" aria-label="Avatar pinguino"><span class="text-3xl md:text-4xl">🐧</span></button>
+        <button class="avatar-option p-3 rounded-[1.5rem] border-4 border-transparent bg-slate-100" onclick="selectAvatar('🦋',this)" aria-label="Avatar mariposa"><span class="text-3xl md:text-4xl">🦋</span></button>
+      </div>
+      <button onclick="startNewSession()" class="btn-magic w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl flex justify-center items-center gap-3">
+        ¡COMENZAR AVENTURA! 🚀
+      </button>
+    </div>
+    <div class="flex flex-col justify-center text-center">
+      <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-600 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-6 mx-auto shadow-inner text-4xl">🎒</div>
+      <h2 class="text-3xl md:text-4xl font-black mb-3 md:mb-4 text-emerald-900">Continuar</h2>
+      <p class="text-slate-500 font-bold text-base md:text-lg mb-6 md:mb-8">¿Ya tienes tu archivo mágico guardado? ¡Súbelo aquí!</p>
+      <div id="upload-zone" class="border-4 border-dashed border-emerald-300 bg-emerald-50 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-center hover:bg-emerald-100 active:scale-95 transition-all cursor-pointer group" onclick="document.getElementById('file-upload').click()" role="button" tabindex="0" aria-label="Subir archivo de progreso .eva" onkeypress="if(event.key==='Enter') document.getElementById('file-upload').click()">
+        <div class="text-5xl md:text-6xl mb-3 md:mb-4 group-hover:scale-110 transition-transform">📂</div>
+        <span class="text-emerald-700 font-bold text-lg md:text-xl block">Toca para buscar tu archivo</span>
+        <span class="text-emerald-500 font-bold text-sm block mt-2">📱 Android: busca en <b>Descargas</b></span>
+        <input type="file" id="file-upload" class="hidden" accept=".eva,.json" onchange="loadSession(event)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SURVEY SCREEN ==================== -->
+<div id="survey-screen" class="fixed inset-0 z-[250] bg-blue-500 hidden items-center justify-center p-2 md:p-4">
+  <div class="bg-white rounded-[2rem] md:rounded-[4rem] shadow-2xl p-6 md:p-10 w-full max-w-3xl max-h-[95vh] overflow-y-auto custom-scrollbar border-4 md:border-8 border-white relative">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="text-4xl animate-float">🦁</div>
+      <div>
+        <h2 class="text-3xl md:text-4xl font-black text-blue-900">¡Conozcámonos!</h2>
+        <p class="text-slate-500 font-bold text-base md:text-lg">Leo quiere saber más sobre ti 😊</p>
+      </div>
+    </div>
+    <form id="diagnostic-survey" class="space-y-6 md:space-y-8">
+      <div class="bg-orange-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-orange-100">
+        <h3 class="font-black text-xl md:text-2xl text-orange-800 mb-4">1. ¿Te gusta leer? 📚</h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-orange-200 hover:border-orange-400 active:scale-95 font-bold text-lg transition-all"><input type="radio" name="q1" value="Sí" class="hidden peer" required><span class="peer-checked:text-orange-600">¡Sí, mucho! 😍</span></label>
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-orange-200 hover:border-orange-400 active:scale-95 font-bold text-lg transition-all"><input type="radio" name="q1" value="A veces" class="hidden peer"><span class="peer-checked:text-orange-600">A veces 🙂</span></label>
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-orange-200 hover:border-orange-400 active:scale-95 font-bold text-lg transition-all"><input type="radio" name="q1" value="No" class="hidden peer"><span class="peer-checked:text-orange-600">No mucho 😐</span></label>
+        </div>
+      </div>
+      <div class="bg-green-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-green-100">
+        <h3 class="font-black text-xl md:text-2xl text-green-800 mb-4">2. ¿Qué tipo de historias prefieres? 🌟</h3>
+        <div class="grid grid-cols-2 sm:flex sm:flex-row gap-3">
+          <label class="text-center cursor-pointer bg-white p-3 rounded-[1.2rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q2" value="Animales" class="hidden peer" required><span class="peer-checked:text-green-600">🐾 Animales</span></label>
+          <label class="text-center cursor-pointer bg-white p-3 rounded-[1.2rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q2" value="Aventuras" class="hidden peer"><span class="peer-checked:text-green-600">🚀 Aventuras</span></label>
+          <label class="text-center cursor-pointer bg-white p-3 rounded-[1.2rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q2" value="Misterios" class="hidden peer"><span class="peer-checked:text-green-600">🔍 Misterios</span></label>
+          <label class="text-center cursor-pointer bg-white p-3 rounded-[1.2rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q2" value="Naturaleza" class="hidden peer"><span class="peer-checked:text-green-600">🌿 Naturaleza</span></label>
+        </div>
+      </div>
+      <div class="bg-purple-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-purple-100">
+        <h3 class="font-black text-xl md:text-2xl text-purple-800 mb-4">3. ¿Lees en tu casa? 🏠</h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q3" value="Siempre" class="hidden peer" required><span class="peer-checked:text-purple-600">¡Siempre! 📖</span></label>
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q3" value="A veces" class="hidden peer"><span class="peer-checked:text-purple-600">A veces 🙂</span></label>
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base transition-all"><input type="radio" name="q3" value="Nunca" class="hidden peer"><span class="peer-checked:text-purple-600">Nunca 😶</span></label>
+        </div>
+      </div>
+      <div class="bg-blue-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-blue-100">
+        <h3 class="font-black text-xl md:text-2xl text-blue-800 mb-4">4. ¿Te gustaría aprender jugando? 🎮</h3>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-blue-200 hover:border-blue-400 active:scale-95 font-bold text-xl transition-all"><input type="radio" name="q4" value="Sí" class="hidden peer" required><span class="peer-checked:text-blue-600">¡SÍ! 🎮</span></label>
+          <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] border-4 border-blue-200 hover:border-blue-400 active:scale-95 font-bold text-xl transition-all"><input type="radio" name="q4" value="No" class="hidden peer"><span class="peer-checked:text-blue-600">No 😐</span></label>
+        </div>
+      </div>
+      <button type="button" onclick="submitSurvey()" class="btn-magic w-full py-5 md:py-6 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl flex justify-center gap-2 mt-8">
+        ¡GUARDAR Y JUGAR! 🚀
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== WELCOME MODAL ==================== -->
+<div id="welcome-modal" class="fixed inset-0 z-[350] modal-overlay hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-[2rem] md:rounded-[4rem] shadow-2xl p-8 md:p-14 w-full max-w-2xl text-center border-4 md:border-8 border-yellow-300 animate-pop relative overflow-hidden">
+    <div class="absolute -top-10 -left-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
+    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay:2s"></div>
+    <div class="flex justify-center mb-4"><div class="text-6xl animate-float">🦁</div></div>
+    <h2 class="text-4xl md:text-5xl font-black text-blue-900 mb-3 relative z-10">¡Bienvenido! 🎉</h2>
+    <p class="text-blue-600 font-bold text-base md:text-lg mb-6 relative z-10" id="welcome-name-display">¡Tu gran aventura lectora comienza!</p>
+    <div class="space-y-4 text-left mb-8 relative z-10">
+      <div class="flex items-center gap-4 bg-blue-50 p-4 rounded-2xl slide-in-up" style="animation-delay:.1s"><span class="text-3xl">🎬</span><p class="text-base font-bold text-blue-800">Verás videos y leerás cuentos mágicos.</p></div>
+      <div class="flex items-center gap-4 bg-emerald-50 p-4 rounded-2xl slide-in-up" style="animation-delay:.2s"><span class="text-3xl">💬</span><p class="text-base font-bold text-emerald-800">Participarás en el foro con tus amigos.</p></div>
+      <div class="flex items-center gap-4 bg-purple-50 p-4 rounded-2xl slide-in-up" style="animation-delay:.3s"><span class="text-3xl">⭐</span><p class="text-base font-bold text-purple-800">Ganarás estrellas completando misiones.</p></div>
+      <div class="flex items-center gap-4 bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-200 slide-in-up" style="animation-delay:.4s"><span class="text-3xl">🏆</span><p class="text-base font-bold text-yellow-800">Al final, ¡el <b>Gran Reto Final</b> te espera!</p></div>
+    </div>
+    <button onclick="closeWelcome()" class="btn-magic w-full py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl relative z-10 flex justify-center items-center gap-2">
+      ¡ESTOY LISTO, LEO! 🚀
+    </button>
+  </div>
+</div>
+
+<!-- ==================== NAV ==================== -->
+<nav class="bg-white/95 backdrop-blur-xl border-b-4 border-slate-200 p-3 md:p-4 sticky top-0 z-50 shadow-sm flex-none">
+  <div class="container mx-auto max-w-6xl flex flex-wrap justify-between items-center gap-y-3">
+    <div class="flex items-center gap-3 md:gap-4">
+      <div class="bg-blue-100 w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center text-2xl md:text-4xl shadow-inner border-2 border-blue-200" id="nav-avatar-icon" aria-hidden="true"></div>
+      <div>
+        <h1 class="text-xl md:text-3xl font-black leading-none text-blue-900">Aventura Lectora</h1>
+        <p id="student-name-display" class="text-xs md:text-sm text-orange-500 font-bold uppercase tracking-widest mt-0.5">Aventurero</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap md:justify-end w-full sm:w-auto mt-2 sm:mt-0">
+      <div class="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-black border-2 border-yellow-300 shadow-sm text-sm md:text-lg" id="star-counter-wrap" title="Estrellas ganadas" aria-label="Estrellas ganadas">
+        <span id="star-counter">0</span> ⭐
+      </div>
+      <button onclick="openForum()" aria-label="Abrir foro de amigos" class="flex-1 sm:flex-none flex justify-center items-center gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200 active:scale-95 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold transition-all border-2 border-purple-200 shadow-sm">
+        <span class="text-lg md:text-2xl" aria-hidden="true">💬</span> <span class="hidden md:inline text-sm md:text-lg">Foro</span>
+      </button>
+      <button onclick="sendToWhatsAppAndDownload()" aria-label="Enviar progreso al profesor por WhatsApp" class="flex-1 sm:flex-none flex justify-center items-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 active:scale-95 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold transition-all border-2 border-green-200 shadow-sm">
+        <span class="text-lg md:text-2xl" aria-hidden="true">📲</span> <span class="hidden lg:inline text-sm md:text-lg">Enviar al Profe</span>
+      </button>
+      <button onclick="toggleTeacherPanel()" aria-label="Abrir panel del docente" class="p-2 md:p-3 text-slate-400 hover:text-slate-800 active:scale-95 transition-all border-2 md:border-4 border-slate-100 rounded-xl md:rounded-2xl bg-white hover:bg-slate-50">
+        ⚙️
+      </button>
+      <button onclick="logout()" aria-label="Cerrar sesión" class="p-2 md:p-3 text-red-400 hover:text-red-600 active:scale-95 transition-all border-2 md:border-4 border-red-100 rounded-xl md:rounded-2xl bg-white hover:bg-red-50">
+        🚪
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== TEACHER PANEL ==================== -->
+<div id="teacher-panel" class="hidden bg-slate-900 text-white border-b-4 md:border-b-8 border-blue-500 shadow-inner flex-none">
+  <div class="container mx-auto max-w-6xl p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+    <div>
+      <h3 class="text-xl md:text-2xl font-black text-blue-300 uppercase tracking-widest flex items-center justify-center md:justify-start gap-2 mb-2">🛡️ Zona del Docente</h3>
+      <p class="text-sm md:text-base text-slate-400 font-bold">Incluye tiempo por misión, intentos fallidos y autoevaluación del estudiante.</p>
+    </div>
+    <button onclick="exportTeacherReport()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 active:scale-95 px-6 py-3 md:py-4 rounded-[1rem] md:rounded-2xl font-black text-base md:text-xl flex items-center justify-center gap-2 transition-transform border-2 border-blue-400">
+      📄 DESCARGAR REPORTE (TXT)
+    </button>
+  </div>
+</div>
+
+<!-- ==================== MAIN CONTENT ==================== -->
+<main class="container mx-auto p-4 md:p-8 max-w-6xl flex-1" id="main-content">
+  <div class="bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between mb-8 md:mb-12 border-4 md:border-8 border-purple-200 active:scale-[.98] transition-transform cursor-pointer" onclick="openForum()" role="button" aria-label="Abrir el foro mágico">
+    <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 text-center md:text-left">
+      <div class="bg-white p-3 md:p-4 rounded-full shadow-lg border-4 border-purple-300 animate-float text-4xl md:text-5xl" aria-hidden="true">👋</div>
+      <div>
+        <h2 class="text-3xl md:text-4xl font-black text-white drop-shadow-md mb-1">El Foro Mágico</h2>
+        <p class="text-purple-100 font-bold text-sm md:text-xl">¡Entra y saluda a los demás aventureros!</p>
+      </div>
+    </div>
+    <button class="w-full md:w-auto bg-white text-purple-600 hover:bg-purple-100 px-6 md:px-8 py-3 md:py-4 rounded-full font-black text-base md:text-xl shadow-[0_4px_0_#d8b4fe] flex items-center justify-center gap-2 transition-all active:translate-y-1 active:shadow-none" tabindex="-1">ENTRAR AL FORO →</button>
+  </div>
+  <header class="mb-8 md:mb-12 text-center md:text-left flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 md:gap-6">
+    <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-yellow-400 animate-float shrink-0 text-4xl md:text-5xl" aria-hidden="true">🗺️</div>
+    <div>
+      <h2 class="text-4xl md:text-6xl font-black text-blue-900 tracking-tight mb-2">Mapa de Misiones</h2>
+      <p class="text-slate-600 font-bold text-lg md:text-xl">¡Completa los módulos para el Reto Final!</p>
+    </div>
+  </header>
+  <div id="modules-container"></div>
+</main>
+
+<!-- ==================== FORUM MODAL ==================== -->
+<div id="forum-modal" class="fixed inset-0 z-[400] modal-overlay hidden flex items-center justify-center p-0 md:p-4">
+  <div class="bg-white w-full h-full md:h-auto max-w-4xl md:rounded-[3rem] shadow-2xl flex flex-col md:max-h-[90vh] md:border-8 border-purple-300 animate-pop">
+    <div class="p-6 md:p-8 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white flex justify-between items-center shrink-0">
+      <div class="flex items-center gap-4 md:gap-6">
+        <div class="bg-white/20 p-2 md:p-4 rounded-xl md:rounded-2xl text-3xl md:text-4xl" aria-hidden="true">💬</div>
+        <div><h3 class="font-black text-2xl md:text-4xl">Foro Mágico</h3><p class="font-bold text-sm md:text-lg opacity-90 hidden sm:block">Comparte tu alegría con la clase</p></div>
+      </div>
+      <button onclick="closeForum()" aria-label="Cerrar foro" class="bg-white/20 hover:bg-white/40 p-2 md:p-4 rounded-full transition-colors active:scale-90 text-2xl">✕</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-purple-50 space-y-4 md:space-y-6 custom-scrollbar" id="forum-messages" aria-live="polite"></div>
+    <div class="p-4 md:p-8 bg-white border-t-4 md:border-t-8 border-purple-100 shrink-0 pb-8 md:pb-8">
+      <p class="font-black text-slate-500 mb-2 md:mb-4 uppercase tracking-widest text-xs md:text-sm">Elige un mensaje:</p>
+      <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
+        <select id="forum-select" class="flex-1 p-4 md:p-5 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-slate-200 font-bold text-base md:text-xl text-slate-700 outline-none focus:border-purple-400 bg-slate-50" aria-label="Seleccionar mensaje para el foro">
+          <option value="¡Hola a todos mis amigos!">¡Hola a todos mis amigos! 👋</option>
+          <option value="¡Terminé una misión, qué emoción!">¡Terminé una misión, qué emoción! ⭐</option>
+          <option value="¡Me encanta leer cuentos aquí!">¡Me encanta leer cuentos aquí! 📖</option>
+          <option value="¡Vamos, todos podemos hacerlo!">¡Vamos, todos podemos hacerlo! 🚀</option>
+          <option value="¡El cuento del Carnaval me encantó!">¡El cuento del Carnaval me encantó! 🎭</option>
+          <option value="¡Las alegrías son mis dulces favoritos!">¡Las alegrías son mis dulces favoritos! 🍬</option>
+          <option value="¡Estoy listo para la Evaluación Final!">¡Estoy listo para la Evaluación Final! 🏆</option>
+        </select>
+        <button onclick="postForumMessage()" class="btn-magic text-white w-full sm:w-auto px-6 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl flex items-center justify-center gap-2">
+          ENVIAR 📤
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUPPORT MODAL ==================== -->
+<div id="support-modal" class="fixed inset-0 z-[450] modal-overlay hidden flex items-center justify-center p-0 md:p-4">
+  <div class="bg-white w-full h-full md:h-auto max-w-xl md:rounded-[3rem] shadow-2xl flex flex-col text-center md:border-8 border-yellow-300 animate-pop">
+    <div class="p-6 md:p-10 bg-yellow-50 relative flex-1 flex flex-col justify-center">
+      <button onclick="closeSupport()" aria-label="Cerrar ayuda" class="absolute top-4 right-4 md:top-6 md:right-6 text-yellow-500 hover:text-yellow-700 bg-yellow-200 p-2 rounded-full active:scale-90 text-xl">✕</button>
+      <div class="w-24 h-24 md:w-32 md:h-32 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg border-4 border-white animate-float text-5xl md:text-6xl">🦁</div>
+      <h3 class="font-black text-3xl md:text-4xl text-yellow-900 mb-3 md:mb-4">¡Hola! Soy Leo</h3>
+      <p class="text-slate-600 font-bold text-lg md:text-xl leading-relaxed mb-6 md:mb-8 px-4">
+        ¿No sabes qué hacer?<br>
+        <span class="text-blue-700">1.</span> Toca una misión abierta.<br>
+        <span class="text-blue-700">2.</span> Mira el video si hay uno 🎬<br>
+        <span class="text-blue-700">3.</span> Lee o escucha la historia 📖<br>
+        <span class="text-blue-700">4.</span> ¡Responde para ganar estrellas ⭐!
+      </p>
+      <div class="flex flex-col gap-3 md:gap-4 px-4">
+        <button onclick="readSupportAloud()" class="btn-magic w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-xl flex justify-center items-center gap-2">
+          🔊 ESCUCHAR INSTRUCCIONES
+        </button>
+        <button onclick="contactTechSupport()" class="btn-whatsapp w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-xl flex justify-center items-center gap-2">
+          📲 SOPORTE WHATSAPP
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STORY MODAL ==================== -->
+<div id="story-modal" class="fixed inset-0 z-[150] modal-overlay hidden flex items-center justify-center p-0 md:p-6">
+  <div class="bg-white w-full h-full md:h-[90vh] max-w-5xl md:rounded-[4rem] shadow-2xl flex flex-col overflow-hidden md:border-8 border-blue-200 animate-pop">
+    <div class="p-4 md:p-8 bg-gradient-to-r from-blue-500 to-blue-600 text-white flex justify-between items-center shrink-0">
+      <div class="flex items-center gap-3 md:gap-6">
+        <div class="bg-white/20 p-2 md:p-2 rounded-xl md:rounded-[1.5rem] shadow-inner text-3xl md:text-5xl" id="story-emoji-container" aria-hidden="true"></div>
+        <div>
+          <h3 id="story-title" class="font-black text-xl md:text-4xl leading-tight mb-0.5">Título</h3>
+          <span id="story-tag" class="text-xs md:text-sm font-bold uppercase tracking-widest opacity-90 bg-black/20 inline-block px-2 md:px-3 py-0.5 rounded-md">Categoría</span>
+        </div>
+      </div>
+      <button onclick="closeStory()" aria-label="Cerrar historia" class="bg-white/20 hover:bg-white/40 p-2 md:p-3 rounded-full transition-colors active:scale-90 text-2xl">✕</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 md:p-12 custom-scrollbar bg-[#f8fafc]" id="content-area">
+
+      <!-- Reading Section -->
+      <div id="reading-section" class="max-w-3xl mx-auto pb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8 gap-3">
+          <span class="bg-blue-100 text-blue-700 px-4 md:px-6 py-2 rounded-full text-xs md:text-sm font-black uppercase tracking-widest border-2 border-blue-200 w-full sm:w-auto text-center">📖 Paso 1: Explora y Lee</span>
+          <button onclick="readAloud()" id="btn-read-aloud" aria-label="Leer el texto en voz alta" class="btn-magic w-full sm:w-auto px-4 md:px-6 py-3 rounded-xl md:rounded-2xl font-black text-base md:text-lg flex items-center justify-center gap-2 text-white">
+            🔊 LEER EN VOZ ALTA
+          </button>
+        </div>
+        <div id="story-video-container" class="hidden mb-6 md:mb-8 aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-xl border-2 md:border-4 border-slate-200 bg-black">
+          <iframe id="story-video" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Video del cuento"></iframe>
+        </div>
+        <div id="story-content" class="text-xl md:text-4xl leading-relaxed text-slate-700 font-medium space-y-4 md:space-y-6 bg-white p-6 md:p-10 rounded-2xl md:rounded-[3rem] shadow-lg border-2 md:border-4 border-slate-100"></div>
+        <div id="leo-reading-tip" class="hidden mt-4 flex items-center gap-3 bg-blue-50 rounded-2xl p-4 border-2 border-blue-200 slide-in-up">
+          <span class="text-3xl shrink-0" aria-hidden="true">🦁</span>
+          <p class="font-bold text-blue-800 text-sm md:text-base" id="leo-reading-tip-text">¡Lee con calma!</p>
+        </div>
+      </div>
+
+      <!-- Quiz Section -->
+      <div id="quiz-section" class="hidden max-w-3xl mx-auto pb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 md:mb-8 bg-white p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm border-2 border-slate-100 gap-2">
+          <span id="q-level-badge" class="px-4 md:px-5 py-1.5 rounded-lg md:rounded-xl text-xs md:text-sm font-black uppercase tracking-widest">Nivel</span>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500 font-black text-base md:text-lg bg-slate-100 px-3 md:px-4 py-1.5 rounded-lg md:rounded-xl">
+              Pregunta <span id="q-current" class="text-blue-600">1</span> de <span id="q-total">3</span>
+            </span>
+            <button onclick="readQuestionAloud()" aria-label="Escuchar la pregunta en voz alta" class="btn-purple px-3 py-2 rounded-xl text-white font-black text-sm flex items-center gap-1" title="Leo te la lee">
+              🔊 Leo
+            </button>
+          </div>
+        </div>
+        <h4 id="q-text" class="text-2xl md:text-4xl font-black text-slate-800 mb-6 md:mb-10 leading-tight"></h4>
+        <div id="q-options" class="flex flex-col gap-3 md:gap-5"></div>
+        <div id="leo-quiz-tip" class="hidden mt-6 flex items-center gap-3 bg-amber-50 rounded-2xl p-4 border-2 border-amber-200 slide-in-up">
+          <span class="text-3xl shrink-0" aria-hidden="true">🦁</span>
+          <p class="font-bold text-amber-800 text-sm md:text-base" id="leo-quiz-tip-text">¡Lee bien las opciones!</p>
+        </div>
+      </div>
+
+      <!-- Reflection Section -->
+      <div id="reflection-section" class="hidden max-w-3xl mx-auto pb-4 text-center reflection-in">
+        <div class="bg-white rounded-[2rem] p-6 md:p-10 shadow-lg border-4 border-yellow-200">
+          <div class="flex justify-center mb-4"><span class="text-5xl animate-float" aria-hidden="true">🦁</span></div>
+          <h3 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">¡Completaste el reto!</h3>
+          <p class="text-slate-500 font-bold text-base md:text-lg mb-8">¿Cómo te fue con esta historia?</p>
+          <div class="flex justify-center gap-4 md:gap-6" role="group" aria-label="Autoevaluación de comprensión">
+            <button class="reflection-btn flex flex-col items-center gap-2 p-4 md:p-5 rounded-[1.5rem] hover:border-orange-400 active:scale-95 transition-all" onclick="saveReflection('🤔 Fue difícil',this)" aria-label="Fue difícil">
+              <span class="text-4xl md:text-5xl">🤔</span>
+              <span class="font-black text-slate-600 text-xs md:text-sm">Fue difícil</span>
+            </button>
+            <button class="reflection-btn flex flex-col items-center gap-2 p-4 md:p-5 rounded-[1.5rem] hover:border-blue-400 active:scale-95 transition-all" onclick="saveReflection('😊 Estuvo bien',this)" aria-label="Estuvo bien">
+              <span class="text-4xl md:text-5xl">😊</span>
+              <span class="font-black text-slate-600 text-xs md:text-sm">Estuvo bien</span>
+            </button>
+            <button class="reflection-btn flex flex-col items-center gap-2 p-4 md:p-5 rounded-[1.5rem] hover:border-yellow-400 active:scale-95 transition-all" onclick="saveReflection('⭐ Lo entendí todo',this)" aria-label="Lo entendí todo">
+              <span class="text-4xl md:text-5xl">⭐</span>
+              <span class="font-black text-slate-600 text-xs md:text-sm">¡Lo entendí!</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success Section -->
+      <div id="success-section" class="hidden h-full flex-col items-center justify-center text-center pb-10">
+        <div class="w-24 h-24 md:w-40 md:h-40 bg-yellow-400 rounded-full flex items-center justify-center mb-6 md:mb-8 shadow-[0_0_60px_rgba(250,204,21,.6)] animate-bounce border-4 md:border-8 border-white star-pop" aria-hidden="true">
+          <span class="text-5xl md:text-8xl">⭐</span>
+        </div>
+        <h2 class="text-4xl md:text-6xl font-black text-blue-900 mb-2 md:mb-4">¡Eres Genial!</h2>
+        <p class="text-lg md:text-2xl text-slate-500 font-bold mb-4">Has ganado una estrella mágica ⭐</p>
+        <p id="success-leo-msg" class="text-base md:text-xl text-blue-600 font-bold mb-8 md:mb-10 bg-blue-50 px-6 py-3 rounded-full border-2 border-blue-200">🦁 ¡Leo está muy orgulloso de ti!</p>
+        <button onclick="finishStoryAndPromptSave()" class="btn-primary w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl flex justify-center items-center gap-3">
+          VOLVER AL MAPA 🗺️
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom controls -->
+    <div class="p-4 md:p-8 bg-white border-t-2 md:border-t-4 border-slate-100 flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-center shrink-0 pb-6 md:pb-8">
+      <div class="w-full md:w-1/2">
+        <div class="flex justify-between text-xs md:text-sm font-black text-slate-400 uppercase tracking-widest mb-2">
+          <span>Progreso</span>
+          <span id="modal-progress-text" class="text-blue-600">0%</span>
+        </div>
+        <div class="bg-slate-100 h-4 md:h-6 rounded-full overflow-hidden shadow-inner border-2 border-slate-200" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div id="modal-progress-bar" class="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full progress-bar"></div>
+        </div>
+      </div>
+      <button id="btn-next-step" onclick="advanceFlow()" class="btn-primary w-full md:w-auto px-6 md:px-12 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-2xl flex justify-center items-center gap-2 md:gap-3">
+        ¡YA EXPLORÉ TODO! →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Support Floating Button -->
+<button onclick="openSupport()" aria-label="Pedir ayuda a Leo" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 bg-yellow-400 text-yellow-900 p-3 md:p-4 rounded-full shadow-[0_6px_0_#ca8a04] active:translate-y-2 animate-float border-4 border-white flex items-center gap-2 md:gap-3 font-bold text-lg md:text-xl hidden" id="btn-support">
+  <span>🦁</span> <span class="hidden md:inline">¿Necesitas Ayuda?</span>
+</button>
+
+<script>
+// ============================================================
+// CONFIG - ⚠️ REEMPLAZA EL NÚMERO DEL DOCENTE
+// ============================================================
+const CONFIG = {
+    teacherPhone: '573001234567',
+    teacherName: 'Profe',
+    schoolName: 'IED San Vicente de Paúl'
+};
+
+// ============================================================
+// COLOR MAP (evita clases Tailwind dinámicas)
+// ============================================================
+const CM = {
+    blue:    {bg:'bg-blue-100',   tag:'bg-blue-50 text-blue-700',   border:'border-blue-200'},
+    emerald: {bg:'bg-emerald-100',tag:'bg-emerald-50 text-emerald-700',border:'border-emerald-200'},
+    purple:  {bg:'bg-purple-100', tag:'bg-purple-50 text-purple-700', border:'border-purple-200'},
+    orange:  {bg:'bg-orange-100', tag:'bg-orange-50 text-orange-700', border:'border-orange-200'},
+    rose:    {bg:'bg-rose-100',   tag:'bg-rose-50 text-rose-700',    border:'border-rose-200'},
+    amber:   {bg:'bg-amber-100',  tag:'bg-amber-50 text-amber-700',  border:'border-amber-200'},
+    cyan:    {bg:'bg-cyan-100',   tag:'bg-cyan-50 text-cyan-700',    border:'border-cyan-200'},
+    pink:    {bg:'bg-pink-100',   tag:'bg-pink-50 text-pink-700',    border:'border-pink-200'},
+    sky:     {bg:'bg-sky-100',    tag:'bg-sky-50 text-sky-700',      border:'border-sky-200'},
+    indigo:  {bg:'bg-indigo-100', tag:'bg-indigo-50 text-indigo-700',border:'border-indigo-200'},
+    yellow:  {bg:'bg-yellow-100', tag:'bg-yellow-50 text-yellow-700',border:'border-yellow-200'},
+};
+
+// ============================================================
+// LEO MESSAGES SYSTEM
+// ============================================================
+const LEO = {
+    welcome: ["¡Hola! 🦁 Soy Leo. ¡Escribe tu nombre y elige tu avatar!", "¡Bienvenido a Aventura Lectora! 🎒 ¿Listo?"],
+    survey:  ["¡Responde con sinceridad! No hay respuestas malas 😊", "¡Ya casi terminamos! 🎉"],
+    reading: ["📖 Lee con calma, ¡no hay afán!", "🔊 ¿Prefieres escuchar? ¡Toca el botón naranja!"],
+    hasVideo:["🎬 ¡Este cuento tiene VIDEO! ¡Míralo primero!", "¡Dale PLAY! El video es súper chévere 📺"],
+    quiz:    ["🤔 ¡Lee cada pregunta despacio! Recuerda el cuento.", "💪 ¡Confío en ti! Tú puedes lograrlo."],
+    ttsHint: ["🔊 Toca el botón morado para que yo te lea la pregunta."],
+    wrong:   ["¡Casi! Lee la pista con cuidado 💡", "¡Inténtalo de nuevo! Estás muy cerca 💪", "¡No te rindas! Vuelve al texto 📖"],
+    success: ["¡INCREÍBLE! ¡Eres un súper lector! 🎉⭐", "¡GENIAL! ¡Una estrella más! ¡Sigue así! 🏆", "¡LO LOGRASTE! ¡Eres un campeón! 🎊"],
+    reflection:["¿Cómo te fue? ¡Toca una carita! 😊", "¡Cuéntame cómo te fue! 🤗"],
+    idle:    ["¿Necesitas ayuda? ¡Tócame! 👆", "¡Listo para la próxima misión? 🚀", "¡Recuerda enviar tu progreso al profe! 📲", "¡Puedes escuchar los cuentos! 🔊", "¡El foro te espera! 💬"],
+    unlock:  ["🔓 ¡Nueva misión desbloqueada! ¡Adelante!", "¡Abriste una nueva aventura! 🌟"],
+    save:    ["💾 ¡Guarda tu archivo .eva!", "📲 ¡Envía tu progreso al profe!"],
+};
+let leoIdleTimer = null;
+
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function showLeo(key, delay=0) {
+    const msgs = LEO[key]; if (!msgs) return;
+    clearTimeout(leoIdleTimer);
+    setTimeout(() => {
+        const speech = document.getElementById('leo-speech');
+        const text = document.getElementById('leo-text');
+        if (!speech || !text) return;
+        text.textContent = rnd(msgs);
+        speech.classList.remove('hidden');
+        speech.classList.add('bubble-pop');
+        speech.addEventListener('animationend', ()=> speech.classList.remove('bubble-pop'), {once:true});
+        clearTimeout(leoIdleTimer);
+        leoIdleTimer = setTimeout(() => speech.classList.add('hidden'), 5500);
+    }, delay);
+}
+
+function toggleLeoBubble() {
+    const speech = document.getElementById('leo-speech');
+    if (!speech) return;
+    if (speech.classList.contains('hidden')) showLeo('idle');
+    else speech.classList.add('hidden');
+}
+
+function setLeoFace(face) {
+    const m = document.getElementById('leo-m');
+    const t = document.getElementById('leo-teeth');
+    const lp= document.getElementById('lp');
+    const rp= document.getElementById('rp');
+    if (!m) return;
+    if (face==='excited') {
+        m.setAttribute('d','M30 40 Q40 50 50 40');
+        if(t) t.setAttribute('d','M32 42 Q40 48 48 42');
+    } else if (face==='thinking') {
+        m.setAttribute('d','M34 44 Q40 46 46 44');
+        if(t) t.setAttribute('d','M35 44 Q40 45 45 44');
+        if(lp) lp.setAttribute('cx','33'); if(rp) rp.setAttribute('cx','49');
+    } else {
+        m.setAttribute('d','M32 40 Q40 48 48 40');
+        if(t) t.setAttribute('d','M34 41 Q40 46 46 41');
+        if(lp) { lp.setAttribute('cx','32'); lp.setAttribute('cy','27'); }
+        if(rp) { rp.setAttribute('cx','50'); rp.setAttribute('cy','27'); }
+    }
+}
+
+function startLeoIdle() {
+    setInterval(() => {
+        const s = document.getElementById('leo-speech');
+        if (s && s.classList.contains('hidden')) showLeo('idle');
+    }, 22000);
+}
+
+// ============================================================
+// MODULES & STORIES DATA
+// ============================================================
+const modulesData = [
+    {id:'mod1', title:'Módulo 1: Diagnóstico', desc:'Conozcamos cómo lees', color:'blue', emoji:'🔍'},
+    {id:'mod2', title:'Módulo 2: Naturaleza', desc:'Explorando el entorno', color:'emerald', emoji:'🌳'},
+    {id:'mod3', title:'Módulo 3: Cultura', desc:'Nuestras tradiciones', color:'purple', emoji:'🎭'},
+    {id:'mod4', title:'Módulo 4: Misterios', desc:'Resolviendo acertijos', color:'orange', emoji:'🕵️'},
+    {id:'mod5', title:'Módulo 5: Evaluación', desc:'¡El Gran Reto para ganar!', color:'rose', emoji:'🏆'},
+];
+
+const storiesData = [
+    // MOD 1
+    {id:'m1',moduleId:'mod1',title:'Bruno y Milo',tag:'Diagnóstico',emoji:'🐶',color:'blue',
+     youtube:'RlkGpAgU6ns',
+     text:'El perro y el gato eran amigos. Un día decidieron salir a jugar.<br><br>Bruno llevaba su pelota roja y Milo prefería perseguir mariposas de colores. Mientras jugaban, encontraron un mapa escondido debajo de un gran árbol.<br><br>Los dos amigos decidieron seguirlo juntos. ¡Eso es lo que hacen los verdaderos amigos!',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Quiénes eran los personajes del texto?',options:['Bruno y Milo','Paco y Lola','El árbol y el sol'],correct:0,hint:'Vuelve a leer la primera línea.'},
+         {level:'Literal',type:'choice',q:'¿Qué encontraron bajo el árbol?',options:['Una pelota roja','Un mapa','Un tesoro de oro'],correct:1,hint:'Busca qué hallaron debajo del árbol.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué siguieron el mapa juntos?',options:['Porque eran verdaderos amigos','Porque tenían miedo solos','Porque se lo ordenaron'],correct:0,hint:'Los amigos hacen las cosas juntos.'},
+         {level:'Crítico',type:'open',q:'¿Te gustó la historia de Bruno y Milo? ¿Por qué sí o por qué no?'},
+     ]},
+    {id:'m2',moduleId:'mod1',title:'La Ciénaga',tag:'Lectura Inicial',emoji:'🏖️',color:'cyan',
+     youtube:'KjS6QhQj3hM',
+     text:'Cerca de la escuela San Vicente de Paúl, está la Ciénaga de Mallorquín. Es un lugar lleno de agua tranquila y manglares verdes.<br><br>Los niños saben que allí viven aves hermosas como garzas y flamencos. Debemos cuidar el agua y proteger los árboles para que estos animales sigan viviendo.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿De qué lugar habla la historia?',options:['Del Río Magdalena','De la Ciénaga de Mallorquín','Del mar Caribe'],correct:1,hint:'El nombre está en el primer párrafo.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué debemos cuidar la ciénaga?',options:['Para bañarnos allí','Para proteger animales y árboles','Para vender el agua'],correct:1,hint:'Recuerda qué animales viven en los manglares.'},
+         {level:'Crítico',type:'open',q:'¿Qué le dirías a alguien que tira basura al agua?'},
+     ]},
+    // MOD 2
+    {id:'m3',moduleId:'mod2',title:'La Hormiguita',tag:'Fábula',emoji:'🐜',color:'amber',
+     youtube:'l5jLKKynDqk',
+     text:'Una hormiguita caminaba bajo el sol cargando un enorme grano de trigo. Un saltamontes se burló: "¡Deja de trabajar tanto!".<br><br>La hormiga no le hizo caso y siguió guardando comida para el invierno. Cuando llegó el frío, el saltamontes tenía hambre y la hormiga compartió su comida.<br><br>Trabajar con esfuerzo siempre vale la pena.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué cargaba la hormiguita?',options:['Una hoja grande','Un grano de trigo','Miel dulce'],correct:1,hint:'Busca qué objeto pesado llevaba.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué el saltamontes pasó hambre en el invierno?',options:['No guardó comida en el verano','Alguien le robó su comida','No le gustaba el trigo'],correct:0,hint:'¿Qué hacía el saltamontes mientras la hormiga trabajaba?'},
+         {level:'Crítico',type:'open',q:'¿Qué hubieras hecho tú en el lugar de la hormiga? ¿Compartirías tu comida?'},
+     ]},
+    {id:'m4',moduleId:'mod2',title:'La Iguana',tag:'Fauna Costeña',emoji:'🦎',color:'emerald',
+     text:'Juan iba por la Vía 40 cuando vio una iguana verde tomando el sol en una rama. La iguana movió la cabeza como saludando.<br><br>Juan recordó lo que dijo su maestra: "Las iguanas son parte de nuestra tierra costeña, no debemos asustarlas ni capturarlas". Le tomó una foto de lejos y siguió su camino feliz.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Dónde vio Juan a la iguana?',options:['En el techo de su casa','En la Vía 40','En el río Magdalena'],correct:1,hint:'Mira la primera oración del texto.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué Juan tomó la foto de lejos?',options:['Para no asustar a la iguana','Su cámara tenía zoom','Le daba miedo el animal'],correct:0,hint:'Recuerda lo que dijo la maestra sobre las iguanas.'},
+         {level:'Crítico',type:'open',q:'¿Cómo podemos ayudar a los animales silvestres de nuestra ciudad?'},
+     ]},
+    // MOD 3
+    {id:'m5',moduleId:'mod3',title:'El Carnaval',tag:'Cultura',emoji:'🎉',color:'purple',
+     youtube:'gC4WpT_hYQo',
+     text:'En el Carnaval de Barranquilla todos bailan con alegría: Marimondas, Monocucos y Negritas Puloy. El ritmo de la cumbia y el mapalé llena las calles de color y alegría.<br><br>Pero lo más importante es el respeto y la unión. Si alguien se tropieza en el desfile, los demás lo ayudan a levantarse para seguir la fiesta juntos.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué personajes se mencionan en el texto?',options:['Solo las Marimondas','Marimondas, Monocucos y Negritas','Payasos y magos del circo'],correct:1,hint:'Busca los tres nombres de los bailarines.'},
+         {level:'Inferencial',type:'choice',q:'¿Qué valor importante muestra el Carnaval?',options:['La competencia entre grupos','El respeto y la unión','Quién baila más rápido'],correct:1,hint:'¿Qué hacen cuando alguien se tropieza?'},
+         {level:'Crítico',type:'open',q:'¿Cómo demuestras respeto cuando juegas con tus amigos en el recreo?'},
+     ]},
+    {id:'m6',moduleId:'mod3',title:'Las Alegrías',tag:'Tradición',emoji:'🍬',color:'pink',
+     youtube:'lYbKMXMvmc0',
+     text:'Las palenqueras son mujeres valientes y alegres que venden dulces típicos del Caribe colombiano. Sus "Alegrías" están hechas de millo tostado, panela derretida y coco rallado.<br><br>Se mezcla todo muy caliente para formar bolitas dulces y pegajosas que dan energía y alegría a quien las come. ¡Son el sabor de Barranquilla!',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿De qué están hechas las Alegrías?',options:['Chocolate y leche','Millo, panela y coco','Harina de trigo y azúcar'],correct:1,hint:'Busca los ingredientes listados en el texto.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué las Alegrías quedan pegajosas?',options:['Les ponen pegante especial','La panela caliente las une al enfriarse','El coco las endurece mucho'],correct:1,hint:'Recuerda que se mezcla todo muy caliente.'},
+         {level:'Crítico',type:'open',q:'¿Cuál es tu dulce típico favorito y por qué te gusta tanto?'},
+     ]},
+    // MOD 4
+    {id:'m7',moduleId:'mod4',title:'El Pescador',tag:'Narrativo',emoji:'🎣',color:'sky',
+     youtube:'yOGqpFOO2Dk',
+     text:'Don Pedro es un viejo pescador del río Magdalena. Un día, sacó del agua una botella con un mensaje: "El río es de todos, ¡mantenlo limpio!".<br><br>Desde ese día, Don Pedro no solo pesca, sino que también recoge la basura que encuentra en la orilla. Sus nietos aprendieron de él a amar y cuidar el río.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué sacó Don Pedro del río?',options:['Un pez enorme','Una botella con mensaje','Un zapato viejo'],correct:1,hint:'Lee lo que encontró el pescador además del pez.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué Don Pedro empezó a recoger basura?',options:['Para venderla','El mensaje de la botella lo hizo reflexionar','Estaba aburrido de pescar'],correct:1,hint:'El mensaje le dio una idea importante.'},
+         {level:'Crítico',type:'open',q:'Escribe un mensaje corto para poner en una botella y cuidar el río.'},
+     ]},
+    {id:'m8',moduleId:'mod4',title:'El Misterio',tag:'Escolar',emoji:'🔍',color:'indigo',
+     text:'En la biblioteca de la escuela, los libros amanecían desordenados cada mañana. La profesora Lilibeth decidió quedarse escondida detrás de un estante para investigar.<br><br>Descubrió que el viento entraba por una ventana rota y movía los libros. ¡Cerró la ventana y el misterio quedó resuelto!',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Cuál era el problema en la biblioteca?',options:['Había mucho ruido','Los libros amanecían desordenados','Faltaban muchas sillas'],correct:1,hint:'Mira el problema descrito al inicio del texto.'},
+         {level:'Inferencial',type:'choice',q:'¿Qué causaba el desorden de los libros?',options:['Un fantasma travieso','El viento por la ventana rota','Un gato que jugaba'],correct:1,hint:'¿Qué descubrió la profesora al investigar?'},
+         {level:'Crítico',type:'open',q:'Si fueras detective en tu escuela, ¿qué misterio te gustaría investigar?'},
+     ]},
+    // MOD 5 - EVALUACIÓN FINAL (expandida)
+    {id:'m9',moduleId:'mod5',title:'El Cofre del Saber',tag:'Evaluación 1',emoji:'🧰',color:'rose',
+     text:'Has recorrido un largo camino de aventuras y lecturas. Recuerda que la lectura es como un cofre mágico: dentro no hay oro ni monedas, sino historias, aventuras y enseñanzas que te hacen más inteligente y creativo cada día.<br><br>Cada vez que lees, abres ese cofre y te llevas algo valioso para toda la vida.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué hay dentro del "cofre" de la lectura?',options:['Monedas de oro y joyas','Historias y enseñanzas','Juguetes y dulces'],correct:1,hint:'Lee qué dice que NO hay y luego qué SÍ hay en el cofre.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué la lectura te hace "más inteligente"?',options:['Porque sacas mejores notas en matemáticas','Porque aprendes cosas nuevas con cada libro','Porque hablas más rápido'],correct:1,hint:'Piensa en lo que pasa cuando descubres algo nuevo leyendo.'},
+         {level:'Crítico',type:'open',q:'De todas las historias que leíste en EVA, ¿cuál fue tu favorita y qué aprendiste de ella?'},
+     ]},
+    {id:'m10',moduleId:'mod5',title:'El Río Magdalena',tag:'Evaluación 2',emoji:'🌊',color:'sky',
+     text:'El río Magdalena es el río más importante de Colombia. Nace en las montañas del sur y viaja un larguísimo camino hasta llegar al mar Caribe, cerca de Barranquilla.<br><br>Sus aguas dan vida a muchos pueblos y familias que pescan y viajan en él. Pero la contaminación y la basura lo enferman. Los niños y niñas de las orillas lo cuidan recogiendo basura y sembrando árboles.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Dónde nace el río Magdalena?',options:['En el mar Caribe','En las montañas del sur','En Barranquilla'],correct:1,hint:'Busca de dónde viene el río al inicio del texto.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué los niños cuidan el río?',options:['Porque les pagan por cuidarlo','La contaminación lo está enfermando','Para pescar más peces'],correct:1,hint:'Recuerda qué problemas tiene el río según el texto.'},
+         {level:'Crítico',type:'open',q:'¿Qué puedes hacer TÚ para cuidar el agua en tu casa o en tu barrio?'},
+     ]},
+    {id:'m11',moduleId:'mod5',title:'La Maestra Valeria',tag:'Evaluación 3',emoji:'👩‍🏫',color:'indigo',
+     text:'La maestra Valeria siempre decía a sus estudiantes: "Leer es volar sin necesitar alas". Cada día traía un libro diferente y lo leía en voz alta con mucha emoción.<br><br>Un día, Miguel no quería leer nada. La maestra le preguntó: "¿De qué quieres saber más?" Miguel dijo: "De animales del mar". Valeria encontró el libro perfecto y desde ese día, Miguel no pudo dejar de leer.',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué decía la maestra Valeria sobre leer?',options:['Que era muy difícil','Que era volar sin necesitar alas','Que era aburrido'],correct:1,hint:'Busca la frase exacta de la maestra al inicio.'},
+         {level:'Inferencial',type:'choice',q:'¿Por qué Miguel empezó a querer leer?',options:['Lo obligaron a leer todos los días','Encontró un libro sobre lo que le gustaba','Le dio miedo la maestra'],correct:1,hint:'¿Qué le preguntó la maestra y qué pasó después?'},
+         {level:'Crítico',type:'open',q:'¿Sobre qué tema te gustaría leer un libro? ¿Por qué ese tema te llama la atención?'},
+     ]},
+    {id:'m12',moduleId:'mod5',title:'La Gran Medalla',tag:'Evaluación Final',emoji:'🏅',color:'yellow',
+     text:'¡Felicitaciones! Has llegado al final de tu gran Aventura Lectora. Como el gran lector que eres ahora, sabes que cada libro es una puerta a mundos nuevos y emocionantes.<br><br>Recuerda: leer te permite viajar sin moverte de tu silla, conocer personas que nunca has visto y aprender cosas que la vida todavía no te ha enseñado. ¡El conocimiento que tienes ahora es tuyo para siempre!',
+     questions:[
+         {level:'Literal',type:'choice',q:'¿Qué te permite hacer la lectura según el texto?',options:['Viajar sin moverte de tu silla','Correr más rápido que antes','Dormir mejor por las noches'],correct:0,hint:'Busca la frase exacta sobre viajar y leer.'},
+         {level:'Inferencial',type:'choice',q:'¿Qué significa que el conocimiento "es tuyo para siempre"?',options:['Que recibes un diploma especial','Que nadie puede quitarte lo que aprendiste','Que debes guardarlo en una caja'],correct:1,hint:'Piensa: ¿alguien puede borrar lo que ya aprendiste?'},
+         {level:'Crítico',type:'open',q:'¿Por qué crees que leer es importante para los niños de tu edad? ¿Cómo te puede ayudar en el futuro?'},
+     ]},
+];
+
+// ============================================================
+// SESSION STATE
+// ============================================================
+let sessionData = {studentName:'',avatar:'🐶',dateStr:'',surveyCompleted:false,surveyAnswers:{},forumMessages:[],missions:{}};
+let currentStoryIndex=0, activeStory=null, currentStep='reading', qIndex=0;
+let currentMissionResponses=[], currentMissionAttempts=1, currentAudioClicks=0;
+let currentWrongAttempts=0, storyStartTime=null, pendingReflection=null, ttsActive=false;
+
+function newMissionSlot() {
+    return {completed:false,attempts:0,audioClicks:0,wrongAttempts:0,durationSeconds:0,responses:[],selfRating:null};
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+    // Pre-select first avatar visually
+    const first = document.querySelector('.avatar-option');
+    if (first) first.classList.add('avatar-selected');
+
+    // Load from sessionStorage first, then localStorage backup
+    const saved = sessionStorage.getItem('eva_temp_session') || localStorage.getItem('eva_backup');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.studentName) {
+                sessionData = data;
+                if (!sessionData.forumMessages) sessionData.forumMessages = [];
+                storiesData.forEach(s => { if (!sessionData.missions[s.id]) sessionData.missions[s.id] = newMissionSlot(); });
+                if (data.surveyCompleted) initDashboard();
+                else showSurveyScreen();
+            }
+        } catch(e) { /* start fresh */ }
+    }
+};
+
+// ============================================================
+// AVATAR
+// ============================================================
+let tempSelectedAvatar = '🐶';
+function selectAvatar(emoji, btn) {
+    tempSelectedAvatar = emoji;
+    document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('avatar-selected'));
+    btn.classList.add('avatar-selected');
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function startNewSession() {
+    const name = document.getElementById('input-name').value.trim();
+    if (!name) return showModal('¡Falta tu nombre!','Escribe tu nombre para empezar la aventura 😊','warning');
+    sessionData = {studentName:name, avatar:tempSelectedAvatar, dateStr:new Date().toLocaleString('es-CO'), surveyCompleted:false, surveyAnswers:{}, forumMessages:[], missions:{}};
+    storiesData.forEach(s => sessionData.missions[s.id] = newMissionSlot());
+    saveTempSession();
+    document.getElementById('auth-screen').classList.add('hidden');
+    showSurveyScreen();
+}
+
+function showSurveyScreen() {
+    document.getElementById('survey-screen').classList.remove('hidden');
+    document.getElementById('survey-screen').classList.add('flex');
+    setTimeout(() => showLeo('survey', 1500), 400);
+}
+
+function submitSurvey() {
+    const form = document.getElementById('diagnostic-survey');
+    const q1=form.querySelector('input[name="q1"]:checked');
+    const q2=form.querySelector('input[name="q2"]:checked');
+    const q3=form.querySelector('input[name="q3"]:checked');
+    const q4=form.querySelector('input[name="q4"]:checked');
+    if (!q1||!q2||!q3||!q4) return showModal('¡Oh no!','Por favor responde todas las preguntas antes de jugar 😊','warning');
+    sessionData.surveyAnswers = {q1:q1.value, q2:q2.value, q3:q3.value, q4:q4.value};
+    sessionData.surveyCompleted = true;
+    saveTempSession();
+    document.getElementById('survey-screen').classList.add('hidden');
+    document.getElementById('survey-screen').classList.remove('flex');
+    const wn = document.getElementById('welcome-name-display');
+    if (wn) wn.textContent = `¡Hola ${sessionData.studentName}! ¡Tu gran aventura lectora comienza ahora!`;
+    document.getElementById('welcome-modal').classList.remove('hidden');
+}
+
+function closeWelcome() {
+    document.getElementById('welcome-modal').classList.add('hidden');
+    initDashboard();
+    setTimeout(() => showLeo('idle', 1500), 500);
+}
+
+// ============================================================
+// FILE LOAD
+// ============================================================
+function loadSession(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const zone = document.getElementById('upload-zone');
+    zone.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;gap:8px"><span class="spinner" style="font-size:3rem">⏳</span><span style="color:#065f46;font-weight:700;font-size:1.1rem">Cargando tu aventura...</span></div>';
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data.studentName || !data.missions) throw new Error('Inválido');
+            sessionData = data;
+            if (!sessionData.avatar) sessionData.avatar = '🐶';
+            if (!sessionData.forumMessages) sessionData.forumMessages = [];
+            storiesData.forEach(s => { if (!sessionData.missions[s.id]) sessionData.missions[s.id] = newMissionSlot(); });
+            saveTempSession();
+            if (sessionData.surveyCompleted) {
+                initDashboard();
+                showModal('¡Bienvenido de vuelta!','Tu aventura fue cargada. ¡Sigue así, '+sessionData.studentName+'! 🦁','success');
+            } else showSurveyScreen();
+        } catch(err) {
+            showModal('Error','Este no parece un archivo .eva válido. Intenta de nuevo.','error');
+            zone.innerHTML = '<div style="font-size:3rem;margin-bottom:8px">📂</div><span style="color:#065f46;font-weight:700;font-size:1.1rem;display:block">Toca para buscar tu archivo</span><span style="color:#34d399;font-weight:700;font-size:.85rem;display:block;margin-top:4px">📱 Android: busca en Descargas</span>';
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ============================================================
+// SESSION MANAGEMENT
+// ============================================================
+function saveTempSession() {
+    const data = JSON.stringify(sessionData);
+    sessionStorage.setItem('eva_temp_session', data);
+    try { localStorage.setItem('eva_backup', data); } catch(e) {}
+    updateStars();
+}
+
+function updateStars() {
+    let stars = 0;
+    if (sessionData.missions) Object.values(sessionData.missions).forEach(m => { if (m.completed) stars++; });
+    const counter = document.getElementById('star-counter');
+    if (!counter) return;
+    const prev = parseInt(counter.textContent) || 0;
+    counter.textContent = stars;
+    if (stars > prev) {
+        const wrap = document.getElementById('star-counter-wrap');
+        if (wrap) { wrap.classList.add('star-pop'); wrap.addEventListener('animationend', ()=> wrap.classList.remove('star-pop'), {once:true}); }
+    }
+}
+
+function logout() {
+    showModal('¿Cerrar Sesión?','Asegúrate de enviar tu progreso al profe antes de salir. ¿Estás seguro?','warning',
+        () => { sessionStorage.removeItem('eva_temp_session'); localStorage.removeItem('eva_backup'); location.reload(); }, true);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function initDashboard() {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('survey-screen').classList.add('hidden');
+    document.getElementById('survey-screen').classList.remove('flex');
+    document.getElementById('btn-support').classList.remove('hidden');
+    document.getElementById('leo-container').classList.remove('hidden');
+    document.getElementById('student-name-display').textContent = sessionData.studentName;
+    document.getElementById('nav-avatar-icon').textContent = sessionData.avatar;
+    updateStars();
+    renderMissions();
+    startLeoIdle();
+    setLeoFace('happy');
+}
+
+function renderMissions() {
+    const container = document.getElementById('modules-container');
+    container.innerHTML = '';
+    let globalIdx = 0;
+    modulesData.forEach((module, mi) => {
+        const mc = CM[module.color] || CM.blue;
+        const el = document.createElement('div');
+        el.className = 'module-container shadow-xl';
+        el.style.animation = `module-slide .5s ease-out ${mi * .1}s both`;
+        el.innerHTML = `
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4 mb-4 sm:mb-6 border-b-4 border-dashed border-slate-200 pb-4 text-center sm:text-left">
+                <div class="${mc.bg} w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shrink-0">${module.emoji}</div>
+                <div><h3 class="text-2xl sm:text-3xl font-black text-slate-800">${module.title}</h3><p class="text-slate-500 font-bold text-sm sm:text-base">${module.desc}</p></div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" id="grid-${module.id}"></div>`;
+        container.appendChild(el);
+        const grid = document.getElementById('grid-'+module.id);
+        storiesData.filter(s => s.moduleId===module.id).forEach(story => {
+            const ms = sessionData.missions[story.id] || newMissionSlot();
+            const prev = storiesData[globalIdx-1];
+            const isUnlocked = globalIdx===0 || (prev && sessionData.missions[prev.id]?.completed);
+            const sc = CM[story.color] || CM.blue;
+            const isMod5 = module.id==='mod5';
+            const cardTopBg = isMod5 && isUnlocked ? 'background:linear-gradient(135deg,#fecdd3,#fef9c3)' : '';
+            const selfRatingEmoji = ms.selfRating ? ms.selfRating.split(' ')[0] : '';
+
+            const card = document.createElement('div');
+            card.className = `bg-white rounded-[1.5rem] sm:rounded-[2rem] border-4 border-slate-100 shadow-md flex flex-col overflow-hidden transition-all duration-300 ${isUnlocked ? 'cursor-pointer active:scale-95 hover:-translate-y-1 hover:shadow-xl '+(ms.completed?'':'just-unlocked') : 'opacity-60 grayscale'}`;
+            if (isUnlocked) {
+                card.onclick = () => openStory(story.id);
+                card.setAttribute('tabindex','0');
+                card.addEventListener('keypress', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openStory(story.id); } });
+            }
+            card.setAttribute('role', isUnlocked?'button':'article');
+            card.setAttribute('aria-label', `${story.title} - ${isUnlocked?(ms.completed?'Completada, repetir':'Jugar'):'Bloqueada'}`);
+
+            card.innerHTML = `
+                <div class="${isMod5&&isUnlocked?'':''+sc.bg} h-28 sm:h-36 flex items-center justify-center relative" ${cardTopBg ? 'style="'+cardTopBg+'"': ''}>
+                    <span class="color-icon ${isUnlocked?'animate-float':''}">${story.emoji}</span>
+                    ${story.youtube?'<div class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-black border-2 border-white shadow">▶ VIDEO</div>':''}
+                    ${selfRatingEmoji?'<div class="absolute top-2 right-2 bg-white/90 rounded-full px-2 py-0.5 text-xs font-black border border-slate-200 shadow" title="Tu autoevaluación">'+selfRatingEmoji+'</div>':''}
+                    ${ms.completed?'<div class="absolute -bottom-3 sm:-bottom-4 right-3 sm:right-4 bg-yellow-400 text-yellow-900 p-1.5 sm:p-2 rounded-full shadow-lg border-2 border-white z-10 star-pop" aria-label="Misión completada">⭐</div>':''}
+                    ${!isUnlocked?'<div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center" aria-hidden="true"><span style="font-size:2rem">🔒</span></div>':''}
+                </div>
+                <div class="p-4 sm:p-6 flex-1 flex flex-col">
+                    <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest mb-1 inline-block px-2 py-1 rounded-md self-start ${sc.tag}">${story.tag}</span>
+                    <h3 class="text-lg sm:text-xl font-black text-slate-800 leading-tight mb-2 mt-1">${story.title}</h3>
+                    ${ms.attempts>0?'<div class="text-xs text-slate-400 font-bold mb-2">🔄 '+ms.attempts+' int. · ⏱️ '+ms.durationSeconds+'s · ❌ '+ms.wrongAttempts+' err.</div>':''}
+                    <div class="mt-auto">
+                        ${isUnlocked
+                            ?'<button class="w-full py-2 sm:py-3 rounded-xl font-black text-base sm:text-lg transition-transform '+(ms.completed?'bg-slate-100 text-slate-600 border-2 border-slate-300':'bg-blue-500 text-white shadow-[0_4px_0_#2563eb] border-2 border-blue-400')+'" tabindex="-1" aria-hidden="true">'+(ms.completed?'↩ REPETIR':'¡JUGAR!')+'</button>'
+                            :'<button class="w-full py-2 sm:py-3 rounded-xl font-black text-base sm:text-lg bg-slate-200 text-slate-400 cursor-not-allowed" disabled aria-hidden="true">🔒 BLOQUEADA</button>'
+                        }
+                    </div>
+                </div>`;
+            grid.appendChild(card);
+            globalIdx++;
+        });
+    });
+}
+
+// ============================================================
+// STORY FLOW
+// ============================================================
+function openStory(storyId) {
+    const index = storiesData.findIndex(s => s.id===storyId);
+    if (index===-1) return;
+    currentStoryIndex=index; activeStory=storiesData[index];
+    currentStep='reading'; qIndex=0; currentMissionResponses=[];
+    currentMissionAttempts=(sessionData.missions[activeStory.id].attempts||0)+1;
+    currentAudioClicks=0; currentWrongAttempts=0; pendingReflection=null;
+    storyStartTime=Date.now();
+
+    document.getElementById('story-emoji-container').textContent=activeStory.emoji;
+    document.getElementById('story-title').textContent=activeStory.title;
+    document.getElementById('story-tag').textContent=activeStory.tag;
+    document.getElementById('story-content').innerHTML=activeStory.text;
+
+    const vc=document.getElementById('story-video-container');
+    const iframe=document.getElementById('story-video');
+    if (activeStory.youtube) {
+        vc.classList.remove('hidden');
+        iframe.src='https://www.youtube-nocookie.com/embed/'+activeStory.youtube+'?rel=0';
+    } else {
+        vc.classList.add('hidden');
+        iframe.src='';
+    }
+
+    ['reading-section','quiz-section','reflection-section','success-section'].forEach(id=>{
+        const el=document.getElementById(id);
+        el.classList.add('hidden');
+        if(id==='success-section') el.classList.remove('flex');
+    });
+    document.getElementById('reading-section').classList.remove('hidden');
+
+    const btn=document.getElementById('btn-next-step');
+    btn.innerHTML='¡YA EXPLORÉ TODO! →';
+    btn.classList.remove('hidden');
+    document.getElementById('story-modal').classList.remove('hidden');
+    updateModalProgress(10);
+    window.speechSynthesis.cancel();
+    ttsActive=false; resetReadBtn();
+
+    // Leo tip
+    const tipEl=document.getElementById('leo-reading-tip');
+    const tipTxt=document.getElementById('leo-reading-tip-text');
+    if (tipEl && tipTxt) {
+        tipTxt.textContent = rnd(activeStory.youtube ? LEO.hasVideo : LEO.reading);
+        tipEl.classList.remove('hidden');
+    }
+    setLeoFace(activeStory.youtube?'excited':'happy');
+}
+
+function stopVideo() {
+    const iframe=document.getElementById('story-video');
+    iframe.src='about:blank';
+    setTimeout(()=>{ iframe.src=''; }, 150);
+}
+
+function closeStory() {
+    stopVideo();
+    document.getElementById('story-modal').classList.add('hidden');
+    window.speechSynthesis.cancel();
+    ttsActive=false; resetReadBtn();
+}
+
+function readAloud() {
+    if (!activeStory) return;
+    if (ttsActive) {
+        window.speechSynthesis.cancel(); ttsActive=false; resetReadBtn(); return;
+    }
+    ttsActive=true;
+    const btn=document.getElementById('btn-read-aloud');
+    if (btn) { btn.textContent='⏹️ DETENER AUDIO'; btn.classList.add('tts-playing'); }
+    const u=new SpeechSynthesisUtterance(activeStory.text.replace(/<[^>]*>?/gm,''));
+    u.lang='es-CO'; u.rate=0.85;
+    u.onend=()=>{ ttsActive=false; resetReadBtn(); };
+    currentAudioClicks++;
+    window.speechSynthesis.speak(u);
+}
+
+function resetReadBtn() {
+    const btn=document.getElementById('btn-read-aloud');
+    if (btn) { btn.innerHTML='🔊 LEER EN VOZ ALTA'; btn.classList.remove('tts-playing'); }
+}
+
+function readQuestionAloud() {
+    if (!activeStory) return;
+    const q=activeStory.questions[qIndex];
+    window.speechSynthesis.cancel();
+    let txt=q.q;
+    if (q.type==='choice') {
+        txt+=' Las opciones son: ';
+        q.options.forEach((o,i)=> txt+=`Opción ${String.fromCharCode(65+i)}: ${o}. `);
+    }
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang='es-CO'; u.rate=0.85;
+    window.speechSynthesis.speak(u);
+}
+
+function advanceFlow() {
+    if (currentStep==='reading') {
+        stopVideo();
+        window.speechSynthesis.cancel(); ttsActive=false; resetReadBtn();
+        currentStep='quiz';
+        document.getElementById('reading-section').classList.add('hidden');
+        document.getElementById('leo-reading-tip').classList.add('hidden');
+        document.getElementById('quiz-section').classList.remove('hidden');
+        document.getElementById('btn-next-step').classList.add('hidden');
+        renderQuestion();
+        setLeoFace('thinking');
+        setTimeout(()=>showLeo('quiz',500),300);
+    }
+}
+
+function renderQuestion() {
+    const q=activeStory.questions[qIndex];
+    document.getElementById('q-current').textContent=qIndex+1;
+    document.getElementById('q-total').textContent=activeStory.questions.length;
+    document.getElementById('q-text').textContent=q.q;
+
+    const badge=document.getElementById('q-level-badge');
+    badge.textContent='NIVEL: '+q.level;
+    badge.className='px-3 md:px-4 py-1.5 rounded-lg md:rounded-xl text-xs md:text-sm font-black uppercase tracking-widest '+(q.level==='Literal'?'bg-emerald-100 text-emerald-700 border-2 border-emerald-200':q.level==='Inferencial'?'bg-amber-100 text-amber-700 border-2 border-amber-200':'bg-purple-100 text-purple-700 border-2 border-purple-200');
+
+    const container=document.getElementById('q-options'); container.innerHTML='';
+    if (q.type==='choice') {
+        q.options.forEach((opt,idx)=>{
+            const btn=document.createElement('button');
+            btn.className='w-full text-left p-4 md:p-6 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-slate-100 bg-white hover:border-blue-400 active:scale-[.98] transition-all font-bold text-slate-700 text-lg md:text-2xl flex items-center gap-4 md:gap-6 group shadow-sm';
+            btn.setAttribute('aria-label','Opción '+String.fromCharCode(65+idx)+': '+opt);
+            btn.innerHTML='<div class="w-10 h-10 md:w-14 md:h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-black text-lg md:text-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors shrink-0 shadow-inner">'+String.fromCharCode(65+idx)+'</div><span>'+opt+'</span>';
+            btn.onclick=()=>handleChoiceAnswer(idx);
+            container.appendChild(btn);
+        });
+    } else if (q.type==='open') {
+        const area=document.createElement('textarea');
+        area.className='w-full p-4 md:p-6 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-slate-200 focus:border-blue-400 outline-none text-lg md:text-2xl font-medium text-slate-700 min-h-[150px] md:min-h-[200px] resize-none mb-4 md:mb-6 shadow-inner';
+        area.placeholder='¡Escribe tu idea aquí! ✍️...'; area.id='open-answer-text';
+        area.setAttribute('aria-label','Tu respuesta a la pregunta');
+        const btnSave=document.createElement('button');
+        btnSave.className='btn-magic w-full py-4 md:py-6 rounded-2xl md:rounded-[2rem] text-white font-black text-lg md:text-2xl';
+        btnSave.textContent='¡GUARDAR MI RESPUESTA! ✅'; btnSave.onclick=handleOpenAnswer;
+        container.appendChild(area); container.appendChild(btnSave);
+    }
+
+    const qTip=document.getElementById('leo-quiz-tip');
+    const qTipTxt=document.getElementById('leo-quiz-tip-text');
+    if (qTip && qTipTxt) { qTipTxt.textContent=rnd(LEO.ttsHint); qTip.classList.remove('hidden'); }
+    updateModalProgress(10+((qIndex/activeStory.questions.length)*80));
+}
+
+function handleChoiceAnswer(selectedIndex) {
+    const q=activeStory.questions[qIndex];
+    if (selectedIndex===q.correct) {
+        currentMissionResponses.push({question:q.q,level:q.level,type:'choice',answerGiven:q.options[selectedIndex],correct:true,wrongBefore:currentWrongAttempts});
+        currentWrongAttempts=0;
+        nextQuestionOrFinish();
+    } else {
+        currentWrongAttempts++;
+        const quizEl=document.getElementById('quiz-section');
+        quizEl.classList.add('shake');
+        quizEl.addEventListener('animationend',()=>quizEl.classList.remove('shake'),{once:true});
+        setLeoFace('thinking'); showLeo('wrong');
+        showModal('¡Casi lo tienes!','💡 Pista de Leo: '+q.hint,'hint');
+    }
+}
+
+function handleOpenAnswer() {
+    const text=(document.getElementById('open-answer-text')||{}).value?.trim()||'';
+    if (text.length<5) return showModal('¡Escribe un poquito más!','Leo quiere conocer mejor tu idea. ¡Cuéntanos más! 😊','warning');
+    currentMissionResponses.push({question:activeStory.questions[qIndex].q,level:activeStory.questions[qIndex].level,type:'open',answerGiven:text,correct:'Abierta'});
+    nextQuestionOrFinish();
+}
+
+function nextQuestionOrFinish() {
+    qIndex++;
+    if (qIndex<activeStory.questions.length) renderQuestion();
+    else showReflectionScreen();
+}
+
+function showReflectionScreen() {
+    document.getElementById('quiz-section').classList.add('hidden');
+    document.getElementById('leo-quiz-tip').classList.add('hidden');
+    document.getElementById('reflection-section').classList.remove('hidden');
+    updateModalProgress(92);
+    setLeoFace('excited');
+    setTimeout(()=>showLeo('reflection',500),300);
+}
+
+function saveReflection(rating, btn) {
+    pendingReflection=rating;
+    document.querySelectorAll('.reflection-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    setTimeout(()=>showSuccessScreen(), 600);
+}
+
+// ============================================================
+// CONFETTI & SUCCESS
+// ============================================================
+function shootConfetti() {
+    const colors=['#fca5a5','#fef08a','#a7f3d0','#bfdbfe','#e879f9','#fb923c','#34d399'];
+    for(let i=0;i<40;i++){
+        const c=document.createElement('div');
+        c.className='confetti';
+        c.style.left=Math.random()*100+'vw';
+        c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+        c.style.width=(8+Math.random()*10)+'px';
+        c.style.height=(8+Math.random()*10)+'px';
+        c.style.borderRadius=Math.random()>.5?'50%':'0';
+        c.style.animationDuration=(2+Math.random()*2)+'s';
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),4000);
+    }
+}
+
+function showSuccessScreen() {
+    const duration=Math.round((Date.now()-storyStartTime)/1000);
+    const ms=sessionData.missions[activeStory.id];
+    const isFirst=!ms.completed;
+
+    if (isFirst) shootConfetti();
+
+    sessionData.missions[activeStory.id]={
+        completed:true, attempts:currentMissionAttempts,
+        audioClicks:(ms.audioClicks||0)+currentAudioClicks,
+        wrongAttempts:(ms.wrongAttempts||0)+currentWrongAttempts,
+        durationSeconds:duration, responses:currentMissionResponses,
+        selfRating:pendingReflection
+    };
+    saveTempSession();
+    renderMissions();
+
+    document.getElementById('reflection-section').classList.add('hidden');
+    document.getElementById('success-section').classList.remove('hidden');
+    document.getElementById('success-section').classList.add('flex');
+    document.getElementById('success-leo-msg').textContent='🦁 '+rnd(LEO.success);
+    updateModalProgress(100);
+    setLeoFace('excited'); showLeo('save', 3000);
+}
+
+function finishStoryAndPromptSave() {
+    closeStory();
+    showModal('¡Genial!','Tu progreso está asegurado. ¡Sigue así '+sessionData.studentName+'! 🌟','success');
+}
+
+function updateModalProgress(pct) {
+    document.getElementById('modal-progress-bar').style.width=pct+'%';
+    document.getElementById('modal-progress-text').textContent=Math.round(pct)+'%';
+}
+
+// ============================================================
+// FORUM
+// ============================================================
+function openForum() {
+    document.getElementById('forum-modal').classList.remove('hidden');
+    renderForumMessages();
+    showLeo('forum', 500);
+}
+function closeForum() { document.getElementById('forum-modal').classList.add('hidden'); }
+
+function postForumMessage() {
+    sessionData.forumMessages.push({author:sessionData.studentName,avatar:sessionData.avatar,text:document.getElementById('forum-select').value});
+    saveTempSession(); renderForumMessages();
+}
+
+function renderForumMessages() {
+    const container=document.getElementById('forum-messages');
+    let html=`
+        <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-purple-100 flex gap-3 md:gap-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-orange-100 rounded-full flex items-center justify-center text-2xl md:text-3xl shrink-0">🐱</div>
+            <div><span class="font-black text-slate-800 block mb-0.5 text-sm md:text-base">María (Compañera)</span><p class="text-slate-600 font-bold text-base md:text-lg">¡Me encantó la historia del Carnaval! 🎉</p></div>
+        </div>
+        <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-purple-100 flex gap-3 md:gap-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-green-100 rounded-full flex items-center justify-center text-2xl md:text-3xl shrink-0">🐢</div>
+            <div><span class="font-black text-slate-800 block mb-0.5 text-sm md:text-base">Pedro (Compañero)</span><p class="text-slate-600 font-bold text-base md:text-lg">Ya quiero llegar a la Evaluación Final 🏆</p></div>
+        </div>`;
+    sessionData.forumMessages.forEach(m=>{
+        html+=`<div class="bg-purple-100 p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-purple-300 flex gap-3 md:gap-4 animate-pop"><div class="w-10 h-10 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center text-2xl md:text-3xl border-2 border-purple-200 shrink-0">${m.avatar}</div><div><span class="font-black text-purple-900 block mb-0.5 text-sm md:text-base">${m.author} (Tú)</span><p class="text-purple-800 font-bold text-base md:text-lg">${m.text}</p></div></div>`;
+    });
+    container.innerHTML=html;
+    container.scrollTop=container.scrollHeight;
+}
+
+// ============================================================
+// SUPPORT
+// ============================================================
+function openSupport() { document.getElementById('support-modal').classList.remove('hidden'); }
+function closeSupport() { document.getElementById('support-modal').classList.add('hidden'); window.speechSynthesis.cancel(); }
+
+function readSupportAloud() {
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance('Hola Aventurero. Soy Leo, tu guía. Toca un módulo abierto en el mapa. Si hay un video, míralo primero. Luego lee o escucha la historia con el botón naranja. Después responde las preguntas para ganar estrellas. ¡Tú puedes!');
+    u.lang='es-CO'; u.rate=0.9;
+    window.speechSynthesis.speak(u);
+}
+
+function contactTechSupport() {
+    const url=`https://wa.me/${CONFIG.teacherPhone}?text=${encodeURIComponent('Hola '+CONFIG.teacherName+', soy '+sessionData.studentName+' de '+CONFIG.schoolName+'. Necesito ayuda con el juego de Aventura Lectora EVA.')}`;
+    window.open(url,'_blank');
+}
+
+// ============================================================
+// EXPORT & WHATSAPP
+// ============================================================
+function downloadProgress(silent=false) {
+    if (!sessionData.studentName) return;
+    const blob=new Blob([JSON.stringify(sessionData)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='aventura_'+sessionData.studentName.replace(/\s+/g,'_')+'.eva'; a.click();
+    URL.revokeObjectURL(url);
+    if (!silent) showModal('¡Archivo Guardado!','Tu archivo .eva fue descargado. ¡Guárdalo en un lugar seguro!','success');
+}
+
+function toggleTeacherPanel() { document.getElementById('teacher-panel').classList.toggle('hidden'); }
+
+function sendToWhatsAppAndDownload() {
+    if (!sessionData.studentName) return showModal('¡Aún no empezaste!','Primero juega y completa algunas misiones 😊','warning');
+    downloadProgress(true);
+    let msg=`🌟 *REPORTE AVENTURA LECTORA* 🌟\n\n👦 *Estudiante:* ${sessionData.studentName}\n📅 *Fecha:* ${sessionData.dateStr}\n🏫 *Escuela:* ${CONFIG.schoolName}\n\n`;
+    if (sessionData.surveyCompleted) {
+        msg+=`📋 *Diagnóstico Inicial:*\n- ¿Le gusta leer?: ${sessionData.surveyAnswers.q1}\n- Prefiere: ${sessionData.surveyAnswers.q2}\n- Lee en casa: ${sessionData.surveyAnswers.q3}\n- Aprende jugando: ${sessionData.surveyAnswers.q4}\n\n`;
+    }
+    msg+=`🚀 *Progreso de Misiones:*\n`;
+    let done=0;
+    storiesData.forEach(story=>{
+        const d=sessionData.missions[story.id];
+        if(d && d.attempts>0){
+            if(d.completed) done++;
+            msg+=`\n${story.emoji} *${story.title}* (${story.tag})\n`;
+            msg+=`✅ ${d.completed?'Completada':'Pendiente'} | 🔄 ${d.attempts} int. | ⏱️ ${d.durationSeconds}s | ❌ ${d.wrongAttempts} err.\n`;
+            if(d.selfRating) msg+=`💭 Autoevaluación: ${d.selfRating}\n`;
+            if(d.responses?.length>0){
+                msg+=`📝 Últimas respuestas:\n`;
+                d.responses.slice(0,2).forEach((r,i)=>{
+                    const ans=(r.answerGiven||'').substring(0,120);
+                    msg+=`  ${i+1}. [${r.level}] ${ans} (${r.correct===true?'Correcta':r.correct})\n`;
+                });
+            }
+        }
+    });
+    msg+=`\n🏆 *Total:* ${done} de ${storiesData.length} misiones\n\n✨ _Generado por EVA - Aventura Lectora_ ✨`;
+    const encoded=encodeURIComponent(msg);
+    showModal('¡Enviando al Profe!','1. Tu archivo .eva fue descargado como respaldo.<br><br>2. Abriremos WhatsApp para enviar el reporte.<br><br>💡 <i>Busca el archivo en Descargas.</i>','success',
+        ()=>{ window.open('https://api.whatsapp.com/send?text='+encoded,'_blank'); });
+}
+
+function exportTeacherReport() {
+    let r='========================================================\n    REPORTE DE EVALUACIÓN - EVA AVENTURA LECTORA\n';
+    r+='    '+CONFIG.schoolName+' - 2do Grado\n';
+    r+='========================================================\n\n';
+    r+=`ESTUDIANTE: ${sessionData.studentName}\nAVATAR: ${sessionData.avatar}\nFECHA INICIO: ${sessionData.dateStr}\n\n`;
+    if (sessionData.surveyCompleted) {
+        r+='--- DIAGNÓSTICO INICIAL ---\n';
+        r+=`¿Le gusta leer?: ${sessionData.surveyAnswers.q1}\nPrefiere: ${sessionData.surveyAnswers.q2}\n¿Lee en casa?: ${sessionData.surveyAnswers.q3}\n¿Aprende con tecnología?: ${sessionData.surveyAnswers.q4}\n\n`;
+    }
+    r+='--- RESULTADOS POR MISIÓN ---\n\n';
+    let totalDone=0, totalTime=0, totalWrong=0;
+    storiesData.forEach(story=>{
+        const d=sessionData.missions[story.id];
+        if(d && d.attempts>0){
+            if(d.completed) totalDone++;
+            totalTime+=d.durationSeconds||0; totalWrong+=d.wrongAttempts||0;
+            r+=`[${story.tag}] ${story.title}\n`;
+            r+=`Estado: ${d.completed?'COMPLETADA':'PENDIENTE'}\n`;
+            r+=`Intentos: ${d.attempts} | Tiempo: ${d.durationSeconds}s | Errores: ${d.wrongAttempts} | Ayuda audio: ${d.audioClicks} clics\n`;
+            if(d.selfRating) r+=`Autoevaluación del estudiante: ${d.selfRating}\n`;
+            if(d.responses?.length>0){
+                r+=`Respuestas:\n`;
+                d.responses.forEach((resp,i)=>{
+                    r+=`  ${i+1}. [${resp.level}] P: ${resp.question}\n      R: "${resp.answerGiven}"\n      Evaluación: ${resp.correct===true?'CORRECTA':resp.correct}\n`;
+                });
+            }
+            r+='--------------------------------------------------------\n';
+        }
+    });
+    r+=`\nRESUMEN FINAL:\nMisiones completadas: ${totalDone} / ${storiesData.length}\nTiempo total: ${totalTime} segundos\nErrores totales: ${totalWrong}\n`;
+    const blob=new Blob([r],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='Reporte_Docente_'+sessionData.studentName.replace(/\s+/g,'_')+'.txt'; a.click();
+    URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// MODAL SYSTEM (with warning type + cancel button)
+// ============================================================
+let alertCallback=null;
+
+function showModal(title, message, type, callback=null, cancelable=false) {
+    alertCallback=callback;
+    document.getElementById('alert-title').textContent=title;
+    document.getElementById('alert-message').innerHTML=message;
+    const icon=document.getElementById('alert-icon');
+    const okBtn=document.getElementById('btn-alert-ok');
+    const cancelBtn=document.getElementById('btn-alert-cancel');
+    const iconMap={
+        error:   {emoji:'❌',bg:'bg-red-100',   border:'border-red-200'},
+        success: {emoji:'✅',bg:'bg-emerald-100',border:'border-emerald-200'},
+        hint:    {emoji:'💡',bg:'bg-amber-100',  border:'border-amber-200'},
+        warning: {emoji:'⚠️',bg:'bg-orange-100', border:'border-orange-200'},
+        default: {emoji:'ℹ️',bg:'bg-blue-100',   border:'border-blue-200'},
+    };
+    const ic=iconMap[type]||iconMap.default;
+    icon.className=`w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 rounded-full flex items-center justify-center animate-bounce border-4 ${ic.bg} ${ic.border}`;
+    icon.innerHTML=`<span style="font-size:2.5rem">${ic.emoji}</span>`;
+    cancelBtn.classList.toggle('hidden',!cancelable);
+    okBtn.textContent=cancelable?'¡SÍ, SALIR!':'¡ENTENDIDO!';
+    const alertDiv=document.getElementById('custom-alert');
+    alertDiv.classList.remove('hidden');
+    setTimeout(()=>{
+        alertDiv.classList.remove('opacity-0');
+        document.getElementById('custom-alert-box').classList.remove('scale-95');
+        document.getElementById('custom-alert-box').classList.add('scale-100');
+    },10);
+}
+
+function closeAlert() {
+    const alertDiv=document.getElementById('custom-alert');
+    alertDiv.classList.add('opacity-0');
+    document.getElementById('custom-alert-box').classList.remove('scale-100');
+    document.getElementById('custom-alert-box').classList.add('scale-95');
+    setTimeout(()=>{
+        alertDiv.classList.add('hidden');
+        if (alertCallback) { const cb=alertCallback; alertCallback=null; cb(); }
+        else alertCallback=null;
+    },300);
+}
+
+function cancelAlert() {
+    alertCallback=null;
+    const alertDiv=document.getElementById('custom-alert');
+    alertDiv.classList.add('opacity-0');
+    document.getElementById('custom-alert-box').classList.remove('scale-100');
+    document.getElementById('custom-alert-box').classList.add('scale-95');
+    setTimeout(()=>alertDiv.classList.add('hidden'),300);
+}
+</script>
+</body>
+</html>
