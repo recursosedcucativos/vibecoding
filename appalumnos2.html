@@ -26,6 +26,7 @@
 
         .progress-bar { transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
         
+        /* === ANIMACIONES LEO Y SISTEMA === */
         @keyframes float-character {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(3deg); }
@@ -38,6 +39,37 @@
         }
         .animate-pop { animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .magic-book { animation: float 3s ease-in-out infinite; }
+        .sparkle { animation: sparkle 1.5s ease-in-out infinite; }
+
+        @keyframes leo-dance {
+            0%,100%{transform:rotate(-3deg) translateY(0)}
+            25%{transform:rotate(3deg) translateY(-7px)}
+            50%{transform:rotate(-2deg) translateY(-11px)}
+            75%{transform:rotate(4deg) translateY(-4px)}
+        }
+        @keyframes leoArm {
+            0%,100%{transform:rotate(-55deg)}
+            50%{transform:rotate(-15deg)}
+        }
+        @keyframes bubble-pop {
+            0%{transform:scale(.5) translateY(10px);opacity:0}
+            70%{transform:scale(1.06) translateY(-2px)}
+            100%{transform:scale(1) translateY(0);opacity:1}
+        }
+        .leo-dance { animation: leo-dance 2.5s ease-in-out infinite; }
+        .bubble-pop { animation: bubble-pop .35s cubic-bezier(.34,1.56,.64,1) forwards; }
+        #leo-wave-arm { transform-origin: 56px 52px; animation: leoArm .9s ease-in-out infinite; }
+
+        /* === CONFETI === */
         .confetti {
             position: fixed;
             width: 15px;
@@ -52,10 +84,11 @@
         }
 
         .modal-overlay { 
-            background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(8px); 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(10px); 
         }
 
+        /* === BOTONES === */
         .btn-magic {
             background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
             box-shadow: 0 8px 0 #c2410c, 0 10px 15px rgba(234, 88, 12, 0.3);
@@ -108,37 +141,130 @@
             line-height: 1;
             filter: drop-shadow(0px 8px 10px rgba(0,0,0,0.15));
         }
+
+        /* === BURBUJA LEO === */
+        .bubble-tail::after { content:''; position:absolute; bottom:-11px; left:12px; width:0; height:0; border-left:10px solid transparent; border-right:0; border-top:11px solid #3b82f6; }
+        .bubble-tail::before { content:''; position:absolute; bottom:-7px; left:16px; width:0; height:0; border-left:7px solid transparent; border-right:0; border-top:8px solid white; z-index:1; }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col">
 
-    <!-- BOTÓN DE SOPORTE TÉCNICO FLOTANTE -->
-    <button onclick="openSupport()" class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-40 bg-yellow-400 text-yellow-900 p-3 md:p-4 rounded-full shadow-[0_6px_0_#ca8a04] active:translate-y-2 animate-float border-4 border-white flex items-center gap-2 md:gap-3 font-bold text-lg md:text-xl hidden" id="btn-support">
-        <i data-lucide="help-circle" class="w-8 h-8 md:w-8 md:h-8"></i> <span class="hidden md:inline">¿Necesitas Ayuda?</span>
-    </button>
+    <!-- 1. PANTALLA DE CARGA MÁGICA -->
+    <div id="loader-screen" class="fixed inset-0 z-[600] bg-slate-900 flex flex-col items-center justify-center text-white p-6 transition-opacity duration-1000">
+        <div class="relative mb-8">
+            <svg class="magic-book w-32 h-32 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                <path d="M8 7h6M8 11h8M8 15h6" />
+            </svg>
+            <div class="absolute -top-4 -right-4 sparkle"><i data-lucide="sparkles" class="text-white w-8 h-8"></i></div>
+        </div>
+        <h1 class="text-2xl font-black tracking-[0.3em] uppercase mb-2">Aventura Lectora</h1>
+        <p class="text-blue-400 font-bold text-sm">Preparando el entorno pedagógico...</p>
+    </div>
 
-    <!-- ALERTAS PERSONALIZADAS -->
+    <!-- 2. PANTALLA DE INFORMACIÓN INSTITUCIONAL UTB -->
+    <div id="intro-screen" class="fixed inset-0 z-[550] flex items-center justify-center p-4 overflow-y-auto hidden" style="background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);">
+        <div class="bg-white rounded-[3.5rem] shadow-2xl w-full max-w-4xl flex flex-col md:flex-row overflow-hidden animate-in zoom-in duration-700">
+            <div class="md:w-1/3 bg-blue-600 p-10 flex flex-col justify-center items-center text-white text-center">
+                <div class="bg-white/20 p-6 rounded-[2.5rem] mb-6">
+                    <i data-lucide="graduation-cap" class="w-16 h-16 text-white"></i>
+                </div>
+                <p class="font-black text-xs uppercase tracking-widest opacity-70 mb-2">Maestría en TIC</p>
+                <h3 class="font-bold text-lg leading-tight uppercase">Universidad Tecnológica de Bolívar</h3>
+            </div>
+            <div class="md:w-2/3 p-10 md:p-16 flex flex-col justify-center">
+                <h2 class="text-3xl font-black text-slate-800 leading-none mb-6 tracking-tighter">Diseño e Implementación de un EVA</h2>
+                <p class="text-slate-500 font-bold mb-8 leading-relaxed italic border-l-4 border-blue-200 pl-4 text-sm md:text-base">
+                    "Fortalecimiento de la Comprensión Lectora en Estudiantes de Básica Primaria de la IE Distrital San Vicente de Paul, Barranquilla."
+                </p>
+                <div class="grid grid-cols-2 gap-6 mb-10">
+                    <div>
+                        <h4 class="text-blue-600 font-black uppercase text-[10px] tracking-widest mb-2">Investigadores</h4>
+                        <ul class="text-[10px] md:text-xs text-slate-600 font-bold space-y-1">
+                            <li>Lilibeth Herrera Rodríguez</li>
+                            <li>Leidy Yohana Baena Guzmán</li>
+                            <li>Alexander Escobar Hostia</li>
+                            <li>Piedad Esther Franco Hernández</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-blue-600 font-black uppercase text-[10px] tracking-widest mb-2">Contexto</h4>
+                        <p class="text-[10px] md:text-xs text-slate-600 font-bold">Barranquilla, Atlántico<br>Corregimiento La Playa</p>
+                    </div>
+                </div>
+                <button onclick="handleEnterMissions()" class="btn-magic py-5 rounded-[1.5rem] text-white font-black text-xl shadow-xl flex items-center justify-center gap-4">
+                    ENTRAR AL EVA <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MASCOTA LEO ==================== -->
+    <div id="leo-container" class="fixed bottom-3 left-3 z-[200] hidden select-none" style="width:88px">
+      <div id="leo-speech" class="hidden absolute bubble-tail" style="bottom:118px;left:0;z-index:10;background:white;border:3px solid #3b82f6;border-radius:18px 18px 18px 4px;padding:10px 12px;min-width:165px;max-width:210px;box-shadow:0 8px 20px rgba(0,0,0,.15)">
+        <span id="leo-text" style="font-size:12px;font-weight:700;color:#1e40af;line-height:1.4;display:block">¡Hola!</span>
+      </div>
+      <div class="leo-dance cursor-pointer" id="leo-char" onclick="toggleLeoBubble()">
+        <svg viewBox="0 0 80 112" xmlns="http://www.w3.org/2000/svg" style="width:88px;height:100px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.22))">
+          <path d="M16 30 Q16 7 40 7 Q64 7 64 30 Q60 13 40 15 Q20 13 16 30Z" fill="#4A3728"/>
+          <ellipse cx="40" cy="28" rx="24" ry="24" fill="#F5C09A"/>
+          <ellipse cx="16" cy="30" rx="4.5" ry="6" fill="#E8A87C"/>
+          <ellipse cx="64" cy="30" rx="4.5" ry="6" fill="#E8A87C"/>
+          <path d="M16 30 Q13 40 18 49 Q15 37 19 32Z" fill="#4A3728"/>
+          <path d="M64 30 Q67 40 62 49 Q65 37 61 32Z" fill="#4A3728"/>
+          <path d="M24 19 Q31 15 37 19" fill="none" stroke="#4A3728" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M43 19 Q49 15 56 19" fill="none" stroke="#4A3728" stroke-width="2.5" stroke-linecap="round"/>
+          <ellipse cx="31" cy="26" rx="7" ry="8" fill="white"/>
+          <ellipse cx="49" cy="26" rx="7" ry="8" fill="white"/>
+          <circle id="lp" cx="32" cy="27" r="4.5" fill="#2D1B00"/>
+          <circle id="rp" cx="50" cy="27" r="4.5" fill="#2D1B00"/>
+          <circle cx="34" cy="24.5" r="1.8" fill="white"/>
+          <circle cx="52" cy="24.5" r="1.8" fill="white"/>
+          <ellipse cx="40" cy="34" rx="2.5" ry="2" fill="#D98C5F"/>
+          <path id="leo-m" d="M32 40 Q40 48 48 40" fill="#EB6B4A" stroke="#C4502E" stroke-width="1.5" stroke-linecap="round"/>
+          <path id="leo-teeth" d="M34 41 Q40 46 46 41" fill="white"/>
+          <circle cx="23" cy="36" r="5.5" fill="#FFB5A0" opacity="0.45"/>
+          <circle cx="57" cy="36" r="5.5" fill="#FFB5A0" opacity="0.45"/>
+          <rect x="24" y="49" width="32" height="33" rx="10" fill="#3B82F6"/>
+          <polygon points="36,49 40,58 44,49" fill="white"/>
+          <rect x="38" y="58" width="5" height="23" rx="2" fill="white" opacity="0.7"/>
+          <rect x="26" y="54" width="13" height="9" rx="3" fill="#1D4ED8"/>
+          <text x="32.5" y="61.5" font-size="4.5" fill="white" text-anchor="middle" font-family="Arial,sans-serif" font-weight="bold">SVP</text>
+          <rect x="6" y="52" width="20" height="9" rx="5" fill="#3B82F6" transform="rotate(25 16 56)"/>
+          <circle cx="9" cy="65" r="5.5" fill="#F5C09A"/>
+          <g id="leo-wave-arm">
+            <rect x="56" y="48" width="18" height="8" rx="4" fill="#3B82F6"/>
+            <circle cx="74" cy="52" r="5.5" fill="#F5C09A"/>
+          </g>
+          <rect x="24" y="80" width="32" height="5" rx="2" fill="#1D4ED8"/>
+          <rect x="27" y="84" width="12" height="20" rx="6" fill="#2563EB"/>
+          <rect x="41" y="84" width="12" height="20" rx="6" fill="#2563EB"/>
+          <ellipse cx="33" cy="104" rx="10" ry="6" fill="#1E293B"/>
+          <ellipse cx="47" cy="104" rx="10" ry="6" fill="#1E293B"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ==================== ALERTAS ==================== -->
     <div id="custom-alert" class="fixed inset-0 z-[500] modal-overlay hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-white rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 max-w-sm w-full text-center shadow-2xl transform scale-95 transition-transform duration-300 border-4 md:border-8 border-blue-100" id="custom-alert-box">
-            <div id="alert-icon" class="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 animate-bounce-slow">
-                <i data-lucide="info" class="w-10 h-10 md:w-12 md:h-12"></i>
-            </div>
+            <div id="alert-icon" class="w-20 h-20 md:w-24 md:h-24 mx-auto mb-4 md:mb-6 rounded-full flex items-center justify-center bg-blue-100 text-blue-600 animate-bounce-slow"></div>
             <h3 id="alert-title" class="text-2xl md:text-3xl font-black mb-3 md:mb-4 text-slate-800">Mensaje</h3>
             <p id="alert-message" class="text-slate-600 font-bold text-base md:text-lg mb-6 md:mb-8"></p>
             <button onclick="closeAlert()" class="btn-primary w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-xl">¡ENTENDIDO!</button>
         </div>
     </div>
 
-    <!-- MÓDULO DE BIENVENIDA -->
-    <div id="auth-screen" class="fixed inset-0 z-[300] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center p-2 md:p-4">
+    <!-- MÓDULO DE BIENVENIDA / AUTH -->
+    <div id="auth-screen" class="fixed inset-0 z-[400] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center p-2 md:p-4 hidden">
         <div class="bg-white/95 backdrop-blur-md rounded-[2rem] md:rounded-[4rem] shadow-2xl p-6 md:p-12 w-full max-w-5xl flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-10 border-4 md:border-8 border-white animate-pop max-h-[98vh] overflow-y-auto custom-scrollbar">
             <div class="flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-4 border-dashed border-slate-200 pb-8 md:pb-0 md:pr-10 text-center md:text-left">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-blue-100 text-blue-600 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-6 mx-auto md:mx-0 shadow-inner">
-                    <i data-lucide="sparkles" class="w-8 h-8 md:w-10 md:h-10"></i>
+                <div class="flex items-center gap-4 mb-6 justify-center md:justify-start">
+                    <div class="text-5xl animate-float select-none">🦁</div>
+                    <div class="bg-blue-50 border-4 border-blue-200 rounded-2xl rounded-tl-none px-4 py-3 text-sm font-bold text-blue-800 text-left" style="max-width:220px">
+                        ¡Hola! Soy <b>Leo</b> 🎒 ¡Tu guía de aventuras! ¿Cómo te llamas?
+                    </div>
                 </div>
-                <h2 class="text-3xl md:text-4xl font-black mb-3 md:mb-4 text-blue-900">¡Nueva Aventura!</h2>
-                <p class="text-slate-500 font-bold text-base md:text-lg mb-4 md:mb-6">Escribe tu nombre y elige a tu compañero de viaje.</p>
-                
                 <input type="text" id="input-name" placeholder="Tu Nombre Aquí" class="w-full px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] border-4 border-slate-100 focus:border-blue-400 outline-none text-xl md:text-2xl font-bold mb-6 text-center md:text-left shadow-inner">
                 
                 <p class="text-xs md:text-sm font-bold text-slate-400 mb-3 uppercase tracking-widest text-center md:text-left">Elige tu Avatar</p>
@@ -155,9 +281,7 @@
             </div>
             
             <div class="flex flex-col justify-center text-center">
-                <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-600 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-6 mx-auto shadow-inner">
-                    <i data-lucide="backpack" class="w-8 h-8 md:w-10 md:h-10"></i>
-                </div>
+                <div class="w-16 h-16 md:w-20 md:h-20 bg-emerald-100 text-emerald-600 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-6 mx-auto shadow-inner text-4xl">🎒</div>
                 <h2 class="text-3xl md:text-4xl font-black mb-3 md:mb-4 text-emerald-900">Continuar</h2>
                 <p class="text-slate-500 font-bold text-base md:text-lg mb-6 md:mb-8">¿Ya tienes tu archivo mágico guardado? ¡Súbelo aquí!</p>
                 <div class="border-4 border-dashed border-emerald-300 bg-emerald-50 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-center hover:bg-emerald-100 active:scale-95 transition-all cursor-pointer group" onclick="document.getElementById('file-upload').click()">
@@ -169,59 +293,14 @@
         </div>
     </div>
 
-    <!-- ENCUESTA DIAGNÓSTICA (MÓVIL ADAPTADA) -->
-    <div id="survey-screen" class="fixed inset-0 z-[250] bg-blue-500 hidden items-center justify-center p-2 md:p-4">
-        <div class="bg-white rounded-[2rem] md:rounded-[4rem] shadow-2xl p-6 md:p-10 w-full max-w-3xl max-h-[95vh] overflow-y-auto custom-scrollbar border-4 md:border-8 border-white relative">
-            <div class="hidden md:flex absolute -top-10 -right-10 w-32 h-32 bg-yellow-300 rounded-full items-center justify-center animate-bounce-slow shadow-lg border-4 border-white">
-                <i data-lucide="star" class="w-16 h-16 text-yellow-600 fill-current"></i>
-            </div>
-            <h2 class="text-3xl md:text-4xl font-black text-blue-900 mb-2 mt-2 md:mt-0 text-center md:text-left">¡Conozcámonos un poco!</h2>
-            <p class="text-slate-500 font-bold text-lg md:text-xl mb-6 md:mb-10 text-center md:text-left">Responde estas preguntas divertidas antes de empezar.</p>
-            <form id="diagnostic-survey" class="space-y-6 md:space-y-8">
-                <div class="bg-orange-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-orange-100">
-                    <h3 class="font-black text-xl md:text-2xl text-orange-800 mb-4 md:mb-6">1. ¿Te gusta leer? 📚</h3>
-                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-orange-200 hover:border-orange-400 active:scale-95 font-bold text-lg md:text-xl transition-transform"><input type="radio" name="q1" value="Sí" class="hidden peer" required><span class="peer-checked:text-orange-600">¡Sí, mucho!</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-orange-200 hover:border-orange-400 active:scale-95 font-bold text-lg md:text-xl transition-transform"><input type="radio" name="q1" value="No" class="hidden peer"><span class="peer-checked:text-orange-600">No mucho</span></label>
-                    </div>
-                </div>
-                <div class="bg-green-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-green-100">
-                    <h3 class="font-black text-xl md:text-2xl text-green-800 mb-4 md:mb-6">2. ¿Qué tipo de historias prefieres? 🐉</h3>
-                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q2" value="Cuentos" class="hidden peer" required><span class="peer-checked:text-green-600">Cuentos</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q2" value="Historias" class="hidden peer"><span class="peer-checked:text-green-600">Historias</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-green-200 hover:border-green-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q2" value="Otros" class="hidden peer"><span class="peer-checked:text-green-600">Otros</span></label>
-                    </div>
-                </div>
-                <div class="bg-purple-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-purple-100">
-                    <h3 class="font-black text-xl md:text-2xl text-purple-800 mb-4 md:mb-6">3. ¿Lees en tu casa? 🏠</h3>
-                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q3" value="Siempre" class="hidden peer" required><span class="peer-checked:text-purple-600">¡Siempre!</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q3" value="A veces" class="hidden peer"><span class="peer-checked:text-purple-600">A veces</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-purple-200 hover:border-purple-400 active:scale-95 font-bold text-base md:text-lg transition-transform"><input type="radio" name="q3" value="Nunca" class="hidden peer"><span class="peer-checked:text-purple-600">Nunca</span></label>
-                    </div>
-                </div>
-                <div class="bg-blue-50 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-4 border-blue-100">
-                    <h3 class="font-black text-xl md:text-2xl text-blue-800 mb-4 md:mb-6">4. ¿Te gustaría aprender jugando? 🎮</h3>
-                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-blue-200 hover:border-blue-400 active:scale-95 font-bold text-xl transition-transform"><input type="radio" name="q4" value="Sí" class="hidden peer" required><span class="peer-checked:text-blue-600">¡SÍ!</span></label>
-                        <label class="flex-1 text-center cursor-pointer bg-white p-4 rounded-[1.2rem] md:rounded-[1.5rem] border-4 border-blue-200 hover:border-blue-400 active:scale-95 font-bold text-xl transition-transform"><input type="radio" name="q4" value="No" class="hidden peer"><span class="peer-checked:text-blue-600">No</span></label>
-                    </div>
-                </div>
-                <button type="button" onclick="submitSurvey()" class="btn-magic w-full py-5 md:py-6 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl flex justify-center gap-2 md:gap-3 mt-8">
-                    ¡GUARDAR Y JUGAR! <i data-lucide="play-circle"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- GRAN MENSAJE DE BIENVENIDA -->
+    <!-- MÓDULO DE BIENVENIDA FINAL -->
     <div id="welcome-modal" class="fixed inset-0 z-[350] modal-overlay hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-[2rem] md:rounded-[4rem] shadow-2xl p-8 md:p-14 w-full max-w-2xl text-center border-4 md:border-8 border-yellow-300 animate-pop relative overflow-hidden">
             <div class="absolute -top-10 -left-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float"></div>
             <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-pink-100 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-float" style="animation-delay: 2s;"></div>
             
             <h2 class="text-4xl md:text-5xl font-black text-blue-900 mb-6 relative z-10">¡Bienvenido! 🎉</h2>
+            <p id="welcome-name-display" class="text-blue-600 font-bold text-lg mb-6"></p>
             
             <div class="space-y-4 md:space-y-6 text-left mb-8 md:mb-10 relative z-10">
                 <div class="flex items-center gap-3 md:gap-4 bg-blue-50 p-3 md:p-4 rounded-xl md:rounded-2xl">
@@ -244,7 +323,39 @@
         </div>
     </div>
 
-    <!-- BARRA DE NAVEGACIÓN PRINCIPAL (MÓVIL ADAPTADA) -->
+    <!-- MODAL SOBRE EL PROYECTO (UTB) -->
+    <div id="project-modal" class="fixed inset-0 z-[560] modal-overlay hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-pop">
+            <div class="p-10 bg-gradient-to-br from-blue-700 to-indigo-600 text-white relative">
+                <button onclick="toggleProjectModal()" class="absolute top-8 right-8 text-white/40 hover:text-white transition-colors"><i data-lucide="x"></i></button>
+                <h2 class="text-3xl font-black mb-2 tracking-tighter">Sobre la Investigación</h2>
+                <p class="opacity-80 font-bold uppercase text-[10px] tracking-[0.2em]">Maestría en Educación Mediada por las TIC - UTB</p>
+            </div>
+            <div class="p-10 overflow-y-auto custom-scrollbar space-y-8">
+                <section>
+                    <h4 class="text-blue-600 font-black uppercase text-xs tracking-widest mb-4">Objetivo General</h4>
+                    <p class="text-slate-700 font-bold text-xl leading-relaxed italic">"Fortalecer la comprensión lectora en los estudiantes de segundo grado mediante el diseño e implementación de un EVA."</p>
+                </section>
+                <div class="grid grid-cols-2 gap-8">
+                    <section>
+                        <h4 class="text-blue-600 font-black uppercase text-xs tracking-widest mb-3">Investigadores</h4>
+                        <ul class="text-slate-600 font-bold space-y-2 text-sm">
+                            <li>• Lilibeth Herrera R.</li>
+                            <li>• Leidy Yohana Baena G.</li>
+                            <li>• Alexander Escobar H.</li>
+                            <li>• Piedad Franco H.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h4 class="text-blue-600 font-black uppercase text-xs tracking-widest mb-3">Contexto</h4>
+                        <p class="text-slate-600 font-bold text-sm">IED San Vicente de Paúl<br>Barranquilla, Atlántico</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav class="bg-white/95 backdrop-blur-xl border-b-4 border-slate-200 p-3 md:p-4 sticky top-0 z-50 shadow-sm flex-none">
         <div class="container mx-auto max-w-6xl flex flex-wrap justify-between items-center gap-y-3">
             <div class="flex items-center gap-3 md:gap-4">
@@ -255,25 +366,22 @@
                 </div>
             </div>
             
-            <!-- Botones de Acción Múltiple adaptados para celular -->
             <div class="flex items-center gap-2 flex-wrap md:justify-end w-full sm:w-auto mt-2 sm:mt-0">
-                
+                <button onclick="toggleProjectModal()" class="p-2 md:p-3 text-blue-400 hover:text-blue-600 active:scale-95 transition-all border-2 md:border-4 border-blue-100 rounded-xl md:rounded-2xl bg-white" title="Info Proyecto">
+                    <i data-lucide="info" class="w-5 h-5 md:w-6 md:h-6"></i>
+                </button>
                 <div class="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-black border-2 border-yellow-300 shadow-sm text-sm md:text-lg" title="Estrellas Ganadas">
                     <span id="star-counter">0</span> ⭐
                 </div>
-
                 <button onclick="openForum()" class="flex-1 sm:flex-none flex justify-center items-center gap-2 bg-purple-100 text-purple-700 hover:bg-purple-200 active:scale-95 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold transition-all border-2 border-purple-200 shadow-sm" title="Foro de Amigos">
                     <span class="text-lg md:text-2xl">💬</span> <span class="hidden md:inline text-sm md:text-lg">Foro</span>
                 </button>
-                
                 <button onclick="sendToWhatsAppAndDownload()" class="flex-1 sm:flex-none flex justify-center items-center gap-2 bg-green-100 text-green-700 hover:bg-green-200 active:scale-95 px-3 py-2 md:py-3 rounded-xl md:rounded-2xl font-bold transition-all border-2 border-green-200 shadow-sm" title="Enviar mis logros al profe">
                     <span class="text-lg md:text-2xl">📲</span> <span class="hidden lg:inline text-sm md:text-lg">Enviar a Profe</span>
                 </button>
-                
                 <button onclick="toggleTeacherPanel()" class="p-2 md:p-3 text-slate-400 hover:text-slate-800 active:scale-95 transition-all border-2 md:border-4 border-slate-100 rounded-xl md:rounded-2xl bg-white hover:bg-slate-50" title="Zona del Profesor">
                     <i data-lucide="settings" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </button>
-                
                 <button onclick="logout()" class="p-2 md:p-3 text-red-400 hover:text-red-600 active:scale-95 transition-all border-2 md:border-4 border-red-100 rounded-xl md:rounded-2xl bg-white hover:bg-red-50" title="Salir">
                     <i data-lucide="log-out" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </button>
@@ -288,7 +396,7 @@
                 <h3 class="text-xl md:text-2xl font-black text-blue-300 uppercase tracking-widest flex items-center justify-center md:justify-start gap-2 md:gap-3 mb-2">
                     <i data-lucide="shield-check" class="w-6 h-6 md:w-8 h-8"></i> Zona del Docente
                 </h3>
-                <p class="text-sm md:text-base text-slate-400 font-bold">Exporta los datos de evaluación y seguimiento.</p>
+                <p class="text-sm md:text-base text-slate-400 font-bold">Exporta los datos de evaluación y diagnóstico objetivo.</p>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <button onclick="exportTeacherReport()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 active:scale-95 px-6 py-3 md:py-4 rounded-[1rem] md:rounded-2xl font-black text-base md:text-xl flex items-center justify-center gap-2 md:gap-3 transition-transform border-2 border-blue-400">
@@ -304,9 +412,7 @@
         <!-- SÚPER BANNER DEL FORO -->
         <div class="bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between mb-8 md:mb-12 border-4 md:border-8 border-purple-200 active:scale-[0.98] transition-transform cursor-pointer" onclick="openForum()">
             <div class="flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-0 text-center md:text-left">
-                <div class="bg-white p-3 md:p-4 rounded-full shadow-lg border-4 border-purple-300 animate-float text-4xl md:text-5xl">
-                    👋
-                </div>
+                <div class="bg-white p-3 md:p-4 rounded-full shadow-lg border-4 border-purple-300 animate-float text-4xl md:text-5xl">👋</div>
                 <div>
                     <h2 class="text-3xl md:text-4xl font-black text-white drop-shadow-md mb-1">El Foro Mágico</h2>
                     <p class="text-purple-100 font-bold text-sm md:text-xl">¡Escribe tus ideas y compártelas con la clase!</p>
@@ -318,9 +424,7 @@
         </div>
 
         <header class="mb-8 md:mb-12 text-center md:text-left flex flex-col md:flex-row items-center justify-center md:justify-start gap-4 md:gap-6">
-            <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-yellow-400 animate-float shrink-0 text-4xl md:text-5xl">
-                🗺️
-            </div>
+            <div class="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-yellow-400 animate-float shrink-0 text-4xl md:text-5xl">🗺️</div>
             <div>
                 <h2 class="text-4xl md:text-6xl font-black text-blue-900 tracking-tight mb-2">Mapa de Misiones</h2>
                 <p class="text-slate-600 font-bold text-lg md:text-xl px-4 md:px-0">¡Completa los módulos para el Reto Final!</p>
@@ -342,14 +446,11 @@
                 </div>
                 <button onclick="closeForum()" class="bg-white/20 hover:bg-white/40 p-2 md:p-4 rounded-full transition-colors active:scale-90"><i data-lucide="x" class="w-6 h-6 md:w-8 md:h-8"></i></button>
             </div>
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-purple-50 space-y-4 md:space-y-6 custom-scrollbar" id="forum-messages">
-                <!-- Contenido Dinámico -->
-            </div>
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-purple-50 space-y-4 md:space-y-6 custom-scrollbar" id="forum-messages"></div>
             <div class="p-4 md:p-8 bg-white border-t-4 md:border-t-8 border-purple-100 shrink-0 pb-8 md:pb-8">
                 <p class="font-black text-slate-500 mb-2 md:mb-4 uppercase tracking-widest text-xs md:text-sm">Escribe lo que tú quieras opinar:</p>
                 <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
-                    <!-- ENTRADA DE TEXTO LIBRE (NUEVO) -->
-                    <input type="text" id="forum-input" placeholder="¡Escribe tu idea mágica aquí!..." class="flex-1 p-4 md:p-5 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-slate-200 font-bold text-base md:text-xl text-slate-700 outline-none focus:border-purple-400 bg-slate-50" maxlength="150">
+                    <input type="text" id="forum-input" placeholder="¡Escribe tu idea mágica aquí!..." class="flex-1 p-4 md:p-5 rounded-2xl md:rounded-[2rem] border-2 md:border-4 border-slate-200 font-bold text-base md:text-xl text-slate-700 outline-none focus:border-purple-400 bg-slate-50" maxlength="150" onkeypress="if(event.key==='Enter') postForumMessage()">
                     <button onclick="postForumMessage()" class="btn-magic text-white w-full sm:w-auto px-6 md:px-10 py-4 md:py-5 rounded-2xl md:rounded-[2rem] font-black text-lg md:text-xl flex items-center justify-center gap-2">
                         ENVIAR <i data-lucide="send" class="w-5 h-5 md:w-6 md:h-6"></i>
                     </button>
@@ -358,26 +459,21 @@
         </div>
     </div>
 
-    <!-- MÓDULO SOPORTE TÉCNICO (WHATSAPP CORPORATIVO) -->
+    <!-- MÓDULO SOPORTE TÉCNICO -->
     <div id="support-modal" class="fixed inset-0 z-[450] modal-overlay hidden flex items-center justify-center p-0 md:p-4">
         <div class="bg-white w-full h-full md:h-auto max-w-xl md:rounded-[3rem] shadow-2xl flex flex-col text-center md:border-8 border-yellow-300 animate-pop">
             <div class="p-6 md:p-10 bg-yellow-50 relative flex-1 flex flex-col justify-center">
                 <button onclick="closeSupport()" class="absolute top-4 right-4 md:top-6 md:right-6 text-yellow-500 hover:text-yellow-700 bg-yellow-200 p-2 rounded-full active:scale-90"><i data-lucide="x" class="w-6 h-6 md:w-8 md:h-8"></i></button>
-                <div class="w-24 h-24 md:w-32 md:h-32 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg border-4 border-white animate-float">
-                    <i data-lucide="bot" class="w-12 h-12 md:w-20 md:h-20 text-yellow-900"></i>
-                </div>
+                <div class="w-24 h-24 md:w-32 md:h-32 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-lg border-4 border-white animate-float text-5xl">🦁</div>
                 <h3 class="font-black text-3xl md:text-4xl text-yellow-900 mb-3 md:mb-4">Ayuda Técnica</h3>
                 <p class="text-slate-600 font-bold text-lg md:text-xl leading-relaxed mb-6 md:mb-8 px-4">
-                    ¿No sabes qué hacer?<br>
-                    1. Toca un módulo abierto.<br>
-                    2. Mira el video, lee o escucha.<br>
-                    3. Responde para ganar estrellas.
+                    ¿No sabes qué hacer?<br>1. Toca un módulo abierto.<br>2. Mira el video o lee la historia.<br>3. Responde para ganar estrellas.
                 </p>
                 <div class="flex flex-col gap-3 md:gap-4 px-4">
                     <button onclick="readSupportAloud()" class="btn-magic w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-xl flex justify-center items-center gap-2">
                         ESCUCHAR INSTRUCCIONES <i data-lucide="volume-2" class="w-5 h-5 md:w-6 md:h-6"></i>
                     </button>
-                    <!-- BOTÓN WHATSAPP CON NÚMERO REAL -->
+                    <!-- BOTÓN WHATSAPP CORPORATIVO (+57 300 4323504) -->
                     <button onclick="contactTechSupport()" class="btn-whatsapp w-full py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-lg md:text-xl flex justify-center items-center gap-2">
                         SOPORTE WHATSAPP <i data-lucide="message-circle" class="w-5 h-5 md:w-6 md:h-6"></i>
                     </button>
@@ -434,18 +530,14 @@
                     <div class="w-24 h-24 md:w-40 md:h-40 bg-yellow-400 rounded-full flex items-center justify-center mb-6 md:mb-8 shadow-[0_0_40px_rgba(250,204,21,0.6)] md:shadow-[0_0_60px_rgba(250,204,21,0.6)] animate-bounce-slow border-4 md:border-8 border-white">
                         <i data-lucide="star" class="w-12 h-12 md:w-20 md:h-20 text-white fill-current"></i>
                     </div>
-                    <h2 class="text-4xl md:text-6xl font-black text-blue-900 mb-2 md:mb-4">¡Eres Genial!</h2>
-                    
-                    <!-- Contenedor dinámico de Calificación / Éxito -->
+                    <h2 class="text-4xl md:text-6xl font-black text-blue-900 mb-2 md:mb-4">¡Genial!</h2>
                     <div id="success-score"></div>
-
                     <button onclick="finishStoryAndPromptSave()" class="btn-primary w-full sm:w-auto px-8 md:px-10 py-4 md:py-5 rounded-[1.5rem] md:rounded-[2rem] text-white font-black text-xl md:text-2xl flex justify-center items-center gap-3 mt-4">
                         VOLVER AL MAPA <i data-lucide="map" class="w-6 h-6 md:w-8 md:h-8"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Controles Inferiores -->
             <div class="p-4 md:p-8 bg-white border-t-2 md:border-t-4 border-slate-100 flex flex-col md:flex-row gap-4 md:gap-6 justify-between items-center shrink-0 pb-6 md:pb-8">
                 <div class="w-full md:w-1/2">
                     <div class="flex justify-between text-xs md:text-sm font-black text-slate-400 uppercase tracking-widest mb-2 md:mb-3">
@@ -465,7 +557,7 @@
 
     <script>
         // ==========================================
-        // BASE DE DATOS DE HISTORIAS Y MÓDULOS (Con Textos Más Largos y Sílabas Trabadas)
+        // BASE DE DATOS DE HISTORIAS Y MÓDULOS 
         // ==========================================
         const modulesData = [
             { id: 'mod1', title: 'Módulo 1: Diagnóstico', desc: 'Conozcamos cómo lees', color: 'blue', emoji: '🔍' },
@@ -476,33 +568,30 @@
         ];
 
         const storiesData = [
-            // Módulo 1 (DIAGNÓSTICO OBJETIVO - 9 preguntas)
-            { id: 'm1', moduleId: 'mod1', title: "Bruno y Milo", tag: "Diagnóstico", emoji: "🐶", color: "blue", text: "Bruno el perro y Milo el gato eran grandes amigos. Un día claro, decidieron brincar y jugar en el prado verde. Bruno llevaba su juguete preferido, un plato de plástico rojo, y Milo prefería perseguir mariposas. De pronto, mientras jugaban una broma, encontraron un misterioso cofre de cristal cerca de un roble.", 
+            // Módulo 1 (DIAGNÓSTICO OBJETIVO - 9 preguntas. Sin video. Sin pistas.)
+            { id: 'm1', moduleId: 'mod1', title: "Bruno y Milo", tag: "Diagnóstico", emoji: "🐶", color: "blue", text: "Bruno el perro y Milo el gato eran grandes amigos. Un día claro, decidieron brincar y jugar en el prado verde. Bruno llevaba su juguete preferido, un plato de plástico rojo, y Milo prefería perseguir mariposas. De pronto, mientras jugaban una broma, encontraron un misterioso cofre de cristal cerca de un gran roble.", 
                 questions: [
-                    { level: 'Literal', type: 'choice', q: "¿Quiénes son los personajes principales de la historia?", options: ["Bruno y Milo", "Paco y Lola", "El árbol y el prado"], correct: 0, hint: "Mira los nombres al inicio." }, 
+                    { level: 'Literal', type: 'choice', q: "¿Quiénes son los personajes principales de la historia?", options: ["Bruno y Milo", "Paco y Lola", "El árbol y el prado"], correct: 0, hint: "" }, 
                     { level: 'Literal', type: 'choice', q: "¿Qué juguete llevaba Bruno al prado?", options: ["Un hueso grande", "Un plato de plástico rojo", "Mariposas de colores"], correct: 1, hint: "" }, 
                     { level: 'Literal', type: 'choice', q: "¿Qué encontraron los amigos cerca del roble?", options: ["Agua fría", "Un cofre de cristal", "Un pedazo de plástico"], correct: 1, hint: "" }, 
-                    
                     { level: 'Inferencial', type: 'choice', q: "¿Por qué crees que estaban jugando en el prado?", options: ["Porque tenían mucho frío", "Porque el día estaba lindo y claro", "Para esconder el cofre"], correct: 1, hint: "" }, 
                     { level: 'Inferencial', type: 'choice', q: "¿Cómo se sentían los amigos en el prado?", options: ["Estaban tristes", "Estaban muy felices y juguetones", "Estaban bravos"], correct: 1, hint: "" },
                     { level: 'Inferencial', type: 'choice', q: "¿Qué crees que había dentro del cofre de cristal?", options: ["Tierra sucia", "Un premio o tesoro especial", "Un plato rojo"], correct: 1, hint: "" }, 
-
                     { level: 'Crítico', type: 'open', q: "¿Te parece bien que un perro y un gato sean grandes amigos? Explica tu respuesta." },
                     { level: 'Crítico', type: 'open', q: "¿Qué harías tú si encuentras un cofre de cristal escondido?" },
                     { level: 'Crítico', type: 'open', q: "¿De qué forma cuidas y juegas con tus propios amigos?" }
                 ] 
             },
-            
-            // Módulo 2
-            { id: 'm2', moduleId: 'mod2', title: "La Ciénaga", tag: "Naturaleza", emoji: "🏖️", color: "emerald", youtube: "KjS6QhQj3hM", text: "Cerca de la escuela San Vicente de Paúl, se encuentra la hermosa Ciénaga de Mallorquín. Es un lugar increíble lleno de agua tranquila, brisa suave y manglares de color verde. Los niños saben que en este prado de agua viven aves preciosas como los flamencos y otros animales. La profesora Lilibeth les explicó que debemos cuidar este lugar con mucho afecto, protegiendo los árboles y animales frente a cualquier problema.", 
+            { id: 'm2', moduleId: 'mod1', title: "La Ciénaga", tag: "Lectura Inicial", emoji: "🏖️", color: "cyan", text: "Cerca de la escuela San Vicente de Paúl, se encuentra la hermosa Ciénaga de Mallorquín. Es un lugar increíble lleno de agua tranquila, brisa suave y manglares de color verde. Los niños saben que en este prado de agua viven aves preciosas como los flamencos. La profesora Lilibeth les explicó que debemos cuidar este lugar con mucho afecto, protegiendo los árboles frente a cualquier problema.", 
                 questions: [
-                    { level: 'Literal', type: 'choice', q: "¿Cómo es el agua de la Ciénaga de Mallorquín?", options: ["Tranquila", "Muy brava", "Seca"], correct: 0, hint: "Recuerda cómo se describe el agua." }, 
-                    { level: 'Literal', type: 'choice', q: "¿Qué aves viven allí según la historia?", options: ["Gallinas", "Flamencos", "Águilas"], correct: 1, hint: "Aves rosadas muy bonitas." }, 
-                    { level: 'Inferencial', type: 'choice', q: "¿Por qué la profesora pide cuidar los árboles frente a los problemas?", options: ["Para cortarlos", "Para proteger el refugio de los animales", "Para que den manzanas"], correct: 1, hint: "Piensa en quiénes viven en la ciénaga." }, 
+                    { level: 'Literal', type: 'choice', q: "¿Cómo es el agua de la Ciénaga de Mallorquín?", options: ["Tranquila", "Muy brava", "Seca"], correct: 0, hint: "" }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Por qué la profesora pide cuidar los árboles frente a los problemas?", options: ["Para cortarlos", "Para proteger el refugio de los animales", "Para que den manzanas"], correct: 1, hint: "" }, 
                     { level: 'Crítico', type: 'open', q: "¿Qué harías tú para proteger los árboles y el agua de tu ciudad?" }
                 ] 
             },
-            { id: 'm3', moduleId: 'mod2', title: "La Hormiguita", tag: "Fábula", emoji: "🐜", color: "amber", text: "Una pequeña hormiguita caminaba frente al sol trabajando muy fuerte. Iba cargando un gran tronco y un enorme grano de trigo. De pronto, un grillo flaco la vio y se burló diciéndole: '¡Frena un poco y deja de trabajar!'. La hormiguita no prestó atención y siguió su camino. Cuando llegó el frío invierno, el grillo estaba triste y hambriento. La hormiguita fue amable y le ofreció un plato con comida caliente.", 
+            
+            // Módulo 2
+            { id: 'm3', moduleId: 'mod2', title: "La Hormiguita", tag: "Fábula", emoji: "🐜", color: "amber", youtube: "l5jLKKynDqk", text: "Una pequeña hormiguita caminaba frente al sol trabajando muy fuerte. Iba cargando un gran tronco y un enorme grano de trigo. De pronto, un grillo flaco la vio y se burló diciéndole: '¡Frena un poco y deja de trabajar!'. La hormiguita no prestó atención y siguió su camino. Cuando llegó el frío invierno, el grillo estaba triste y hambriento. La hormiguita fue amable y le ofreció un plato con comida caliente.", 
                 questions: [
                     { level: 'Literal', type: 'choice', q: "¿Qué cargaba la hormiguita frente al sol?", options: ["Un tronco y un grano de trigo", "Una hoja de plástico", "Mucha agua"], correct: 0, hint: "Busca los dos objetos pesados." }, 
                     { level: 'Literal', type: 'choice', q: "¿Qué insecto se burló de ella?", options: ["Un dragón", "Un grillo flaco", "Una mariposa"], correct: 1, hint: "Alguien que le dijo que frenara." }, 
@@ -510,37 +599,41 @@
                     { level: 'Crítico', type: 'open', q: "¿Te parece que la hormiga hizo lo correcto al ayudar al grillo burlón? ¿Por qué?" }
                 ] 
             },
-            
-            // Módulo 3
-            { id: 'm4', moduleId: 'mod3', title: "Carnaval", tag: "Cultura", emoji: "🎉", color: "purple", youtube: "gC4WpT_hYQo", text: "En Barranquilla, el Carnaval es un premio a la alegría. Todos preparan su disfraz para salir a celebrar. En la calle se escuchan los tambores y la flauta, mientras bailan las Marimondas, los Monocucos y las Negritas Puloy. El valor principal de esta enorme fiesta es el respeto mutuo. Si alguien cruza corriendo y se tropieza frente al público, todos frenan la música y le brindan ayuda para que la celebración no pare.", 
+            { id: 'm4', moduleId: 'mod2', title: "La Iguana", tag: "Fauna", emoji: "🦎", color: "emerald", text: "Juan iba por la Vía 40 cuando vio una Iguana verde tomando el sol. La iguana movió la cabeza saludando de forma grandiosa.<br><br>Juan recordó: 'Las iguanas son parte de nuestra tierra, no debemos asustarlas en ningún problema'. Le tomó una foto de cristal de lejos y siguió su camino.", 
                 questions: [
-                    { level: 'Literal', type: 'choice', q: "¿Qué instrumentos se escuchan en la celebración?", options: ["Guitarras", "Tambores y la flauta", "Pianos"], correct: 1, hint: "Busca la parte donde hacen música." }, 
-                    { level: 'Literal', type: 'choice', q: "¿Cuál es el valor principal de la fiesta?", options: ["El respeto mutuo", "Correr rápido", "Comprar plástico"], correct: 0, hint: "El valor más importante mencionado." }, 
-                    { level: 'Inferencial', type: 'choice', q: "¿Por qué crees que todos frenan la música si alguien se cae?", options: ["Para burlarse", "Para brindarle ayuda y que no se lastime", "Porque se cansaron"], correct: 1, hint: "En la fiesta todos se cuidan." }, 
-                    { level: 'Inferencial', type: 'choice', q: "¿Qué significa que el carnaval es un 'premio a la alegría'?", options: ["Que te dan dinero", "Que celebra estar felices juntos", "Que es obligatorio"], correct: 1, hint: "Es una fiesta llena de sonrisas." }, 
-                    { level: 'Crítico', type: 'open', q: "¿Cuál es tu parte favorita de las fiestas o del carnaval y cómo te portas allí?" }
+                    { level: 'Literal', type: 'choice', q: "¿Dónde vio Juan a la iguana?", options: ["En el techo", "En la Vía 40", "En un árbol"], correct: 1, hint: "Mira el inicio del texto." }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Por qué tomó la foto de lejos?", options: ["Para no asustarla", "Su cámara estaba rota", "Le daba miedo"], correct: 0, hint: "Recuerda lo que dijo sobre no asustarlas." }, 
+                    { level: 'Crítico', type: 'open', q: "¿Cómo podemos ayudar a los animales de la calle?" }
                 ] 
             },
-            { id: 'm5', moduleId: 'mod3', title: "Alegrías", tag: "Informativo", emoji: "🍬", color: "pink", text: "Las amables palenqueras preparan y venden un postre crujiente y delicioso llamado Alegrías. Estos dulces están elaborados principalmente con semillas de millo, pedacitos de coco fresco y panela. Para prepararlas, primero se tuesta el millo en una olla grande. Luego, se mezclan todos los ingredientes calientes creando una bola dulce y deliciosa que le quita la tristeza a cualquiera que la pruebe.", 
+            
+            // Módulo 3
+            { id: 'm5', moduleId: 'mod3', title: "Carnaval", tag: "Cultura", emoji: "🎉", color: "purple", youtube: "gC4WpT_hYQo", text: "En Barranquilla, el Carnaval es un premio a la alegría. Todos preparan su disfraz para salir a celebrar. En la calle se escuchan los tambores y la flauta, mientras bailan las Marimondas, los Monocucos y las Negritas Puloy. El valor principal de esta enorme fiesta es el respeto mutuo. Si alguien cruza corriendo y se tropieza frente al público, todos frenan la música y le brindan ayuda para que la celebración no pare.", 
+                questions: [
+                    { level: 'Literal', type: 'choice', q: "¿Qué instrumentos se escuchan en la celebración?", options: ["Guitarras", "Tambores y la flauta", "Pianos"], correct: 1, hint: "Busca la parte donde hacen música." }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Por qué crees que todos frenan la música si alguien se cae?", options: ["Para burlarse", "Para brindarle ayuda y que no se lastime", "Porque se cansaron"], correct: 1, hint: "En la fiesta todos se cuidan." }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Qué significa que el carnaval es un 'premio a la alegría'?", options: ["Que te dan dinero", "Que celebra estar felices juntos", "Que es obligatorio"], correct: 1, hint: "Es una fiesta llena de sonrisas." }, 
+                    { level: 'Crítico', type: 'open', q: "¿Cuál es tu parte favorita del carnaval y cómo te portas allí?" }
+                ] 
+            },
+            { id: 'm6', moduleId: 'mod3', title: "Alegrías", tag: "Informativo", emoji: "🍬", color: "pink", text: "Las amables palenqueras preparan y venden un postre crujiente llamado Alegrías. Estos dulces están elaborados con semillas de millo de trigo, pedacitos de coco fresco y panela. Para prepararlas, primero se tuesta el millo en una olla grande. Luego, se mezclan todos los ingredientes calientes creando una bola dulce y deliciosa que le quita la tristeza a cualquiera que la pruebe.", 
                 questions: [
                     { level: 'Literal', type: 'choice', q: "¿De qué están hechas las Alegrías?", options: ["Chocolate y plástico", "Millo, pedacitos de coco y panela", "Solamente de azúcar"], correct: 1, hint: "Ingredientes crujientes." }, 
-                    { level: 'Literal', type: 'choice', q: "¿Quiénes preparan este delicioso postre?", options: ["Las amables palenqueras", "Los pescadores", "El profesor"], correct: 0, hint: "Las mujeres que venden el postre." }, 
-                    { level: 'Inferencial', type: 'choice', q: "¿Por qué dice que la bola dulce 'le quita la tristeza a cualquiera'?", options: ["Porque tiene magia", "Porque es muy sabrosa y da energía", "Porque te hace llorar"], correct: 1, hint: "Comer algo rico nos pone de buen humor." }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Por qué dice que la bola dulce 'le quita la tristeza a cualquiera'?", options: ["Porque tiene magia de dragón", "Porque es muy sabrosa y da energía", "Porque te hace llorar"], correct: 1, hint: "Comer algo rico nos pone de buen humor." }, 
                     { level: 'Crítico', type: 'open', q: "Escribe cómo harías tú un dulce especial usando tus ingredientes favoritos." }
                 ] 
             },
             
             // Módulo 4
-            { id: 'm6', moduleId: 'mod4', title: "El Pescador", tag: "Narrativo", emoji: "🎣", color: "sky", text: "<i>(Nota: El video te mostrará cómo es un río real para que te lo imagines mejor).</i><br><br>Don Pedro es un viejo pescador que sale de madrugada al río. A él le encanta sentir la brisa fresca en su rostro. Un día de mucho trabajo, en lugar de un pez grande, atrapó una botella de plástico gris. Dentro de la botella había un papel que decía: 'El río es vida, protégelo'. Desde aquel día, Don Pedro recoge toda la basura que cruza frente a su barca.", 
+            { id: 'm7', moduleId: 'mod4', title: "El Pescador", tag: "Narrativo", emoji: "🎣", color: "sky", youtube: "yOGqpFOO2Dk", text: "<i>(Nota: El video te mostrará cómo es un río real para que te lo imagines mejor mientras lees).</i><br><br>Don Pedro es un pescador que sale de madrugada al río. A él le encanta sentir la brisa fresca. Un día de mucho trabajo, en lugar de un pez grande, atrapó una botella de plástico gris. Dentro de la botella había un papel que decía: 'El río es vida, protégelo del problema'. Desde aquel día, Don Pedro recoge toda la basura que cruza frente a su barca.", 
                 questions: [
-                    { level: 'Literal', type: 'choice', q: "¿A qué hora sale Don Pedro al río?", options: ["En la noche", "De madrugada", "A las doce"], correct: 1, hint: "Muy temprano por la mañana." }, 
                     { level: 'Literal', type: 'choice', q: "¿Qué atrapó en lugar de un pez grande?", options: ["Un dragón", "Una botella de plástico gris", "Un cofre de cristal"], correct: 1, hint: "Un objeto contaminante." }, 
                     { level: 'Inferencial', type: 'choice', q: "¿Qué quería enseñar el mensaje del papel?", options: ["Que el río está lleno de peces", "Que el río es valioso y no debemos ensuciarlo", "Que compre botellas nuevas"], correct: 1, hint: "Habla sobre proteger la vida." }, 
                     { level: 'Inferencial', type: 'choice', q: "¿Por qué Don Pedro ahora recoge la basura?", options: ["Porque quiere vender el plástico", "Porque comprendió que debe cuidar el río", "Porque no sabe pescar"], correct: 1, hint: "El mensaje le cambió el corazón." }, 
-                    { level: 'Crítico', type: 'open', q: "¿Qué harías si encuentras basura flotando en la playa o en el río?" }
+                    { level: 'Crítico', type: 'open', q: "¿Qué harías si encuentras basura de plástico flotando en la playa o en el río?" }
                 ] 
             },
-            { id: 'm7', moduleId: 'mod4', title: "Misterio", tag: "Escolar", emoji: "🔍", color: "indigo", text: "En nuestra escuela había un enorme problema: los libros de la biblioteca amanecían tirados en el piso. La profesora Lilibeth preparó una trampa secreta para investigar este gran misterio. Se ocultó detrás de un mueble negro. De pronto, escuchó un ruido fuerte. Se dio cuenta de que la culpa no era de ninguna bruja, sino de la fuerte brisa que entraba por un vidrio roto. ¡Arreglaron la ventana y el misterio fue resuelto para siempre!", 
+            { id: 'm8', moduleId: 'mod4', title: "Misterio Escolar", tag: "Escolar", emoji: "🔍", color: "indigo", text: "En nuestra escuela había un enorme problema: los libros de la biblioteca amanecían tirados en el piso. La profesora Lilibeth preparó una trampa secreta para investigar este gran misterio. Se ocultó detrás de un mueble negro. De pronto, escuchó un ruido fuerte. Se dio cuenta de que la culpa no era de un dragón, sino de la fuerte brisa que entraba por un vidrio roto. ¡Arreglaron la ventana y el problema fue resuelto para siempre!", 
                 questions: [
                     { level: 'Literal', type: 'choice', q: "¿Cuál era el enorme problema en la escuela?", options: ["Había mucho calor", "Los libros amanecían tirados en el piso", "Faltaban niños"], correct: 1, hint: "El problema estaba en la biblioteca." }, 
                     { level: 'Literal', type: 'choice', q: "¿Quién resolvió el misterio?", options: ["El grillo flaco", "La profesora Lilibeth", "Don Pedro"], correct: 1, hint: "Quien se ocultó para investigar." }, 
@@ -550,19 +643,19 @@
                 ] 
             },
 
-            // Módulo 5: EVALUACIÓN FINAL CON CALIFICACIÓN
-            { id: 'm8', moduleId: 'mod5', title: "El Cofre del Saber", tag: "Evaluación Parte 1", emoji: "🧰", color: "rose", text: "Has cruzado un largo camino y superado grandes pruebas. Ahora sabes que la lectura no es aburrida, ¡es como un cofre mágico de cristal! Dentro de los libros no vas a encontrar monedas de oro, ni platos de plástico, sino hermosas historias, increíbles aventuras y sabias enseñanzas que lograrán que tu imaginación crezca cada día más.", 
+            // Módulo 5: EVALUACIÓN FINAL
+            { id: 'm9', moduleId: 'mod5', title: "El Cofre", tag: "Evaluación Parte 1", emoji: "🧰", color: "rose", text: "Has cruzado un largo camino y superado grandes pruebas. Ahora sabes que la lectura no es un problema, ¡es como un cofre mágico de cristal! Dentro de los libros no vas a encontrar monedas de oro, ni platos de plástico, sino hermosas historias, increíbles aventuras y sabias enseñanzas que lograrán que tu imaginación crezca cada día más.", 
                 questions: [
                     { level: 'Inferencial', type: 'choice', q: "¿Con qué objeto mágico se compara a la lectura en este texto?", options: ["Con un plato de plástico", "Con un cofre mágico de cristal", "Con un árbol grande"], correct: 1, hint: "Piensa en algo donde se guardan tesoros." }, 
                     { level: 'Literal', type: 'choice', q: "¿Qué cosas reales encontramos dentro de los libros?", options: ["Monedas de oro puro", "Historias, aventuras y sabias enseñanzas", "Juguetes nuevos"], correct: 1, hint: "Lo que realmente nos da leer." }, 
                     { level: 'Inferencial', type: 'choice', q: "¿De qué forma la lectura hace que tu imaginación 'crezca'?", options: ["Te hace más alto", "Te permite conocer y pensar en cosas nuevas", "Te da hambre"], correct: 1, hint: "Crecer de forma intelectual." }, 
-                    { level: 'Crítico', type: 'open', q: "De todas las maravillosas historias que leíste en este juego, ¿cuál fue tu favorita y por qué?" }
+                    { level: 'Crítico', type: 'open', q: "De todas las historias que leíste en este juego, ¿cuál fue tu favorita y por qué?" }
                 ] 
             },
-            { id: 'm9', moduleId: 'mod5', title: "La Gran Medalla", tag: "Evaluación Parte 2", emoji: "🏅", color: "yellow", text: "¡Felicitaciones enorme aventurero! Has demostrado con gran esfuerzo que eres un maravilloso lector. No olvides nunca este premio: el saber leer y comprender las palabras te permite viajar a otros planetas y vivir mil vidas sin moverte de tu silla. Ahora, todo el conocimiento de la escuela y del mundo es verdaderamente tuyo.", 
+            { id: 'm10', moduleId: 'mod5', title: "La Medalla", tag: "Evaluación Final", emoji: "🏅", color: "yellow", text: "¡Felicitaciones enorme aventurero! Has demostrado con gran esfuerzo que eres un maravilloso lector. No olvides nunca este premio: el saber leer y comprender las palabras te permite cruzar fronteras, viajar a otros planetas y vivir mil vidas sin moverte de tu silla. Ahora, todo el conocimiento es verdaderamente tuyo.", 
                 questions: [
-                    { level: 'Literal', type: 'choice', q: "¿Qué te permite hacer el 'saber leer' según el texto?", options: ["Viajar a otros planetas sin moverte de tu silla", "Correr mucho más rápido que antes", "Tocar mejor la flauta"], correct: 0, hint: "Habla sobre viajar con la mente." }, 
-                    { level: 'Inferencial', type: 'choice', q: "¿Por qué dice que todo el conocimiento del mundo 'ahora es tuyo'?", options: ["Porque lo compraste con monedas", "Porque al saber leer puedes aprender cualquier cosa", "Porque te lo regaló un rey"], correct: 1, hint: "La lectura te abre todas las puertas." }, 
+                    { level: 'Literal', type: 'choice', q: "¿Qué te permite hacer el 'saber leer' según el texto?", options: ["Viajar a otros planetas sin moverte de tu silla", "Correr mucho más rápido", "Tocar la flauta"], correct: 0, hint: "Habla sobre viajar con la mente." }, 
+                    { level: 'Inferencial', type: 'choice', q: "¿Por qué dice que todo el conocimiento 'ahora es tuyo'?", options: ["Porque lo compraste", "Porque al saber leer puedes aprender cualquier cosa", "Porque te lo regaló un rey"], correct: 1, hint: "La lectura te abre todas las puertas." }, 
                     { level: 'Crítico', type: 'open', q: "Escribe un mensaje animando a otros niños a que también aprendan a leer muy bien." }
                 ] 
             }
@@ -576,14 +669,35 @@
             const temp = sessionStorage.getItem('eva_temp_session');
             if (temp) {
                 sessionData = JSON.parse(temp);
+                document.getElementById('loader-screen').classList.add('hidden');
                 if (sessionData.surveyCompleted) initDashboard();
                 else {
                     document.getElementById('auth-screen').classList.add('hidden');
                     document.getElementById('survey-screen').classList.remove('hidden');
                     document.getElementById('survey-screen').classList.add('flex');
                 }
+            } else {
+                setTimeout(() => {
+                    document.getElementById('loader-screen').classList.add('opacity-0');
+                    setTimeout(() => {
+                        document.getElementById('loader-screen').classList.add('hidden');
+                        document.getElementById('intro-screen').classList.remove('hidden');
+                    }, 1000);
+                }, 2000);
             }
         };
+
+        function handleEnterMissions() {
+            document.getElementById('intro-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('intro-screen').classList.add('hidden');
+                document.getElementById('auth-screen').classList.remove('hidden');
+            }, 500);
+        }
+
+        function toggleProjectModal() {
+            document.getElementById('project-modal').classList.toggle('hidden');
+        }
 
         function selectAvatar(emoji, btnElement) {
             tempSelectedAvatar = emoji;
@@ -611,6 +725,7 @@
             
             document.getElementById('survey-screen').classList.add('hidden'); 
             document.getElementById('survey-screen').classList.remove('flex'); 
+            document.getElementById('welcome-name-display').innerText = `¡Hola ${sessionData.studentName}!`;
             document.getElementById('welcome-modal').classList.remove('hidden');
         }
 
@@ -626,9 +741,9 @@
                 try {
                     const data = JSON.parse(e.target.result); if (!data.studentName || !data.missions) throw new Error("Inválido");
                     sessionData = data; if(!sessionData.avatar) sessionData.avatar = '🐶'; if(!sessionData.forumMessages) sessionData.forumMessages = [];
-                    // Asegurar consistencia con nuevas misiones de evaluación
                     if(!sessionData.missions['m8']) sessionData.missions['m8'] = { completed: false, attempts: 0, audioClicks: 0, responses: [] };
                     if(!sessionData.missions['m9']) sessionData.missions['m9'] = { completed: false, attempts: 0, audioClicks: 0, responses: [] };
+                    if(!sessionData.missions['m10']) sessionData.missions['m10'] = { completed: false, attempts: 0, audioClicks: 0, responses: [] };
 
                     saveTempSession();
                     if(sessionData.surveyCompleted) { initDashboard(); showModal("¡Bienvenido de vuelta!", "Tu aventura ha sido cargada.", "success"); } 
@@ -650,7 +765,7 @@
         }
 
         function initDashboard() {
-            document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('survey-screen').classList.add('hidden'); document.getElementById('btn-support').classList.remove('hidden');
+            document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('intro-screen').classList.add('hidden'); document.getElementById('survey-screen').classList.add('hidden'); document.getElementById('btn-support').classList.remove('hidden'); document.getElementById('leo-container').classList.remove('hidden');
             document.getElementById('student-name-display').innerText = sessionData.studentName; 
             document.getElementById('nav-avatar-icon').innerText = sessionData.avatar; 
             updateStars();
@@ -679,7 +794,7 @@
 
                     card.innerHTML = `
                         <div class="h-28 sm:h-36 ${cardBg} flex items-center justify-center relative">
-                            <span class="color-icon animate-float">${story.emoji}</span>
+                            <span class="color-icon ${isUnlocked ? 'animate-float' : ''}">${story.emoji}</span>
                             ${story.youtube ? `<div class="absolute top-2 left-2 bg-red-500 text-white p-1.5 sm:p-2 rounded-full shadow-md"><i data-lucide="youtube" class="w-4 h-4 sm:w-5 sm:h-5"></i></div>` : ''}
                             ${missionState.completed ? `<div class="absolute -bottom-3 sm:-bottom-4 right-3 sm:right-4 bg-yellow-400 text-yellow-900 p-1.5 sm:p-2 rounded-full shadow-lg border-2 border-white z-10"><i data-lucide="star" class="w-5 h-5 sm:w-6 sm:h-6 fill-current"></i></div>` : ''}
                             ${!isUnlocked ? `<div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center"><i data-lucide="lock" class="w-8 h-8 sm:w-10 sm:h-10 text-white drop-shadow-md"></i></div>` : ''}
@@ -694,7 +809,7 @@
         }
 
         // ==========================================
-        // FUNCIONES DE SOPORTE Y FORO (Mejorado con Texto Libre)
+        // MÓDULO FORO (Opinión Libre)
         // ==========================================
         function openForum() { document.getElementById('forum-modal').classList.remove('hidden'); renderForumMessages(); }
         function closeForum() { document.getElementById('forum-modal').classList.add('hidden'); }
@@ -704,7 +819,7 @@
             if(!msg) return showModal("Escribe algo", "Tu mensaje está vacío.", "warning");
             sessionData.forumMessages.push({ author: sessionData.studentName, avatar: sessionData.avatar, text: msg });
             saveTempSession(); renderForumMessages();
-            input.value = ""; // Limpiar input
+            input.value = ""; 
         }
         function renderForumMessages() {
             const container = document.getElementById('forum-messages');
@@ -715,19 +830,30 @@
                 </div>
                 <div class="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-purple-100 flex gap-3 md:gap-4">
                     <div class="w-10 h-10 md:w-14 md:h-14 bg-green-100 rounded-full flex items-center justify-center text-2xl md:text-3xl shrink-0">🐢</div>
-                    <div><span class="font-black text-slate-800 block mb-0.5 md:mb-1 text-sm md:text-base">Pedro (Compañero)</span><p class="text-slate-600 font-bold text-base md:text-lg">Ya quiero llegar a la evaluación final. 🐢</p></div>
+                    <div><span class="font-black text-slate-800 block mb-0.5 md:mb-1 text-sm md:text-base">Pedro (Compañero)</span><p class="text-slate-600 font-bold text-base md:text-lg">Ya quiero llegar a la evaluación final. 🏆</p></div>
                 </div>`;
             sessionData.forumMessages.forEach(m => { html += `<div class="bg-purple-100 p-4 md:p-6 rounded-2xl md:rounded-[2rem] shadow-sm border-2 border-purple-300 flex gap-3 md:gap-4 animate-pop"><div class="w-10 h-10 md:w-14 md:h-14 bg-white rounded-full flex items-center justify-center text-2xl md:text-3xl border-2 border-purple-200 shrink-0">${m.avatar}</div><div><span class="font-black text-purple-900 block mb-0.5 md:mb-1 text-sm md:text-base">${m.author} (Tú)</span><p class="text-purple-800 font-bold text-base md:text-lg">${m.text}</p></div></div>`; });
             container.innerHTML = html; lucide.createIcons(); container.scrollTop = container.scrollHeight;
         }
 
+        // ==========================================
+        // MÓDULO SOPORTE TÉCNICO (Leo y WhatsApp Corporativo)
+        // ==========================================
         function openSupport() { document.getElementById('support-modal').classList.remove('hidden'); }
         function closeSupport() { document.getElementById('support-modal').classList.add('hidden'); window.speechSynthesis.cancel(); }
         function readSupportAloud() { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance("Hola Aventurero. Toca un módulo abierto en el mapa. Mira el video si hay uno, lee o escucha la historia. Luego, responde las preguntas para ganar estrellas. ¡Tú puedes!"); u.lang = 'es-CO'; u.rate = 0.9; window.speechSynthesis.speak(u); }
         function contactTechSupport() {
-            // Número corporativo actualizado a petición
             const whatsappUrl = `https://wa.me/573004323504?text=Hola,%20soy%20${encodeURIComponent(sessionData.studentName || 'un estudiante')}.%20Necesito%20ayuda%20con%20el%20juego%20de%20Aventura%20Lectora.`;
             window.open(whatsappUrl, '_blank');
+        }
+        function toggleLeoBubble() {
+            const speech = document.getElementById('leo-speech');
+            if (!speech) return;
+            if (speech.classList.contains('hidden')) {
+                speech.classList.remove('hidden');
+                speech.classList.add('bubble-pop');
+                setTimeout(() => speech.classList.add('hidden'), 5500);
+            } else { speech.classList.add('hidden'); }
         }
 
         // ==========================================
@@ -816,17 +942,16 @@
             const isCorrect = (selectedIndex === q.correct);
             const isDiagnostic = (activeStory.moduleId === 'mod1');
 
-            // MEJORA: Para Módulo 1 (Diagnóstico) no damos pistas. Guardamos la respuesta tal cual y avanzamos.
             if (isDiagnostic) {
+                // Diagnóstico objetivo sin feedback correctivo, pasa de una.
                 currentMissionResponses.push({ question: q.q, level: q.level, type: q.type, answerGiven: q.options[selectedIndex], correct: isCorrect });
-                showModal("¡Anotado!", "Guardamos tu respuesta. ¡Sigue así!", "success", nextQuestionOrFinish);
+                nextQuestionOrFinish();
             } 
-            // Para las demás misiones, sí pedimos la respuesta correcta para enseñarles (Andamiaje).
             else if (isCorrect) {
                 currentMissionResponses.push({ question: q.q, level: q.level, type: q.type, answerGiven: q.options[selectedIndex], correct: true }); 
                 nextQuestionOrFinish(); 
             } else { 
-                showModal("¡Uy, casi!", "Pista mágica: " + q.hint, "hint"); 
+                showModal("¡Uy, casi!", "Pista de tu amigo Leo: " + q.hint, "hint"); 
             }
         }
 
@@ -851,7 +976,6 @@
         function showSuccessScreen() {
             currentStep = 'success'; document.getElementById('quiz-section').classList.add('hidden'); document.getElementById('success-section').classList.remove('hidden'); document.getElementById('success-section').classList.add('flex'); updateModalProgress(100);
             
-            // Evaluar Notas para el Módulo 5 o dar confeti
             let correctCount = 0; let choiceCount = 0;
             currentMissionResponses.forEach(r => {
                 if(r.type === 'choice') { choiceCount++; if(r.correct === true) correctCount++; }
@@ -892,7 +1016,7 @@
 
         function sendToWhatsAppAndDownload() {
             if (!sessionData.studentName) { showModal("¡Aún no has empezado!", "Primero debes jugar y completar algunas misiones.", "warning"); return; }
-            downloadProgress(true); // Guarda el archivo siempre como respaldo
+            downloadProgress(true);
 
             let msg = `🌟 *REPORTE DE AVENTURA LECTORA* 🌟\n\n👦/👧 *Estudiante:* ${sessionData.studentName}\n📅 *Fecha:* ${sessionData.dateStr}\n\n`;
             if (sessionData.surveyCompleted) { msg += `📋 *Diagnóstico Inicial:*\n- ¿Le gusta leer?: ${sessionData.surveyAnswers.q1}\n- Prefiere: ${sessionData.surveyAnswers.q2}\n- Lee en casa: ${sessionData.surveyAnswers.q3}\n- Aprende con juegos: ${sessionData.surveyAnswers.q4}\n\n`; }
@@ -912,10 +1036,9 @@
 
             msg += `\n🏆 *Total Completadas:* ${misionesCompletadas} de ${storiesData.length}\n\n✨ _¡Excelente trabajo en clase!_ ✨`;
             const encodedMsg = encodeURIComponent(msg); 
-            // Envío directo al WhatsApp corporativo para el profe!
             const whatsappUrl = `https://wa.me/573004323504?text=${encodedMsg}`;
 
-            showModal("¡Enviando al Profe!", "1. Descargamos tu archivo de respaldo por si acaso.<br><br>2. Ahora abriremos WhatsApp para mandar tus notas al profesor.<br><br>💡 <i>En PC, puedes arrastrar el archivo al chat.</i>", "success", () => { window.open(whatsappUrl, '_blank'); });
+            showModal("¡Enviando al Profe!", "1. Descargamos tu archivo de respaldo por si acaso.<br><br>2. Ahora abriremos WhatsApp para mandar tus logros al profesor.<br><br>💡 <i>En PC, puedes arrastrar el archivo al chat.</i>", "success", () => { window.open(whatsappUrl, '_blank'); });
         }
 
         function exportTeacherReport() {
