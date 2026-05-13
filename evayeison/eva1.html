@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVA: Aventuras Matemáticas - Grado Sexto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Librería para el Confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: #f0fdf4;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+        
+        /* Animaciones Personalizadas */
+        .module-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .module-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.15), 0 10px 15px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
+        .bounce-in { animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.26, 1.55) forwards; }
+        .floating { animation: float 3s ease-in-out infinite; }
+        .pulse-soft { animation: pulseSoft 2s infinite; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulseSoft {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Estilos de fracciones */
+        .fraction-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 5px;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .fraction-box span:first-child { border-bottom: 3px solid currentColor; padding: 0 8px; }
+        .fraction-box span:last-child { padding: 0 8px; }
+
+        /* Estilos para Drag & Drop interactivo */
+        .cookie {
+            font-size: 2rem;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            user-select: none;
+        }
+        .cookie:hover { transform: scale(1.2); }
+        .cookie.selected { filter: drop-shadow(0 0 8px #eab308) brightness(1.2); transform: scale(1.1); }
+        
+        .jar {
+            min-height: 120px;
+            transition: background-color 0.3s;
+        }
+        .jar.highlight { background-color: #dbeafe; border-color: #3b82f6; }
+
+        /* Estilos para Pizza Interactiva */
+        .pizza-slice {
+            cursor: pointer;
+            transition: fill 0.3s, transform 0.1s;
+        }
+        .pizza-slice:hover { opacity: 0.8; }
+        .pizza-slice:active { transform: scale(0.95); }
+
+        /* Ocultar barra de scroll pero permitir scroll */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <header class="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="showSection('inicio')">
+                <div class="bg-white text-green-500 p-2 rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-md group-hover:rotate-12 transition-transform">
+                    <i class="fa-solid fa-rocket"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-wide hidden sm:block drop-shadow-md">Aventuras Matemáticas</h1>
+                    <h1 class="text-xl font-bold tracking-wide sm:hidden drop-shadow-md">Matemáticas 6°</h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex flex-col items-end">
+                    <span id="header-username" class="text-sm font-bold">Explorador</span>
+                    <span class="text-xs bg-green-800/50 px-2 py-1 rounded-full border border-green-400">Nivel Sexto</span>
+                </div>
+                <!-- Avatar en el Header -->
+                <div id="header-avatar" class="w-12 h-12 bg-white rounded-full border-4 border-yellow-300 flex items-center justify-center overflow-hidden shadow-lg cursor-pointer transform hover:scale-110 transition-transform">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aventura" alt="Avatar" class="w-full h-full object-cover">
+                </div>
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white text-3xl hover:text-yellow-200 transition-colors" onclick="toggleMobileMenu()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-green-800/50 h-2">
+            <div id="global-progress" class="bg-yellow-400 h-2 w-0 transition-all duration-700 ease-out rounded-r-full shadow-[0_0_10px_rgba(250,204,21,0.8)]"></div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden container mx-auto px-2 sm:px-4 py-6 gap-6 relative">
+        
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside class="hidden md:flex w-64 flex-shrink-0 bg-white rounded-2xl shadow-xl border border-green-100 flex-col h-[calc(100vh-8rem)] sticky top-24 z-10">
+            <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-5 rounded-t-2xl border-b border-green-200">
+                <h2 class="font-bold text-green-800 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-map text-xl text-green-600"></i> Mapa del EVA
+                </h2>
+            </div>
+            <nav class="p-3 flex flex-col gap-2 flex-1 overflow-y-auto no-scrollbar">
+                <button onclick="showSection('inicio')" id="nav-inicio" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 bg-green-50 text-green-700 font-bold border-l-4 border-green-500 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-house text-green-500"></i></div>
+                    Presentación
+                </button>
+                <button onclick="showSection('mod1')" id="nav-mod1" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark text-red-500"></i></div>
+                    1. Multiplicación
+                </button>
+                <button onclick="showSection('mod2')" id="nav-mod2" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-divide text-blue-500"></i></div>
+                    2. División
+                </button>
+                <button onclick="showSection('mod3')" id="nav-mod3" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-chart-pie text-orange-500"></i></div>
+                    3. Fracciones
+                </button>
+                <button onclick="showSection('evaluacion')" id="nav-evaluacion" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-trophy text-purple-500"></i></div>
+                    Reto Final
+                </button>
+            </nav>
+            <div class="p-5 bg-gray-50 rounded-b-2xl border-t border-gray-200">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-bold text-gray-700">Progreso Total</span>
+                    <span id="progress-text" class="text-sm font-black text-green-600 bg-green-100 px-2 py-1 rounded-md">0%</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Sidebar Menu (Overlay) -->
+        <div id="mobile-menu" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden md:hidden transition-opacity">
+            <div class="bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col transform transition-transform duration-300 translate-x-0">
+                <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white flex justify-between items-center">
+                    <h2 class="font-bold text-xl flex items-center gap-2"><i class="fa-solid fa-map"></i> Menú de Navegación</h2>
+                    <button onclick="toggleMobileMenu()" class="text-white text-2xl hover:text-gray-200"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <nav class="flex flex-col gap-2 p-4 overflow-y-auto">
+                    <!-- Mobile nav buttons share similar logic -->
+                    <button onclick="showSection('inicio'); toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-green-50 text-green-700 font-bold flex items-center gap-3 shadow-sm border border-green-100"><i class="fa-solid fa-house text-xl w-6 text-center"></i> Presentación</button>
+                    <button onclick="showSection('mod1'); toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-xmark text-xl text-red-500 w-6 text-center"></i> 1. Multiplicación</button>
+                    <button onclick="showSection('mod2'); toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-divide text-xl text-blue-500 w-6 text-center"></i> 2. División</button>
+                    <button onclick="showSection('mod3'); toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-chart-pie text-xl text-orange-500 w-6 text-center"></i> 3. Fracciones</button>
+                    <button onclick="showSection('evaluacion'); toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 text-purple-800 font-bold flex items-center gap-3 shadow-sm border border-purple-100 mt-4"><i class="fa-solid fa-trophy text-xl text-yellow-500 w-6 text-center"></i> El Reto Final</button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 bg-white rounded-3xl shadow-xl border border-green-100 p-5 md:p-10 overflow-y-auto h-[calc(100vh-8rem)] scroll-smooth relative">
+            
+            <!-- Audio elements for interactive feedback -->
+            <audio id="audio-success" src="data:audio/wav;base64,UklGRmYBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUMBAAApMDAwKSgwMDBBQUFBQEBAQEBAPz8/Pj4+PT09PDw8Ozs7Ojo6OTk5ODg4Nzc3NjY2NTU1NDQ0MzMzMjIyMTExMDAwLy8vLi4uLS0tLCwsKysrKioqKSkpKCgoJycnJiYmJSUlJCQkIyMjIiIiISEhICAgHx8fHh4eHR0dHBwcGhoaGRkZGBgYFxcXFhYWFQUFBQQEBA==" preload="auto"></audio>
+            
+            <!-- SECTION: INICIO (Con selector de avatar) -->
+            <section id="sec-inicio" class="fade-in block">
+                <div class="text-center mb-10 relative">
+                    <div class="absolute top-0 right-0 md:right-10 text-5xl floating opacity-30">🚀</div>
+                    <div class="absolute bottom-0 left-0 md:left-10 text-5xl floating opacity-30" style="animation-delay: 1.5s;">🪐</div>
+                    
+                    <span class="bg-yellow-200 text-yellow-800 text-xs md:text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Presentación del Entorno</span>
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-green-700 mt-6 mb-4 drop-shadow-sm">¡Bienvenido a tu Aventura!</h2>
+                    <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">Prepárate para viajar por el universo de los números. Aquí aprenderás jugando, viendo videos interactivos y superando retos.</p>
+                </div>
+
+                <!-- Avatar Selection -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-3xl border border-indigo-100 mb-10 shadow-inner text-center bounce-in">
+                    <h3 class="font-bold text-2xl text-indigo-800 mb-2"><i class="fa-solid fa-user-astronaut mr-2"></i> Crea tu perfil de explorador</h3>
+                    <p class="text-gray-600 mb-6">Elige el avatar que te acompañará en esta misión:</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-6">
+                        <!-- Avatares generados con DiceBear -->
+                        <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('bottts', 'Aventura')">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aventura" alt="Robot">
+                        </div>
+                        <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('adventurer', 'Nico')">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Nico" alt="Niño">
+                        </div>
+                        <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('adventurer', 'Mia')">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Mia" alt="Niña">
+                        </div>
+                        <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('fun-emoji', 'Happy')">
+                            <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Happy" alt="Emoji">
+                        </div>
+                    </div>
+                    <div class="flex justify-center max-w-xs mx-auto">
+                        <input type="text" id="player-name" placeholder="Escribe tu nombre aquí..." class="w-full text-center px-4 py-3 rounded-xl border-2 border-indigo-200 focus:outline-none focus:border-indigo-500 font-bold text-indigo-700 bg-white shadow-inner" onchange="updateName()">
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 module-card shadow-lg relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+                        <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-md rotate-3"><i class="fa-solid fa-bullseye"></i></div>
+                        <h3 class="font-extrabold text-2xl text-gray-800 mb-3">Nuestra Misión</h3>
+                        <p class="text-gray-600 text-lg">Fortalecer tus superpoderes matemáticos en <b>multiplicación, división y fracciones</b> mediante recursos interactivos, juegos y videos.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 module-card shadow-lg relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+                        <div class="w-14 h-14 bg-purple-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-md -rotate-3"><i class="fa-solid fa-toolbox"></i></div>
+                        <h3 class="font-extrabold text-2xl text-gray-800 mb-3">Herramientas</h3>
+                        <ul class="text-gray-600 text-lg space-y-2">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-play text-red-500"></i> Videos educativos y audios.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-hand-pointer text-blue-500"></i> Ejercicios de tocar y mover.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-gamepad text-green-500"></i> Retos interactivos divertidos.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="text-center mt-12 pb-8">
+                    <button onclick="showSection('mod1')" class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-yellow-900 font-extrabold text-xl py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-[0_10px_20px_rgba(250,204,21,0.4)] flex items-center gap-3 mx-auto pulse-soft">
+                        <i class="fa-solid fa-rocket"></i> ¡Despegar hacia el Módulo 1!
+                    </button>
+                </div>
+            </section>
+
+            <!-- SECTION: MÓDULO 1 (Video + Audio Quiz) -->
+            <section id="sec-mod1" class="hidden">
+                <div class="fade-in">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-xmark"></i></div>
+                        <div>
+                            <span class="text-red-600 font-bold uppercase tracking-wider text-sm">Estación 1</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">La Magia de Multiplicar</h2>
+                        </div>
+                    </div>
+
+                    <!-- Video Educativo Real -->
+                    <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+                        <div class="aspect-video relative">
+                            <!-- Video embebido de YouTube para niños (Smile and Learn o similar) -->
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/CpBVPMBXvt4?rel=0" title="Aprende a multiplicar" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
+                            <span class="font-medium"><i class="fa-solid fa-circle-play text-red-500 mr-2"></i> Mira este video antes de empezar el reto.</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Activity -->
+                    <div class="bg-white border-2 border-red-100 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 text-9xl opacity-5"><i class="fa-solid fa-calculator"></i></div>
+                        
+                        <h3 class="font-bold text-2xl text-gray-800 mb-2 relative z-10"><i class="fa-solid fa-gamepad text-red-500 mr-2"></i> Reto de Multiplicación</h3>
+                        <p class="text-gray-600 mb-6 text-lg relative z-10">Escucha tu intuición (y las tablas) para resolver estos problemas. ¡Obtendrás sonido de victoria por cada acierto!</p>
+                        
+                        <div id="quiz-mod1" class="space-y-6 relative z-10">
+                            <!-- Inyectado por JS -->
+                        </div>
+                        
+                        <div class="mt-8 relative z-10 border-t border-gray-100 pt-6">
+                            <button onclick="checkQuiz('mod1')" class="bg-red-500 hover:bg-red-600 text-white font-bold text-lg py-3 px-8 rounded-xl transition-all transform hover:-translate-y-1 shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-check-double"></i> Evaluar Misión
+                            </button>
+                            <div id="feedback-mod1" class="mt-4 font-bold hidden p-4 rounded-xl text-lg"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex justify-end">
+                        <button onclick="showSection('mod2')" class="text-gray-600 hover:text-blue-600 font-bold text-lg flex items-center gap-2 transition-colors bg-white px-6 py-3 rounded-full shadow-md border border-gray-100 hover:border-blue-200">
+                            Viajar a la Estación 2 <i class="fa-solid fa-arrow-right-long"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: MÓDULO 2 (Video + Drag and Drop Interactivo) -->
+            <section id="sec-mod2" class="hidden">
+                <div class="fade-in">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-divide"></i></div>
+                        <div>
+                            <span class="text-blue-600 font-bold uppercase tracking-wider text-sm">Estación 2</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">Dividir es Compartir</h2>
+                        </div>
+                    </div>
+
+                    <!-- Video Educativo -->
+                    <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+                        <div class="aspect-video relative">
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/uhxgRM5XRo4?rel=0" title="La División" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Drag/Click Activity -->
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-3xl p-6 md:p-8 shadow-xl">
+                        <h3 class="font-bold text-2xl text-blue-800 mb-2"><i class="fa-solid fa-hand-pointer mr-2"></i> Actividad Interactiva: ¡A repartir!</h3>
+                        <p class="text-gray-700 mb-6 text-lg bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                            <b>Instrucciones:</b> Tienes <b>12 galletas</b> y debes repartirlas en partes iguales dentro de los <b>3 frascos</b> (12 ÷ 3). <br>
+                            <span class="text-blue-600"><i class="fa-solid fa-mobile-screen mr-1"></i> Toca una galleta y luego toca un frasco para moverla.</span>
+                        </p>
+                        
+                        <!-- Contenedor de Galletas Original -->
+                        <div id="cookie-tray" class="bg-yellow-100 border-dashed border-4 border-yellow-300 rounded-2xl p-4 flex flex-wrap gap-3 justify-center min-h-[100px] mb-8 shadow-inner">
+                            <!-- Generado por JS -->
+                        </div>
+
+                        <!-- Frascos Destino -->
+                        <div class="grid grid-cols-3 gap-4 md:gap-8">
+                            <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this, 1)">
+                                <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 1</div>
+                            </div>
+                            <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this, 2)">
+                                <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 2</div>
+                            </div>
+                            <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this, 3)">
+                                <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 3</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-center">
+                            <button onclick="checkDivisionGame()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-3 px-10 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-blue-500/30">
+                                Comprobar Repartición
+                            </button>
+                        </div>
+                        <div id="feedback-mod2" class="mt-6 font-bold hidden p-4 rounded-xl text-center text-lg"></div>
+                    </div>
+
+                    <div class="mt-10 flex justify-between">
+                        <button onclick="showSection('mod1')" class="text-gray-500 hover:text-gray-800 font-bold text-lg flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-arrow-left-long"></i> Volver
+                        </button>
+                        <button onclick="showSection('mod3')" class="text-gray-600 hover:text-orange-600 font-bold text-lg flex items-center gap-2 transition-colors bg-white px-6 py-3 rounded-full shadow-md border border-gray-100 hover:border-orange-200">
+                            Viajar a la Estación 3 <i class="fa-solid fa-arrow-right-long"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: MÓDULO 3 (Fracciones Visuales) -->
+            <section id="sec-mod3" class="hidden">
+                <div class="fade-in">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-16 h-16 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-chart-pie"></i></div>
+                        <div>
+                            <span class="text-orange-600 font-bold uppercase tracking-wider text-sm">Estación 3</span>
+                            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">El Mundo de las Fracciones</h2>
+                        </div>
+                    </div>
+
+                    <!-- Video Educativo -->
+                    <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+                        <div class="aspect-video relative">
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/c9cTIjBqFTw?rel=0" title="Fracciones" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Actividad Gráfica Interactiva -->
+                    <div class="bg-white border-2 border-orange-100 rounded-3xl p-6 md:p-8 shadow-xl">
+                        <h3 class="font-bold text-2xl text-gray-800 mb-4"><i class="fa-solid fa-paintbrush text-orange-500 mr-2"></i> Reto Interactivo: Pinta la Fracción</h3>
+                        <p class="text-gray-600 mb-6 text-lg">Toca las porciones del círculo para pintarlas. Tu misión es representar la fracción: <strong class="text-orange-600 text-2xl ml-2">3/4</strong></p>
+                        
+                        <div class="flex flex-col md:flex-row items-center justify-center gap-12 bg-orange-50 p-8 rounded-3xl border border-orange-100 shadow-inner">
+                            
+                            <!-- Visualizador de Fracción Objetivo -->
+                            <div class="bg-white p-6 rounded-2xl shadow-md text-center">
+                                <span class="block text-gray-500 text-sm font-bold mb-2 uppercase">Objetivo</span>
+                                <div class="fraction-box text-5xl text-orange-600 font-black">
+                                    <span>3</span>
+                                    <span>4</span>
+                                </div>
+                            </div>
+
+                            <!-- Gráfico Interactivo SVG -->
+                            <div class="relative w-48 h-48 drop-shadow-xl">
+                                <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+                                    <circle cx="50" cy="50" r="48" fill="white" stroke="#fdba74" stroke-width="2"/>
+                                    <!-- 4 porciones interactivas usando SVG paths -->
+                                    <path id="slice-1" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L100,50 A50,50 0 0,1 50,100 Z" onclick="toggleSlice(1)"/>
+                                    <path id="slice-2" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L50,100 A50,50 0 0,1 0,50 Z" onclick="toggleSlice(2)"/>
+                                    <path id="slice-3" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L0,50 A50,50 0 0,1 50,0 Z" onclick="toggleSlice(3)"/>
+                                    <path id="slice-4" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L50,0 A50,50 0 0,1 100,50 Z" onclick="toggleSlice(4)"/>
+                                </svg>
+                                <!-- Punto central decorativo -->
+                                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-orange-400 rounded-full border-2 border-white shadow-sm pointer-events-none"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 text-center border-t border-gray-100 pt-6">
+                            <button onclick="checkFractionGame()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xl py-3 px-10 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-orange-500/30">
+                                ¡He terminado de pintar!
+                            </button>
+                            <div id="feedback-mod3" class="mt-6 font-bold hidden p-4 rounded-xl text-lg"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 flex justify-between">
+                        <button onclick="showSection('mod2')" class="text-gray-500 hover:text-gray-800 font-bold text-lg flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-arrow-left-long"></i> Volver
+                        </button>
+                        <button onclick="showSection('evaluacion')" class="text-purple-600 hover:text-purple-800 font-extrabold text-lg flex items-center gap-2 transition-colors bg-purple-50 px-6 py-3 rounded-full shadow-md border border-purple-200 hover:bg-purple-100 pulse-soft">
+                            Ir al Reto Final <i class="fa-solid fa-trophy"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: EVALUACIÓN FINAL -->
+            <section id="sec-evaluacion" class="hidden">
+                <div class="fade-in">
+                    <div class="text-center mb-8">
+                        <span class="bg-purple-200 text-purple-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">Evaluación Final</span>
+                        <h2 class="text-4xl md:text-5xl font-black text-gray-800 mt-6"><i class="fa-solid fa-crown text-yellow-500 mr-2 drop-shadow-md"></i> El Gran Reto</h2>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-fuchsia-900 rounded-3xl p-6 md:p-10 text-white shadow-2xl relative overflow-hidden">
+                        <!-- Decoraciones de fondo -->
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+                        <div class="absolute bottom-0 left-0 w-64 h-64 bg-yellow-400 opacity-10 rounded-full blur-3xl"></div>
+                        
+                        <div class="relative z-10 text-center mb-8">
+                            <p class="text-xl md:text-2xl font-medium opacity-90 max-w-2xl mx-auto leading-relaxed">Demuestra todo tu poder combinando multiplicación, división y fracciones. Si logras superarlo, ¡obtendrás el certificado oficial!</p>
+                        </div>
+                        
+                        <div class="bg-black/30 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-white/20 max-w-3xl mx-auto shadow-inner">
+                            <div id="quiz-evaluacion" class="space-y-6 text-white text-lg font-medium">
+                                <!-- Inyectado por JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-10 relative z-10">
+                            <button onclick="checkFinalQuiz()" class="bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200 text-yellow-900 font-black text-2xl py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.6)]">
+                                <i class="fa-solid fa-lock-open mr-2"></i> Desbloquear Insignia
+                            </button>
+                            <div id="feedback-evaluacion" class="mt-6 font-bold text-xl hidden p-4 rounded-xl border"></div>
+                        </div>
+                    </div>
+
+                    <!-- CERTIFICADO FINAL (Oculto inicialmente) -->
+                    <div id="certificate" class="hidden mt-12 bg-white border-8 border-double border-yellow-400 rounded-3xl p-10 text-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] relative max-w-2xl mx-auto bounce-in bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                        <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center text-4xl shadow-xl border-4 border-white z-10">
+                            🏆
+                        </div>
+                        
+                        <h2 class="text-4xl font-black text-gray-800 mt-6 mb-2 tracking-tight" style="font-family: serif;">CERTIFICADO DE EXCELENCIA</h2>
+                        <div class="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
+                        
+                        <p class="text-gray-500 uppercase tracking-widest font-bold text-sm">Se otorga con orgullo a:</p>
+                        <h3 id="cert-name" class="text-4xl font-extrabold text-indigo-700 my-4 py-2 border-b-2 border-dashed border-indigo-200 inline-block px-8">Explorador</h3>
+                        
+                        <p class="text-gray-700 text-lg max-w-md mx-auto mt-4 font-medium leading-relaxed">Por completar victoriosamente el Entorno Virtual de Aprendizaje (EVA) y demostrar habilidades extraordinarias en Matemáticas de Sexto Grado.</p>
+                        
+                        <div class="flex justify-between items-end mt-12 px-8">
+                            <div class="text-center">
+                                <div class="w-32 h-px bg-gray-400 mb-2"></div>
+                                <p class="text-xs font-bold text-gray-500 uppercase">Firma Digital</p>
+                            </div>
+                            <div class="text-center rotate-[-15deg] opacity-80 transform hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-certificate text-red-500 text-6xl drop-shadow-md"></i>
+                                <p class="text-[10px] font-black mt-1 text-red-700 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/80 px-1 rounded">APROBADO</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- LÓGICA JAVASCRIPT DEL EVA -->
+    <script>
+        // --- ESTADO GLOBAL ---
+        const state = {
+            currentSection: 'inicio',
+            userName: 'Explorador',
+            avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Aventura',
+            progress: { mod1: false, mod2: false, mod3: false, evaluacion: false },
+            selectedCookie: null // Para el Drag&Drop
+        };
+
+        // --- SISTEMA DE AUDIO (Web Audio API - 100% Autocontenido) ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new AudioContext();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                const now = audioCtx.currentTime;
+                
+                if (type === 'success') {
+                    // Sonido feliz/campana
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                } else if (type === 'error') {
+                    // Sonido error/buzzer
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'pop') {
+                    // Sonido burbuja (interfaz)
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+            } catch (e) { console.log("Audio no soportado o bloqueado"); }
+        }
+
+        // --- DATOS DE CUESTIONARIOS ---
+        const quizzes = {
+            mod1: [
+                { q: "Si tienes 5 naves espaciales y cada una lleva 6 astronautas. ¿Cuántos astronautas hay en total?", a: "30", placeholder: "Ej: 10" },
+                { q: "Un cohete gasta 8 tanques de combustible por viaje. Si hace 7 viajes, ¿cuántos gasta? (8 x 7)", a: "56", placeholder: "" },
+                { q: "Multiplica rápidamente: 9 x 5 =", a: "45", placeholder: "" }
+            ],
+            evaluacion: [
+                { q: "🚀 Misión 1 (Multiplicación): 12 x 4 =", a: "48" },
+                { q: "🪐 Misión 2 (División): 81 ÷ 9 =", a: "9" },
+                { q: "🍕 Misión 3 (Fracción): Tienes 5 estrellas, 2 son doradas. ¿Qué fracción representan las doradas? (Usa formato numero/numero)", a: "2/5" }
+            ]
+        };
+
+        // --- INICIALIZACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderQuizzes();
+            updateNavigationUI();
+            setupCookieGame();
+        });
+
+        // --- LÓGICA DE USUARIO Y AVATARES ---
+        function selectAvatar(style, seed) {
+            playSound('pop');
+            state.avatar = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+            
+            // Actualizar visualmente la selección
+            document.querySelectorAll('.avatar-option').forEach(el => {
+                el.classList.remove('border-indigo-500', 'scale-110');
+                el.classList.add('border-transparent');
+            });
+            event.currentTarget.classList.remove('border-transparent');
+            event.currentTarget.classList.add('border-indigo-500', 'scale-110');
+            
+            // Actualizar header
+            document.getElementById('header-avatar').innerHTML = `<img src="${state.avatar}" class="w-full h-full object-cover">`;
+        }
+
+        function updateName() {
+            const input = document.getElementById('player-name').value;
+            if(input.trim() !== '') {
+                state.userName = input;
+                document.getElementById('header-username').innerText = state.userName;
+                document.getElementById('cert-name').innerText = state.userName;
+            }
+        }
+
+        // --- NAVEGACIÓN ---
+        function showSection(sectionId) {
+            playSound('pop');
+            document.querySelectorAll('section').forEach(sec => {
+                sec.classList.add('hidden');
+                sec.classList.remove('block');
+            });
+            
+            const target = document.getElementById(`sec-${sectionId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            state.currentSection = sectionId;
+            updateNavigationUI();
+            
+            // Scroll to top suavemente
+            document.getElementById('main-content').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateNavigationUI() {
+            const colors = {
+                'inicio': ['bg-green-50', 'text-green-700', 'border-green-500'],
+                'mod1': ['bg-red-50', 'text-red-700', 'border-red-500'],
+                'mod2': ['bg-blue-50', 'text-blue-700', 'border-blue-500'],
+                'mod3': ['bg-orange-50', 'text-orange-700', 'border-orange-500'],
+                'evaluacion': ['bg-purple-50', 'text-purple-800', 'border-purple-500']
+            };
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3";
+            });
+
+            const activeBtn = document.getElementById(`nav-${state.currentSection}`);
+            if (activeBtn && colors[state.currentSection]) {
+                const activeClasses = colors[state.currentSection];
+                activeBtn.classList.remove('hover:bg-gray-50', 'text-gray-600', 'font-medium', 'border-transparent');
+                activeBtn.classList.add('font-bold', activeClasses[0], activeClasses[1], activeClasses[2]);
+            }
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if(menu.classList.contains('hidden')){
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+
+        // --- RENDERIZADO DE CUESTIONARIOS (Texto) ---
+        function renderQuizzes() {
+            ['mod1', 'evaluacion'].forEach(mod => {
+                const container = document.getElementById(`quiz-${mod}`);
+                if (!container) return;
+                
+                let html = '';
+                quizzes[mod].forEach((item, index) => {
+                    const inputClass = mod === 'evaluacion' 
+                        ? 'bg-black/40 border-2 border-white/30 text-white placeholder-white/50 px-4 py-3 rounded-xl focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/50 w-full sm:w-32 font-bold text-center transition-all'
+                        : 'border-2 border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-200 w-full sm:w-32 font-bold text-center text-lg text-gray-700 transition-all';
+                    
+                    html += `
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4 bg-gray-50/10 p-4 rounded-2xl">
+                            <span class="flex-1">${index + 1}. ${item.q}</span>
+                            <input type="text" id="ans-${mod}-${index}" class="${inputClass}" placeholder="${item.placeholder || '?'}" autocomplete="off">
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        // --- LÓGICA JUEGO: MODULO 2 (ARRASTRAR Y SOLTAR GALLETAS) ---
+        function setupCookieGame() {
+            const tray = document.getElementById('cookie-tray');
+            tray.innerHTML = '';
+            // Generar 12 galletas
+            for(let i=0; i<12; i++){
+                tray.innerHTML += `<div id="cookie-${i}" class="cookie drop-shadow-md text-3xl" onclick="selectCookie(this)">🍪</div>`;
+            }
+        }
+
+        function selectCookie(el) {
+            playSound('pop');
+            // Deseleccionar previas
+            document.querySelectorAll('.cookie').forEach(c => c.classList.remove('selected'));
+            // Seleccionar actual
+            state.selectedCookie = el;
+            el.classList.add('selected');
+        }
+
+        function placeCookieInJar(jarEl, jarNum) {
+            if(state.selectedCookie) {
+                playSound('pop');
+                jarEl.appendChild(state.selectedCookie);
+                state.selectedCookie.classList.remove('selected');
+                state.selectedCookie = null;
+                
+                // Efecto visual en el frasco
+                jarEl.classList.add('highlight');
+                setTimeout(() => jarEl.classList.remove('highlight'), 300);
+            }
+        }
+
+        function checkDivisionGame() {
+            const jars = document.querySelectorAll('.jar');
+            let correctJars = 0;
+            
+            jars.forEach(jar => {
+                // Contar cuantos elementos .cookie hay dentro
+                const cookiesInJar = jar.querySelectorAll('.cookie').length;
+                if(cookiesInJar === 4) correctJars++; // 12/3 = 4
+            });
+
+            const feedback = document.getElementById('feedback-mod2');
+            feedback.classList.remove('hidden');
+
+            if (correctJars === 3 && document.getElementById('cookie-tray').children.length === 0) {
+                playSound('success');
+                lanzarConfeti(1);
+                feedback.innerHTML = `<i class="fa-solid fa-star text-yellow-500 mr-2"></i> ¡Perfecto! 12 ÷ 3 = 4 galletas por frasco.`;
+                feedback.className = "mt-6 font-bold p-4 rounded-xl text-center text-lg bg-green-100 text-green-800 border-2 border-green-400 bounce-in";
+                updateProgress('mod2');
+            } else {
+                playSound('error');
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-2"></i> Mmm... revisa bien. Debes colocar exactamente 4 galletas en cada frasco.`;
+                feedback.className = "mt-6 font-bold p-4 rounded-xl text-center text-lg bg-orange-100 text-orange-800 border-2 border-orange-400";
+            }
+        }
+
+        // --- LÓGICA JUEGO: MODULO 3 (FRACCIONES INTERACTIVAS) ---
+        function toggleSlice(id) {
+            playSound('pop');
+            const slice = document.getElementById(`slice-${id}`);
+            if (slice.classList.contains('fill-orange-500')) {
+                slice.classList.remove('fill-orange-500');
+                slice.classList.add('fill-white');
+            } else {
+                slice.classList.remove('fill-white');
+                slice.classList.add('fill-orange-500');
+            }
+        }
+
+        function checkFractionGame() {
+            const slices = document.querySelectorAll('.pizza-slice');
+            let colored = 0;
+            slices.forEach(s => {
+                if(s.classList.contains('fill-orange-500')) colored++;
+            });
+
+            const feedback = document.getElementById('feedback-mod3');
+            feedback.classList.remove('hidden');
+
+            // Objetivo 3/4 (3 partes pintadas de 4)
+            if (colored === 3) {
+                playSound('success');
+                lanzarConfeti(1.5);
+                feedback.innerHTML = `<i class="fa-solid fa-medal text-yellow-500 mr-2"></i> ¡Excelente! Has pintado 3 de las 4 partes (3/4).`;
+                feedback.className = "mt-6 font-bold p-4 rounded-xl text-lg bg-green-100 text-green-800 border-2 border-green-400 bounce-in text-center";
+                updateProgress('mod3');
+            } else {
+                playSound('error');
+                feedback.innerHTML = `<i class="fa-solid fa-circle-info mr-2"></i> Has pintado ${colored} partes. Recuerda: el numerador (3) indica cuántas pintar.`;
+                feedback.className = "mt-6 font-bold p-4 rounded-xl text-lg bg-orange-100 text-orange-800 border-2 border-orange-400 text-center";
+            }
+        }
+
+        // --- LÓGICA CUESTIONARIO: MODULO 1 ---
+        function checkQuiz(mod) {
+            let correct = 0;
+            const total = quizzes[mod].length;
+            
+            quizzes[mod].forEach((item, index) => {
+                const input = document.getElementById(`ans-${mod}-${index}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = item.a.toLowerCase();
+                
+                if (userAnswer === correctAnswer) {
+                    correct++;
+                    input.classList.add('border-green-500', 'bg-green-50', 'text-green-700');
+                    input.classList.remove('border-red-500', 'bg-red-50');
+                } else {
+                    input.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+                    input.classList.remove('border-green-500', 'bg-green-50', 'text-green-700');
+                }
+            });
+
+            const feedback = document.getElementById(`feedback-${mod}`);
+            feedback.classList.remove('hidden');
+            
+            if (correct === total) {
+                playSound('success');
+                lanzarConfeti(1);
+                feedback.innerHTML = `<i class="fa-solid fa-check-circle mr-2 text-2xl align-middle"></i> ¡Misión Cumplida! Todo correcto.`;
+                feedback.className = "mt-4 font-bold p-4 rounded-xl text-lg border-2 bg-green-100 text-green-800 border-green-400 bounce-in";
+                updateProgress(mod);
+            } else {
+                playSound('error');
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-2"></i> Tienes ${correct} de ${total} correctas. Verifica los recuadros rojos.`;
+                feedback.className = "mt-4 font-bold p-4 rounded-xl text-lg border-2 bg-orange-100 text-orange-800 border-orange-400";
+            }
+        }
+
+        // --- LÓGICA CUESTIONARIO FINAL ---
+        function checkFinalQuiz() {
+            let correct = 0;
+            const total = quizzes.evaluacion.length;
+            
+            quizzes.evaluacion.forEach((item, index) => {
+                const input = document.getElementById(`ans-evaluacion-${index}`);
+                const userAnswer = input.value.trim().toLowerCase();
+                
+                if (userAnswer === item.a.toLowerCase() || (index === 2 && userAnswer === '2/5')) {
+                    correct++;
+                    input.classList.add('border-green-400', 'bg-green-500/20');
+                    input.classList.remove('border-red-400', 'bg-red-500/20');
+                } else {
+                    input.classList.add('border-red-400', 'bg-red-500/20');
+                    input.classList.remove('border-green-400', 'bg-green-500/20');
+                }
+            });
+
+            const feedback = document.getElementById(`feedback-evaluacion`);
+            feedback.classList.remove('hidden');
+            
+            if (correct === total) {
+                playSound('success');
+                lanzarConfeti(3); // Confeti largo
+                feedback.innerHTML = `🎉 ¡CÓDIGO ACEPTADO! Eres un Experto Matemático.`;
+                feedback.className = "mt-6 font-black text-2xl p-6 rounded-2xl bg-green-500/90 text-white shadow-[0_0_20px_rgba(34,197,94,0.6)] backdrop-blur-md bounce-in border-2 border-green-300";
+                updateProgress('evaluacion');
+                
+                // Mostrar certificado
+                setTimeout(() => {
+                    const cert = document.getElementById('certificate');
+                    cert.classList.remove('hidden');
+                    document.getElementById('main-content').scrollTo({ top: cert.offsetTop, behavior: 'smooth' });
+                }, 1500);
+            } else {
+                playSound('error');
+                feedback.innerHTML = `⚠️ Fallo en el sistema. Tienes ${correct}/${total} correctas. Reintenta.`;
+                feedback.className = "mt-6 font-bold text-xl p-4 rounded-xl bg-red-600/90 text-white backdrop-blur-md border border-red-400";
+            }
+        }
+
+        // --- UTILIDADES GLOBALES ---
+        function updateProgress(mod) {
+            if (!state.progress[mod]) {
+                state.progress[mod] = true;
+                
+                const completed = Object.values(state.progress).filter(Boolean).length;
+                const total = Object.keys(state.progress).length;
+                const percentage = Math.round((completed / total) * 100);
+                
+                // Actualizar barras
+                document.getElementById('global-progress').style.width = `${percentage}%`;
+                document.getElementById('progress-text').innerText = `${percentage}%`;
+                
+                // Check visual en el menu
+                const navItem = document.getElementById(`nav-${mod}`);
+                if (navItem) {
+                    navItem.classList.add('border-r-4', 'border-r-green-500'); // Marca visual extra
+                }
+            }
+        }
+
+        function lanzarConfeti(durationInSeconds = 1) {
+            if(typeof confetti !== 'undefined'){
+                const duration = durationInSeconds * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({
+                        particleCount: 5,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 },
+                        colors: ['#22c55e', '#eab308', '#3b82f6', '#a855f7']
+                    });
+                    confetti({
+                        particleCount: 5,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 },
+                        colors: ['#22c55e', '#eab308', '#3b82f6', '#a855f7']
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            }
+        }
+    </script>
+</body>
+</html>

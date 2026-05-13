@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>MathEVA Play | Multiplicación, División y Fracciones 6º</title>
+  <!-- Google Fonts & Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(145deg, #f9eec1 0%, #fff4df 100%);
+      color: #2d3e50;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Animaciones globales */
+    @keyframes bounceSoft {
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-8px); }
+    }
+    @keyframes glowPulse {
+      0% { text-shadow: 0 0 0px gold; }
+      100% { text-shadow: 0 0 12px #ffb347; }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slide {
+      animation: slideUp 0.5s ease forwards;
+    }
+    .eva-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 2rem;
+    }
+    /* Header avatar */
+    .avatar-header {
+      background: #1e2f4e;
+      border-radius: 2rem;
+      padding: 1rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+      background: linear-gradient(120deg, #1f3b64, #2a5298);
+    }
+    .avatar-bot {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #ffdd99;
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
+      box-shadow: 0 5px 0 #b97f10;
+    }
+    .avatar-bot i {
+      font-size: 3rem;
+      color: #ff8c42;
+      animation: bounceSoft 2s infinite;
+    }
+    .avatar-text {
+      font-weight: bold;
+      color: #2c3e2f;
+    }
+    .score-board {
+      background: #f5e7d3;
+      border-radius: 2rem;
+      padding: 0.6rem 1.5rem;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+    /* Tarjetas modulares */
+    .card-modulo {
+      background: rgba(255,255,240,0.9);
+      backdrop-filter: blur(2px);
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      overflow: hidden;
+      transition: all 0.3s;
+      box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+      border: 1px solid #ffe2b5;
+    }
+    .modulo-titulo {
+      background: #ffb347;
+      padding: 1rem 2rem;
+      font-size: 1.6rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modulo-titulo:hover { background: #ffa01e; }
+    .modulo-body {
+      padding: 1.8rem;
+      display: none;
+    }
+    .modulo-activo .modulo-body { display: block; }
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      margin: 1rem 0;
+      border-radius: 1.5rem;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .drag-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    .drag-items {
+      background: #ffe3b5;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      min-width: 160px;
+    }
+    .draggable {
+      display: inline-block;
+      background: #2a5298;
+      color: white;
+      padding: 10px 18px;
+      margin: 8px;
+      border-radius: 40px;
+      cursor: grab;
+      user-select: none;
+      transition: 0.1s;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .draggable:active { cursor: grabbing; }
+    .dropzone {
+      background: #fef1cf;
+      border: 3px dashed #ffa41e;
+      border-radius: 1.5rem;
+      padding: 1rem;
+      min-height: 140px;
+      transition: background 0.2s;
+    }
+    .dropzone.drag-over { background: #ffe2a4; }
+    .feedback-emoji {
+      font-size: 1.4rem;
+      margin-left: 10px;
+    }
+    .game-card {
+      background: #fffff0;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+    }
+    .estrellas {
+      font-size: 1.8rem;
+      letter-spacing: 5px;
+      color: gold;
+    }
+    button {
+      background: #ff8c42;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    button:active { transform: scale(0.96); }
+    .progreso-bar {
+      background: #ddd;
+      border-radius: 20px;
+      height: 18px;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .progreso-fill {
+      background: #4caf50;
+      width: 0%;
+      height: 100%;
+      border-radius: 20px;
+      transition: width 0.3s;
+    }
+    @media (max-width: 760px) {
+      .modulo-titulo { font-size: 1.2rem; }
+      .drag-items { min-width: 120px; }
+    }
+    .robot-mensaje {
+      background: #efefef;
+      border-radius: 1.5rem;
+      padding: 0.8rem;
+      margin: 1rem 0;
+      font-style: italic;
+      border-left: 8px solid #ff8c42;
+    }
+    .juego-memoria {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 12px;
+    }
+    .carta {
+      background: #6c8cbf;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: bold;
+    }
+    .carta.revelada {
+      background: #ffb347;
+      transform: scale(0.98);
+    }
+    audio {
+      display: none;
+    }
+    .badge-animation {
+      animation: glowPulse 0.8s ease;
+    }
+  </style>
+</head>
+<body>
+<div class="eva-container">
+  <!-- CABECERA CON AVATAR ANIMADO -->
+  <div class="avatar-header">
+    <div class="avatar-bot">
+      <i class="fas fa-robot"></i>
+      <div class="avatar-text">
+        <strong>🤖 MateBot</strong><br>
+        <span id="mensajeBot">¡Aprende jugando!</span>
+      </div>
+    </div>
+    <div class="score-board">
+      <i class="fas fa-star"></i> <span id="puntosTotal">0</span> pts | 
+      <i class="fas fa-trophy"></i> <span id="nivelEstrella">🌱 Novato</span>
+    </div>
+  </div>
+
+  <!-- VÍDEOS EXPLICATIVOS (Recursos multimedia reales) -->
+  <div class="card-modulo" style="background:#f2e5c2;">
+    <div class="modulo-titulo" onclick="toggleModulo(this.parentElement)">📺 Videos educativos <i class="fas fa-video"></i></div>
+    <div class="modulo-body" style="display:block;">
+      <div class="grid-2cols" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;">
+        <div><div class="video-container"><iframe src="https://www.youtube.com/embed/9XzfQUXqiYY?si=o5PvV5tm0bIBeAEp" title="Multiplicación" frameborder="0" allowfullscreen></iframe></div><p>🎬 Multiplicación rápida</p></div>
+        <div><div class="video-container"><iframe src="https://www.youtube.com/embed/KGMf314LUc0?si=uQkYy1kjzFyRCc4M" title="División" frameborder="0" allowfullscreen></iframe></div><p>🎬 División explicada</p></div>
+        <div><div class="video-container"><iframe src="https://www.youtube.com/embed/7P_Z_1bq8Wo?si=J0KrIY5lqc9Sm6hO" title="Fracciones" frameborder="0" allowfullscreen></iframe></div><p>🎬 Fracciones divertidas</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 1: MULTIPLICACIÓN con Drag & Drop y desafío -->
+  <div class="card-modulo" id="moduloMult">
+    <div class="modulo-titulo" onclick="toggleModulo(this.parentElement)">✖️ Módulo 1: Multiplicación al poder <i class="fas fa-arrow-down"></i></div>
+    <div class="modulo-body">
+      <div class="robot-mensaje"><i class="fas fa-microphone-alt"></i> ¡Arrastra el número que falta para completar la operación!</div>
+      <!-- Drag & Drop: completar multiplicación -->
+      <div class="drag-area">
+        <div class="drag-items" id="dragOptionsMult">
+          <div draggable="true" class="draggable" data-value="24">24</div>
+          <div draggable="true" class="draggable" data-value="18">18</div>
+          <div draggable="true" class="draggable" data-value="32">32</div>
+          <div draggable="true" class="draggable" data-value="56">56</div>
+        </div>
+        <div class="dropzone" id="dropMult" data-correct="32">___ × 3 = 96 → suelta aquí el número correcto</div>
+      </div>
+      <div id="feedbackDragMult" class="feedback-emoji"></div>
+      <button id="verificarDragMult"><i class="fas fa-check"></i> Verificar arrastre</button>
+      <div class="game-card" style="margin-top:1.5rem">
+        <p><strong>🔥 Reto mental:</strong> 47 × 8 = ?</p>
+        <input type="number" id="retoMult" placeholder="Tu respuesta">
+        <button onclick="checkReto('retoMult', 376, 'feedbackRetoMult')">Comprobar + estrella</button>
+        <div id="feedbackRetoMult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 2: DIVISIÓN + juego memoria -->
+  <div class="card-modulo" id="moduloDiv">
+    <div class="modulo-titulo" onclick="toggleModulo(this.parentElement)">➗ Módulo 2: División Express</div>
+    <div class="modulo-body">
+      <div class="robot-mensaje">🐧 ¡Asocia cada división con su resultado! Juego de memoria.</div>
+      <div id="juegoMemoriaDiv" class="juego-memoria"></div>
+      <div id="msjMemoria" class="feedback-emoji"></div>
+      <div style="margin-top:1rem"><strong>Ejercicio extra:</strong> 675 ÷ 15 = ? <input type="number" id="divExtra"><button onclick="verificarDivExtra()">Resolver</button></div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 3: FRACCIONES con drag & drop de imágenes (emojis) -->
+  <div class="card-modulo" id="moduloFracc">
+    <div class="modulo-titulo" onclick="toggleModulo(this.parentElement)">🍕 Fracciones: Arrastra la fracción correcta</div>
+    <div class="modulo-body">
+      <div class="robot-mensaje">🍰 Arrastra la fracción que representa la parte pintada de la pizza.</div>
+      <div style="display:flex; justify-content:center; gap:20px; flex-wrap:wrap;">
+        <div style="text-align:center"><i class="fas fa-pizza-slice" style="font-size:60px; color:#d97706;"></i><br>🍕 3 de 8 porciones</div>
+        <div class="dropzone" id="dropFraccion" style="min-width:180px;">Suelta aquí la fracción correcta: ___</div>
+      </div>
+      <div class="drag-items" style="display:flex; justify-content:center; gap:10px; margin-top:1rem;">
+        <div draggable="true" class="draggable" data-frac="3/8">3/8</div>
+        <div draggable="true" class="draggable" data-frac="1/4">1/4</div>
+        <div draggable="true" class="draggable" data-frac="5/8">5/8</div>
+      </div>
+      <button id="verificarDragFrac">Verificar fracción pizza</button>
+      <div id="feedbackFracDrag"></div>
+      <div class="game-card"><p>✏️ Simplifica 12/16:</p><input id="simplificaFrac" placeholder="ej: 3/4"><button onclick="verificarSimplificar()">Comprobar</button></div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 4: RETO INTEGRADOR + Temporizador -->
+  <div class="card-modulo">
+    <div class="modulo-titulo" onclick="toggleModulo(this.parentElement)">🏆 Módulo 4: Desafío final ¡contra reloj!</div>
+    <div class="modulo-body">
+      <div class="robot-mensaje">⏱️ Resuelve en menos de 20 segundos y gana estrella extra.</div>
+      <p>Si compras 5 cajas con 24 lápices cada una y repartes entre 8 estudiantes, ¿cuántos lápices por estudiante?</p>
+      <input type="number" id="retoFinal" placeholder="respuesta">
+      <button id="btnReloj">Iniciar reto (20s)</button>
+      <div id="temporizadorDisplay" style="font-weight:bold; margin-top:5px;">⏳ Tiempo: --</div>
+      <div id="feedbackRetoFinal"></div>
+    </div>
+  </div>
+
+  <!-- Barra de progreso y recompensas -->
+  <div class="card-modulo" style="background:#d9e6b3;">
+    <div class="modulo-body">
+      <p><i class="fas fa-chart-line"></i> Progreso general</p>
+      <div class="progreso-bar"><div class="progreso-fill" id="barraProgreso"></div></div>
+      <div id="logrosExtra"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- SISTEMA DE PUNTOS Y SONIDOS ----------
+  let puntos = 0;
+  const maxPuntos = 38; // estimado entre actividades
+  const actividadesCompletadas = new Set();
+  function actualizarPuntos(inc, actividadId) {
+    if (actividadesCompletadas.has(actividadId)) return false;
+    if(inc>0) {
+      actividadesCompletadas.add(actividadId);
+      puntos += inc;
+      document.getElementById("puntosTotal").innerText = puntos;
+      let porcentaje = (puntos / maxPuntos) * 100;
+      document.getElementById("barraProgreso").style.width = Math.min(100,porcentaje)+"%";
+      let nivel = "🌱 Novato";
+      if(puntos>=25) nivel = "🚀 Aprendiz estrella";
+      if(puntos>=35) nivel = "🏅 Genio Matemático";
+      document.getElementById("nivelEstrella").innerText = nivel;
+      // Mensaje bot
+      document.getElementById("mensajeBot").innerHTML = "🎉 ¡Correcto! +"+inc+" puntos";
+      setTimeout(()=>{document.getElementById("mensajeBot").innerHTML = "¡Sigue así!";},1500);
+      // Confeti si es importante
+      if(inc>=5 || puntos%10===0) canvasConfetti({particleCount:100, spread:70, origin:{y:0.6}});
+      // Sonido simulado (beep con AudioContext opcional, usamos simple)
+      try {
+        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let oscillator = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        oscillator.connect(gain);
+        gain.connect(audioCtx.destination);
+        oscillator.frequency.value = 880;
+        gain.gain.value = 0.2;
+        oscillator.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+        oscillator.stop(audioCtx.currentTime + 0.5);
+      } catch(e){}
+      return true;
+    }
+    return false;
+  }
+
+  // función para verificar drag multiplicación
+  let dragCorrectMult = false;
+  function initDragDrop() {
+    const draggables = document.querySelectorAll('.draggable');
+    const dropZones = document.querySelectorAll('.dropzone');
+    draggables.forEach(dragEl => {
+      dragEl.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', dragEl.getAttribute('data-value') || dragEl.getAttribute('data-frac'));
+        e.dataTransfer.effectAllowed = 'copy';
+        dragEl.style.opacity = '0.5';
+      });
+      dragEl.addEventListener('dragend', e => { dragEl.style.opacity = '1'; });
+    });
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        let data = e.dataTransfer.getData('text/plain');
+        if(zone.id === 'dropMult' && data === '32') {
+          zone.innerHTML = "✅ ¡Correcto! 32 × 3 = 96";
+          dragCorrectMult = true;
+          actualizarPuntos(3, 'dragMultOK');
+        } else if(zone.id === 'dropMult') {
+          zone.innerHTML = "❌ Número incorrecto. Intenta otro.";
+        }
+        if(zone.id === 'dropFraccion' && data === '3/8') {
+          zone.innerHTML = "✅ ¡Bien! 3/8 representa la pizza.";
+          actualizarPuntos(3, 'dragFracOK');
+        } else if(zone.id === 'dropFraccion') {
+          zone.innerHTML = "❌ No es la fracción correcta.";
+        }
+      });
+    });
+  }
+
+  document.getElementById("verificarDragMult").addEventListener("click",()=>{
+    if(dragCorrectMult) document.getElementById("feedbackDragMult").innerHTML = "⭐ Ya ganaste puntos por arrastrar correctamente.";
+    else document.getElementById("feedbackDragMult").innerHTML = "❗ Arrastra el número 32 desde la caja de la izquierda a la zona de gota.";
+  });
+  
+  function checkReto(inputId, correcto, feedbackId) {
+    let val = parseInt(document.getElementById(inputId).value);
+    if(val === correcto) {
+      actualizarPuntos(2, inputId+"_ret");
+      document.getElementById(feedbackId).innerHTML = "✔️ +2 puntos!";
+    } else {
+      document.getElementById(feedbackId).innerHTML = `❌ Respuesta: ${correcto}. Sigue practicando.`;
+    }
+  }
+  window.checkReto = checkReto;
+  
+  // DIVISIÓN JUEGO DE MEMORIA (pares división y resultado)
+  const pares = [
+    {op: "144 ÷ 12", res: 12},
+    {op: "81 ÷ 9", res: 9},
+    {op: "250 ÷ 5", res: 50},
+    {op: "64 ÷ 8", res: 8}
+  ];
+  let cartas = [];
+  let seleccionadas = [];
+  let bloqueado = false;
+  let puntosMemoria = false;
+  function construirMemoria() {
+    let deck = [];
+    pares.forEach((p,idx) => {
+      deck.push({tipo:'op', texto:p.op, valor: p.res, parId: idx});
+      deck.push({tipo:'res', texto:p.res.toString(), valor: p.res, parId: idx});
+    });
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    cartas = deck;
+    renderMemoria();
+  }
+  function renderMemoria() {
+    const contenedor = document.getElementById("juegoMemoriaDiv");
+    contenedor.innerHTML = "";
+    cartas.forEach((carta, idx) => {
+      const div = document.createElement("div");
+      div.className = "carta";
+      if(carta.revelada) {
+        div.classList.add("revelada");
+        div.innerText = carta.texto;
+      } else {
+        div.innerText = "?";
+      }
+      div.dataset.index = idx;
+      div.addEventListener("click", () => revelarCarta(idx));
+      contenedor.appendChild(div);
+    });
+  }
+  function revelarCarta(idx) {
+    if(bloqueado) return;
+    if(cartas[idx].revelada) return;
+    cartas[idx].revelada = true;
+    seleccionadas.push(idx);
+    renderMemoria();
+    if(seleccionadas.length === 2) {
+      bloqueado = true;
+      const a = cartas[seleccionadas[0]];
+      const b = cartas[seleccionadas[1]];
+      if(a.parId === b.parId && a.tipo !== b.tipo) {
+        setTimeout(() => {
+          if(!puntosMemoria){
+            actualizarPuntos(4, 'memoriaDivCompleta');
+            puntosMemoria = true;
+            document.getElementById("msjMemoria").innerHTML = "🎉 ¡Memoria completada! +4 puntos.";
+          } else {
+            document.getElementById("msjMemoria").innerHTML = "¡Ya ganaste puntos!";
+          }
+          seleccionadas = [];
+          bloqueado = false;
+        }, 500);
+      } else {
+        setTimeout(() => {
+          cartas[seleccionadas[0]].revelada = false;
+          cartas[seleccionadas[1]].revelada = false;
+          seleccionadas = [];
+          renderMemoria();
+          bloqueado = false;
+        }, 700);
+      }
+    } else {
+      bloqueado = false;
+    }
+  }
+  function verificarDivExtra() {
+    let val = parseInt(document.getElementById("divExtra").value);
+    if(val === 45) actualizarPuntos(2, 'divExtraOk');
+    else alert("Respuesta: 675 ÷ 15 = 45");
+  }
+  window.verificarDivExtra = verificarDivExtra;
+
+  // Fracciones drag
+  document.getElementById("verificarDragFrac").addEventListener("click",()=>{
+    let zona = document.getElementById("dropFraccion");
+    if(zona.innerHTML.includes("3/8")) actualizarPuntos(2,'dropFracManual');
+  });
+  function verificarSimplificar(){
+    let val = document.getElementById("simplificaFrac").value.trim();
+    if(val === "3/4") actualizarPuntos(2,'simplificaOk');
+    else alert("12/16 simplificado = 3/4");
+  }
+  window.verificarSimplificar = verificarSimplificar;
+
+  // Reto final con temporizador
+  let tiempoActivo = false;
+  document.getElementById("btnReloj").addEventListener("click",()=>{
+    let tiempo = 20;
+    const display = document.getElementById("temporizadorDisplay");
+    const btn = document.getElementById("btnReloj");
+    if(tiempoActivo) return;
+    tiempoActivo = true;
+    let intervalo = setInterval(()=>{
+      tiempo--;
+      display.innerText = `⏱️ Tiempo restante: ${tiempo}s`;
+      if(tiempo<=0){
+        clearInterval(intervalo);
+        display.innerText = "⌛ Tiempo agotado!";
+        tiempoActivo=false;
+        let respuesta = parseInt(document.getElementById("retoFinal").value);
+        if(respuesta === 15) {
+          actualizarPuntos(5, 'retoFinalTiempo');
+          document.getElementById("feedbackRetoFinal").innerHTML = "🎉 ¡Ganaste 5 puntos extra por resolver a tiempo!";
+        } else {
+          document.getElementById("feedbackRetoFinal").innerHTML = "La respuesta era 15 lápices (5×24=120, 120÷8=15).";
+        }
+      }
+    },1000);
+    setTimeout(()=>{
+      if(tiempoActivo) {
+        let resp = parseInt(document.getElementById("retoFinal").value);
+        if(resp === 15 && tiempo>0){
+          actualizarPuntos(5, 'retoFinalRapido');
+          document.getElementById("feedbackRetoFinal").innerHTML = "🔥 ¡Respuesta correcta antes del tiempo! +5";
+          clearInterval(intervalo);
+          tiempoActivo=false;
+          display.innerText = "🎯 ¡Completado!";
+        }
+      }
+    },100);
+  });
+
+  function toggleModulo(element) {
+    element.classList.toggle("modulo-activo");
+  }
+  window.toggleModulo = toggleModulo;
+
+  // Inicializar juegos extra: Drag Drop general e iniciar memoria y puntos previos
+  window.onload = () => {
+    initDragDrop();
+    construirMemoria();
+    // Abrir primeros módulos para mejor UX
+    document.querySelectorAll('.card-modulo').forEach((mod, idx) => {
+      if(idx<2) mod.classList.add('modulo-activo');
+    });
+    // Recalcular puntos desde localStorage opcional
+    if(localStorage.getItem("puntosEVA")) puntos = parseInt(localStorage.getItem("puntosEVA"));
+    if(localStorage.getItem("actividadesSet")){
+      let saved = JSON.parse(localStorage.getItem("actividadesSet"));
+      saved.forEach(id => actividadesCompletadas.add(id));
+      puntos = saved.length * 2; // aprox
+      document.getElementById("puntosTotal").innerText = puntos;
+    }
+    actualizarPuntos(0,'inicio');
+  };
+  window.addEventListener("beforeunload", ()=>{
+    localStorage.setItem("puntosEVA", puntos);
+    localStorage.setItem("actividadesSet", JSON.stringify([...actividadesCompletadas]));
+  });
+  // Drag frac adicional para evitar errores
+  const dragFrac = document.querySelectorAll('.draggable[data-frac]');
+  dragFrac.forEach(el => {
+    el.setAttribute('draggable', 'true');
+    el.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', el.getAttribute('data-frac'));
+    });
+  });
+</script>
+</body>
+</html>
