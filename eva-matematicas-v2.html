@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVA: Aventuras Matemáticas – Grado Sexto v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');
+        body { font-family:'Fredoka',sans-serif; background-color:#f0fdf4; color:#1f2937; overflow-x:hidden; }
+        .module-card { transition:transform .3s ease,box-shadow .3s ease; }
+        .module-card:hover { transform:translateY(-8px); box-shadow:0 15px 30px -5px rgba(0,0,0,.15),0 10px 15px -6px rgba(0,0,0,.1); }
+        .fade-in { animation:fadeIn .6s ease-out forwards; }
+        .bounce-in { animation:bounceIn .8s cubic-bezier(.68,-.55,.26,1.55) forwards; }
+        .floating { animation:float 3s ease-in-out infinite; }
+        .pulse-soft { animation:pulseSoft 2s infinite; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes bounceIn { 0%{transform:scale(.3);opacity:0} 50%{transform:scale(1.05);opacity:1} 70%{transform:scale(.9)} 100%{transform:scale(1);opacity:1} }
+        @keyframes float { 0%{transform:translateY(0)} 50%{transform:translateY(-12px)} 100%{transform:translateY(0)} }
+        @keyframes pulseSoft { 0%{transform:scale(1)} 50%{transform:scale(1.05)} 100%{transform:scale(1)} }
+        .fraction-box { display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 5px;font-weight:bold;font-size:1.5rem; }
+        .fraction-box span:first-child { border-bottom:3px solid currentColor;padding:0 8px; }
+        .fraction-box span:last-child { padding:0 8px; }
+        .cookie { font-size:2rem;cursor:pointer;transition:transform .2s,filter .2s;user-select:none; }
+        .cookie:hover { transform:scale(1.2); }
+        .cookie.selected { filter:drop-shadow(0 0 8px #eab308) brightness(1.2);transform:scale(1.1); }
+        .jar { min-height:120px;transition:background-color .3s; }
+        .jar.highlight { background-color:#dbeafe;border-color:#3b82f6; }
+        .pizza-slice { cursor:pointer;transition:fill .3s,transform .1s; }
+        .pizza-slice:hover { opacity:.8; }
+        .pizza-slice:active { transform:scale(.95); }
+        .no-scrollbar::-webkit-scrollbar { display:none; }
+        .no-scrollbar { -ms-overflow-style:none;scrollbar-width:none; }
+        /* Analytics Panel */
+        .stat-card { background:#fff;border-radius:16px;padding:16px;border:1px solid #e5e7eb;box-shadow:0 1px 4px rgba(0,0,0,.06); }
+        .status-badge { display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:700; }
+        .badge-ok   { background:#dcfce7;color:#166534; }
+        .badge-pend { background:#fef9c3;color:#854d0e; }
+        .badge-no   { background:#fee2e2;color:#991b1b; }
+        .ans-row { display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:#f9fafb;border:1px solid #f3f4f6; }
+        .ans-q { flex:1;min-width:200px;font-size:.9rem;color:#374151; }
+        .ans-val { font-weight:700;padding:2px 10px;border-radius:8px;font-size:.9rem; }
+        .ans-ok  { background:#dcfce7;color:#166534; }
+        .ans-bad { background:#fee2e2;color:#991b1b; }
+        .ans-tag { font-size:.75rem;color:#6b7280;padding:2px 8px;border-radius:6px;background:#f3f4f6; }
+        .nav-event { display:flex;align-items:center;gap:6px;font-size:.8rem;color:#6b7280; }
+        .export-btn { display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:12px;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;border:none; }
+        .export-csv  { background:#22c55e;color:#fff; }
+        .export-csv:hover  { background:#16a34a; }
+        .export-json { background:#3b82f6;color:#fff; }
+        .export-json:hover { background:#2563eb; }
+        /* Cookie counter badge */
+        .jar-count { position:absolute;bottom:4px;right:8px;font-size:.75rem;font-weight:700;color:#1e40af;background:#dbeafe;border-radius:8px;padding:1px 7px; }
+        /* Attempt badge */
+        .attempt-badge { display:inline-flex;align-items:center;gap:4px;font-size:.8rem;color:#6b7280;font-weight:600; }
+        /* Timer display */
+        .module-timer { font-size:.8rem;color:#6b7280;font-weight:600;display:flex;align-items:center;gap:4px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+<!-- ===== HEADER ===== -->
+<header class="bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="showSection('inicio')">
+            <div class="bg-white text-green-500 p-2 rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-md group-hover:rotate-12 transition-transform">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-wide hidden sm:block drop-shadow-md">Aventuras Matemáticas</h1>
+                <h1 class="text-xl font-bold tracking-wide sm:hidden drop-shadow-md">Matemáticas 6°</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex flex-col items-end">
+                <span id="header-username" class="text-sm font-bold">Explorador</span>
+                <span class="text-xs bg-green-800/50 px-2 py-1 rounded-full border border-green-400">Nivel Sexto</span>
+            </div>
+            <!-- Session Timer -->
+            <div class="hidden md:flex items-center gap-1 text-xs bg-green-800/40 px-3 py-1.5 rounded-full border border-green-400/50">
+                <i class="fa-regular fa-clock"></i>
+                <span id="session-clock">00:00</span>
+            </div>
+            <div id="header-avatar" class="w-12 h-12 bg-white rounded-full border-4 border-yellow-300 flex items-center justify-center overflow-hidden shadow-lg cursor-pointer transform hover:scale-110 transition-transform">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aventura" alt="Avatar" class="w-full h-full object-cover">
+            </div>
+            <button class="md:hidden text-white text-3xl hover:text-yellow-200 transition-colors" onclick="toggleMobileMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </div>
+    <div class="w-full bg-green-800/50 h-2">
+        <div id="global-progress" class="bg-yellow-400 h-2 w-0 transition-all duration-700 ease-out rounded-r-full shadow-[0_0_10px_rgba(250,204,21,0.8)]"></div>
+    </div>
+</header>
+
+<div class="flex flex-1 overflow-hidden container mx-auto px-2 sm:px-4 py-6 gap-6 relative">
+
+<!-- ===== SIDEBAR DESKTOP ===== -->
+<aside class="hidden md:flex w-64 flex-shrink-0 bg-white rounded-2xl shadow-xl border border-green-100 flex-col h-[calc(100vh-8rem)] sticky top-24 z-10">
+    <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-5 rounded-t-2xl border-b border-green-200">
+        <h2 class="font-bold text-green-800 text-lg flex items-center gap-2"><i class="fa-solid fa-map text-xl text-green-600"></i> Mapa del EVA</h2>
+    </div>
+    <nav class="p-3 flex flex-col gap-2 flex-1 overflow-y-auto no-scrollbar">
+        <button onclick="showSection('inicio')" id="nav-inicio" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 bg-green-50 text-green-700 font-bold border-l-4 border-green-500 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm"><i class="fa-solid fa-house text-green-500"></i></div>Presentación
+        </button>
+        <button onclick="showSection('mod1')" id="nav-mod1" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-xmark text-red-500"></i></div>1. Multiplicación
+        </button>
+        <button onclick="showSection('mod2')" id="nav-mod2" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-divide text-blue-500"></i></div>2. División
+        </button>
+        <button onclick="showSection('mod3')" id="nav-mod3" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-chart-pie text-orange-500"></i></div>3. Fracciones
+        </button>
+        <button onclick="showSection('evaluacion')" id="nav-evaluacion" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-trophy text-purple-500"></i></div>Reto Final
+        </button>
+        <!-- Panel Docente -->
+        <div class="my-1 border-t border-gray-100"></div>
+        <button onclick="showSection('panel')" id="nav-panel" class="nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center shadow-sm"><i class="fa-solid fa-chart-line text-teal-500"></i></div>
+            <span>Panel Docente</span>
+            <span class="ml-auto text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">Datos</span>
+        </button>
+    </nav>
+    <div class="p-5 bg-gray-50 rounded-b-2xl border-t border-gray-200">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold text-gray-700">Progreso Total</span>
+            <span id="progress-text" class="text-sm font-black text-green-600 bg-green-100 px-2 py-1 rounded-md">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div id="sidebar-progress-bar" class="bg-green-500 h-2.5 rounded-full w-0 transition-all duration-700"></div>
+        </div>
+    </div>
+</aside>
+
+<!-- ===== MOBILE SIDEBAR ===== -->
+<div id="mobile-menu" class="fixed inset-0 bg-gray-900/80 backdrop-blur-sm z-[100] hidden md:hidden" onclick="closeMobileMenuOutside(event)">
+    <div class="bg-white w-4/5 max-w-sm h-full shadow-2xl flex flex-col" id="mobile-panel">
+        <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white flex justify-between items-center">
+            <h2 class="font-bold text-xl flex items-center gap-2"><i class="fa-solid fa-map"></i> Menú</h2>
+            <button onclick="toggleMobileMenu()" class="text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <nav class="flex flex-col gap-2 p-4 overflow-y-auto">
+            <button onclick="showSection('inicio');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-green-50 text-green-700 font-bold flex items-center gap-3 shadow-sm border border-green-100"><i class="fa-solid fa-house text-xl w-6 text-center"></i> Presentación</button>
+            <button onclick="showSection('mod1');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-xmark text-xl text-red-500 w-6 text-center"></i> 1. Multiplicación</button>
+            <button onclick="showSection('mod2');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-divide text-xl text-blue-500 w-6 text-center"></i> 2. División</button>
+            <button onclick="showSection('mod3');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-white text-gray-700 font-medium flex items-center gap-3 shadow-sm border border-gray-100"><i class="fa-solid fa-chart-pie text-xl text-orange-500 w-6 text-center"></i> 3. Fracciones</button>
+            <button onclick="showSection('evaluacion');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-purple-50 text-purple-800 font-bold flex items-center gap-3 shadow-sm border border-purple-100 mt-4"><i class="fa-solid fa-trophy text-xl text-yellow-500 w-6 text-center"></i> El Reto Final</button>
+            <button onclick="showSection('panel');toggleMobileMenu()" class="w-full text-left px-4 py-4 rounded-xl bg-teal-50 text-teal-800 font-bold flex items-center gap-3 shadow-sm border border-teal-100"><i class="fa-solid fa-chart-line text-xl text-teal-500 w-6 text-center"></i> Panel Docente</button>
+        </nav>
+    </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main-content" class="flex-1 bg-white rounded-3xl shadow-xl border border-green-100 p-5 md:p-10 overflow-y-auto h-[calc(100vh-8rem)] scroll-smooth relative">
+
+<!-- ======================================================
+     SECTION: INICIO
+     ====================================================== -->
+<section id="sec-inicio" class="fade-in block">
+    <div class="text-center mb-10 relative">
+        <div class="absolute top-0 right-0 md:right-10 text-5xl floating opacity-30">🚀</div>
+        <div class="absolute bottom-0 left-0 md:left-10 text-5xl floating opacity-30" style="animation-delay:1.5s">🪐</div>
+        <span class="bg-yellow-200 text-yellow-800 text-xs md:text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">Presentación del Entorno</span>
+        <h2 class="text-4xl md:text-5xl font-extrabold text-green-700 mt-6 mb-4 drop-shadow-sm">¡Bienvenido a tu Aventura!</h2>
+        <p class="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">Prepárate para viajar por el universo de los números. Aquí aprenderás jugando, viendo videos interactivos y superando retos.</p>
+    </div>
+
+    <!-- Avatar Selection -->
+    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-3xl border border-indigo-100 mb-10 shadow-inner text-center bounce-in">
+        <h3 class="font-bold text-2xl text-indigo-800 mb-2"><i class="fa-solid fa-user-astronaut mr-2"></i> Crea tu perfil de explorador</h3>
+        <p class="text-gray-600 mb-6">Elige el avatar que te acompañará en esta misión:</p>
+        <div class="flex flex-wrap justify-center gap-4 md:gap-8 mb-6">
+            <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('bottts','Aventura',this)">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Aventura" alt="Robot">
+            </div>
+            <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('adventurer','Nico',this)">
+                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Nico" alt="Niño">
+            </div>
+            <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('adventurer','Mia',this)">
+                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=Mia" alt="Niña">
+            </div>
+            <div class="avatar-option w-20 h-20 md:w-24 md:h-24 bg-white rounded-full border-4 border-transparent hover:border-indigo-400 cursor-pointer shadow-md transition-all transform hover:scale-110" onclick="selectAvatar('fun-emoji','Happy',this)">
+                <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Happy" alt="Emoji">
+            </div>
+        </div>
+        <div class="flex justify-center max-w-xs mx-auto">
+            <input type="text" id="player-name" placeholder="Escribe tu nombre aquí..." maxlength="40"
+                class="w-full text-center px-4 py-3 rounded-xl border-2 border-indigo-200 focus:outline-none focus:border-indigo-500 font-bold text-indigo-700 bg-white shadow-inner"
+                oninput="updateName()">
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 module-card shadow-lg relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+            <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-md rotate-3"><i class="fa-solid fa-bullseye"></i></div>
+            <h3 class="font-extrabold text-2xl text-gray-800 mb-3">Nuestra Misión</h3>
+            <p class="text-gray-600 text-lg">Fortalecer tus superpoderes matemáticos en <b>multiplicación, división y fracciones</b> mediante recursos interactivos, juegos y videos.</p>
+        </div>
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 module-card shadow-lg relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-purple-100 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+            <div class="w-14 h-14 bg-purple-500 text-white rounded-2xl flex items-center justify-center text-2xl mb-4 shadow-md -rotate-3"><i class="fa-solid fa-toolbox"></i></div>
+            <h3 class="font-extrabold text-2xl text-gray-800 mb-3">Herramientas</h3>
+            <ul class="text-gray-600 text-lg space-y-2">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-play text-red-500"></i> Videos educativos y audios.</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-hand-pointer text-blue-500"></i> Ejercicios de tocar y mover.</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-gamepad text-green-500"></i> Retos interactivos divertidos.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="text-center mt-12 pb-8">
+        <button onclick="showSection('mod1')" class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-yellow-900 font-extrabold text-xl py-4 px-10 rounded-full transition-all transform hover:scale-105 shadow-[0_10px_20px_rgba(250,204,21,0.4)] flex items-center gap-3 mx-auto pulse-soft">
+            <i class="fa-solid fa-rocket"></i> ¡Despegar hacia el Módulo 1!
+        </button>
+    </div>
+</section>
+
+<!-- ======================================================
+     SECTION: MÓDULO 1 – Multiplicación
+     ====================================================== -->
+<section id="sec-mod1" class="hidden">
+    <div class="fade-in">
+        <div class="flex items-center gap-4 mb-2">
+            <div class="w-16 h-16 bg-red-100 text-red-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-xmark"></i></div>
+            <div>
+                <span class="text-red-600 font-bold uppercase tracking-wider text-sm">Estación 1</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">La Magia de Multiplicar</h2>
+            </div>
+        </div>
+        <!-- Timer + intentos -->
+        <div class="flex items-center gap-4 mb-6 text-sm">
+            <span class="module-timer"><i class="fa-regular fa-clock text-red-400"></i> Tiempo: <span id="timer-mod1">0:00</span></span>
+            <span class="attempt-badge"><i class="fa-solid fa-rotate-right text-gray-400"></i> Intentos: <span id="attempts-mod1">0</span></span>
+        </div>
+
+        <!-- Video -->
+        <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+            <div class="aspect-video relative">
+                <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/CpBVPMBXvt4?rel=0" title="Aprende a multiplicar" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
+                <span class="font-medium"><i class="fa-solid fa-circle-play text-red-500 mr-2"></i> Mira este video antes de empezar el reto.</span>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+        <div class="bg-white border-2 border-red-100 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 text-9xl opacity-5"><i class="fa-solid fa-calculator"></i></div>
+            <h3 class="font-bold text-2xl text-gray-800 mb-2 relative z-10"><i class="fa-solid fa-gamepad text-red-500 mr-2"></i> Reto de Multiplicación</h3>
+            <p class="text-gray-600 mb-6 text-lg relative z-10">Resuelve los problemas. ¡Obtendrás sonido de victoria por cada acierto!</p>
+            <div id="quiz-mod1" class="space-y-6 relative z-10"></div>
+            <div id="reveal-mod1" class="hidden mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800 font-medium">
+                <i class="fa-solid fa-lightbulb mr-1 text-amber-500"></i> <strong>Respuestas:</strong> <span id="reveal-mod1-text"></span>
+            </div>
+            <div class="mt-8 relative z-10 border-t border-gray-100 pt-6 flex flex-wrap gap-3">
+                <button onclick="checkQuiz('mod1')" class="bg-red-500 hover:bg-red-600 text-white font-bold text-lg py-3 px-8 rounded-xl transition-all transform hover:-translate-y-1 shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-check-double"></i> Evaluar Misión
+                </button>
+                <button onclick="resetQuiz('mod1')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg py-3 px-6 rounded-xl transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                </button>
+            </div>
+            <div id="feedback-mod1" class="mt-4 font-bold hidden p-4 rounded-xl text-lg"></div>
+        </div>
+
+        <div class="mt-10 flex justify-end">
+            <button onclick="showSection('mod2')" class="text-gray-600 hover:text-blue-600 font-bold text-lg flex items-center gap-2 transition-colors bg-white px-6 py-3 rounded-full shadow-md border border-gray-100 hover:border-blue-200">
+                Viajar a la Estación 2 <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ======================================================
+     SECTION: MÓDULO 2 – División
+     ====================================================== -->
+<section id="sec-mod2" class="hidden">
+    <div class="fade-in">
+        <div class="flex items-center gap-4 mb-2">
+            <div class="w-16 h-16 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-divide"></i></div>
+            <div>
+                <span class="text-blue-600 font-bold uppercase tracking-wider text-sm">Estación 2</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">Dividir es Compartir</h2>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 mb-6 text-sm">
+            <span class="module-timer"><i class="fa-regular fa-clock text-blue-400"></i> Tiempo: <span id="timer-mod2">0:00</span></span>
+            <span class="attempt-badge"><i class="fa-solid fa-rotate-right text-gray-400"></i> Intentos: <span id="attempts-mod2">0</span></span>
+        </div>
+
+        <!-- Video CORREGIDO: Happy Learning "Aprende a Dividir" (2024) -->
+        <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+            <div class="aspect-video relative">
+                <iframe class="absolute top-0 left-0 w-full h-full"
+                    src="https://www.youtube.com/embed/yyKkL0R59g0?rel=0"
+                    title="Aprende a Dividir – Happy Learning"
+                    frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="p-4 bg-gray-800 text-white flex justify-between items-center">
+                <span class="font-medium"><i class="fa-solid fa-circle-play text-blue-400 mr-2"></i> Mira este video antes de empezar el reto.</span>
+                <span class="text-xs bg-green-700 px-2 py-1 rounded-full">✔ Video disponible</span>
+            </div>
+        </div>
+
+        <!-- Juego Galletas -->
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="font-bold text-2xl text-blue-800 mb-2"><i class="fa-solid fa-hand-pointer mr-2"></i> Actividad: ¡A repartir!</h3>
+            <p class="text-gray-700 mb-4 text-lg bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                <b>Instrucciones:</b> Tienes <b>12 galletas</b> y debes repartirlas en <b>3 frascos</b> iguales (12 ÷ 3 = ?).
+                <span class="block mt-1 text-blue-600"><i class="fa-solid fa-mobile-screen mr-1"></i> Toca una galleta y luego toca un frasco para moverla.</span>
+            </p>
+
+            <!-- Tray + counter -->
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-bold text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">
+                    <i class="fa-solid fa-cookie-bite mr-1"></i> En el plato: <span id="tray-count">12</span> galleta(s)
+                </span>
+                <button onclick="resetCookieGame()" class="text-sm bg-white border border-gray-200 text-gray-600 hover:text-blue-600 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                    <i class="fa-solid fa-rotate-right text-xs"></i> Reiniciar
+                </button>
+            </div>
+            <div id="cookie-tray" class="bg-yellow-100 border-dashed border-4 border-yellow-300 rounded-2xl p-4 flex flex-wrap gap-3 justify-center min-h-[100px] mb-8 shadow-inner"></div>
+
+            <!-- Frascos -->
+            <div class="grid grid-cols-3 gap-4 md:gap-8">
+                <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this,1)">
+                    <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 1</div>
+                    <span class="jar-count" id="jar-count-1">0</span>
+                </div>
+                <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this,2)">
+                    <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 2</div>
+                    <span class="jar-count" id="jar-count-2">0</span>
+                </div>
+                <div class="jar bg-white/60 border-4 border-blue-300 rounded-b-3xl rounded-t-lg p-3 flex flex-wrap content-start justify-center gap-1 shadow-md relative" onclick="placeCookieInJar(this,3)">
+                    <div class="absolute -top-6 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">Frasco 3</div>
+                    <span class="jar-count" id="jar-count-3">0</span>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-3 justify-center">
+                <button onclick="checkDivisionGame()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl py-3 px-10 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-blue-500/30">
+                    Comprobar Repartición
+                </button>
+            </div>
+            <div id="feedback-mod2" class="mt-6 font-bold hidden p-4 rounded-xl text-center text-lg"></div>
+        </div>
+
+        <div class="mt-10 flex justify-between">
+            <button onclick="showSection('mod1')" class="text-gray-500 hover:text-gray-800 font-bold text-lg flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left-long"></i> Volver
+            </button>
+            <button onclick="showSection('mod3')" class="text-gray-600 hover:text-orange-600 font-bold text-lg flex items-center gap-2 transition-colors bg-white px-6 py-3 rounded-full shadow-md border border-gray-100 hover:border-orange-200">
+                Viajar a la Estación 3 <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ======================================================
+     SECTION: MÓDULO 3 – Fracciones
+     ====================================================== -->
+<section id="sec-mod3" class="hidden">
+    <div class="fade-in">
+        <div class="flex items-center gap-4 mb-2">
+            <div class="w-16 h-16 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-chart-pie"></i></div>
+            <div>
+                <span class="text-orange-600 font-bold uppercase tracking-wider text-sm">Estación 3</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">El Mundo de las Fracciones</h2>
+            </div>
+        </div>
+        <div class="flex items-center gap-4 mb-6 text-sm">
+            <span class="module-timer"><i class="fa-regular fa-clock text-orange-400"></i> Tiempo: <span id="timer-mod3">0:00</span></span>
+            <span class="attempt-badge"><i class="fa-solid fa-rotate-right text-gray-400"></i> Intentos: <span id="attempts-mod3">0</span></span>
+        </div>
+
+        <!-- Video -->
+        <div class="bg-gray-900 rounded-3xl overflow-hidden shadow-2xl mb-8 border-4 border-gray-800">
+            <div class="aspect-video relative">
+                <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/c9cTIjBqFTw?rel=0" title="Fracciones" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- Actividad Gráfica -->
+        <div class="bg-white border-2 border-orange-100 rounded-3xl p-6 md:p-8 shadow-xl">
+            <h3 class="font-bold text-2xl text-gray-800 mb-4"><i class="fa-solid fa-paintbrush text-orange-500 mr-2"></i> Reto: Pinta la Fracción</h3>
+            <p class="text-gray-600 mb-2 text-lg">Toca las porciones del círculo para pintarlas. Tu misión es representar: <strong class="text-orange-600 text-2xl ml-2">3/4</strong></p>
+            <p class="text-sm text-gray-500 mb-6 bg-orange-50 px-4 py-2 rounded-lg border border-orange-100">
+                <i class="fa-solid fa-circle-info mr-1 text-orange-400"></i> El círculo tiene 4 partes iguales. Debes pintar exactamente 3.
+            </p>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-12 bg-orange-50 p-8 rounded-3xl border border-orange-100 shadow-inner">
+                <div class="bg-white p-6 rounded-2xl shadow-md text-center">
+                    <span class="block text-gray-500 text-sm font-bold mb-2 uppercase">Objetivo</span>
+                    <div class="fraction-box text-5xl text-orange-600 font-black"><span>3</span><span>4</span></div>
+                </div>
+                <div class="relative w-48 h-48 drop-shadow-xl">
+                    <svg viewBox="0 0 100 100" class="w-full h-full transform -rotate-90">
+                        <circle cx="50" cy="50" r="48" fill="white" stroke="#fdba74" stroke-width="2"/>
+                        <path id="slice-1" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L100,50 A50,50 0 0,1 50,100 Z" onclick="toggleSlice(1)"/>
+                        <path id="slice-2" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L50,100 A50,50 0 0,1 0,50 Z" onclick="toggleSlice(2)"/>
+                        <path id="slice-3" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L0,50 A50,50 0 0,1 50,0 Z" onclick="toggleSlice(3)"/>
+                        <path id="slice-4" class="pizza-slice fill-white hover:fill-orange-200 stroke-orange-300" stroke-width="1" d="M50,50 L50,0 A50,50 0 0,1 100,50 Z" onclick="toggleSlice(4)"/>
+                    </svg>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-orange-400 rounded-full border-2 border-white shadow-sm pointer-events-none"></div>
+                    <!-- Contador visual -->
+                    <div id="slice-counter" class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full border border-orange-200">
+                        Pintadas: 0 / 4
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center border-t border-gray-100 pt-6 flex flex-wrap gap-3 justify-center">
+                <button onclick="checkFractionGame()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold text-xl py-3 px-10 rounded-full transition-transform transform hover:scale-105 shadow-lg shadow-orange-500/30">
+                    ¡He terminado de pintar!
+                </button>
+                <button onclick="resetFractionGame()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg py-3 px-6 rounded-full flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                </button>
+            </div>
+            <div id="feedback-mod3" class="mt-6 font-bold hidden p-4 rounded-xl text-lg"></div>
+        </div>
+
+        <div class="mt-10 flex justify-between">
+            <button onclick="showSection('mod2')" class="text-gray-500 hover:text-gray-800 font-bold text-lg flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left-long"></i> Volver
+            </button>
+            <button onclick="showSection('evaluacion')" class="text-purple-600 hover:text-purple-800 font-extrabold text-lg flex items-center gap-2 transition-colors bg-purple-50 px-6 py-3 rounded-full shadow-md border border-purple-200 hover:bg-purple-100 pulse-soft">
+                Ir al Reto Final <i class="fa-solid fa-trophy"></i>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ======================================================
+     SECTION: EVALUACIÓN FINAL
+     ====================================================== -->
+<section id="sec-evaluacion" class="hidden">
+    <div class="fade-in">
+        <div class="text-center mb-8">
+            <span class="bg-purple-200 text-purple-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">Evaluación Final</span>
+            <h2 class="text-4xl md:text-5xl font-black text-gray-800 mt-6"><i class="fa-solid fa-crown text-yellow-500 mr-2 drop-shadow-md"></i> El Gran Reto</h2>
+        </div>
+        <div class="flex items-center gap-4 mb-4 justify-center text-sm">
+            <span class="module-timer"><i class="fa-regular fa-clock text-purple-400"></i> Tiempo: <span id="timer-evaluacion">0:00</span></span>
+            <span class="attempt-badge"><i class="fa-solid fa-rotate-right text-gray-400"></i> Intentos: <span id="attempts-evaluacion">0</span></span>
+        </div>
+
+        <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-fuchsia-900 rounded-3xl p-6 md:p-10 text-white shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-yellow-400 opacity-10 rounded-full blur-3xl"></div>
+            <div class="relative z-10 text-center mb-8">
+                <p class="text-xl md:text-2xl font-medium opacity-90 max-w-2xl mx-auto leading-relaxed">Demuestra todo tu poder combinando multiplicación, división y fracciones.</p>
+            </div>
+            <div class="bg-black/30 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-white/20 max-w-3xl mx-auto shadow-inner">
+                <div id="quiz-evaluacion" class="space-y-6 text-white text-lg font-medium"></div>
+            </div>
+            <div id="reveal-evaluacion" class="hidden mt-4 p-4 bg-yellow-900/40 border border-yellow-500/40 rounded-xl text-sm text-yellow-200 font-medium mx-auto max-w-3xl">
+                <i class="fa-solid fa-lightbulb mr-1 text-yellow-400"></i> <strong>Respuestas:</strong> <span id="reveal-evaluacion-text"></span>
+            </div>
+            <div class="text-center mt-10 relative z-10 flex flex-wrap gap-4 justify-center">
+                <button onclick="checkFinalQuiz()" class="bg-gradient-to-r from-yellow-400 to-yellow-300 hover:from-yellow-300 hover:to-yellow-200 text-yellow-900 font-black text-2xl py-4 px-12 rounded-full transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(250,204,21,0.6)]">
+                    <i class="fa-solid fa-lock-open mr-2"></i> Desbloquear Insignia
+                </button>
+                <button onclick="resetQuiz('evaluacion')" class="bg-white/10 hover:bg-white/20 text-white font-bold text-lg py-4 px-8 rounded-full transition-all border border-white/30 flex items-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reiniciar
+                </button>
+            </div>
+            <div id="feedback-evaluacion" class="mt-6 font-bold text-xl hidden p-4 rounded-xl border mx-auto max-w-3xl text-center"></div>
+        </div>
+
+        <!-- Certificado -->
+        <div id="certificate" class="hidden mt-12 bg-white border-8 border-double border-yellow-400 rounded-3xl p-10 text-center shadow-[0_20px_50px_rgba(0,0,0,.2)] relative max-w-2xl mx-auto bounce-in">
+            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 w-20 h-20 bg-gradient-to-br from-yellow-300 to-yellow-600 rounded-full flex items-center justify-center text-4xl shadow-xl border-4 border-white z-10">🏆</div>
+            <h2 class="text-4xl font-black text-gray-800 mt-6 mb-2 tracking-tight" style="font-family:serif">CERTIFICADO DE EXCELENCIA</h2>
+            <div class="w-24 h-1 bg-yellow-400 mx-auto mb-6"></div>
+            <p class="text-gray-500 uppercase tracking-widest font-bold text-sm">Se otorga con orgullo a:</p>
+            <h3 id="cert-name" class="text-4xl font-extrabold text-indigo-700 my-4 py-2 border-b-2 border-dashed border-indigo-200 inline-block px-8">Explorador</h3>
+            <p class="text-gray-700 text-lg max-w-md mx-auto mt-4 font-medium leading-relaxed">Por completar victoriosamente el EVA y demostrar habilidades extraordinarias en Matemáticas de Sexto Grado.</p>
+            <p id="cert-date" class="text-gray-400 text-sm mt-4"></p>
+            <div class="flex justify-between items-end mt-12 px-8">
+                <div class="text-center"><div class="w-32 h-px bg-gray-400 mb-2"></div><p class="text-xs font-bold text-gray-500 uppercase">Firma Digital</p></div>
+                <div class="text-center"><i class="fa-solid fa-certificate text-red-500 text-6xl drop-shadow-md"></i></div>
+            </div>
+            <button onclick="imprimirCertificado()" class="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-xl flex items-center gap-2 mx-auto transition-colors">
+                <i class="fa-solid fa-print"></i> Imprimir / Guardar PDF
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ======================================================
+     SECTION: PANEL DOCENTE
+     ====================================================== -->
+<section id="sec-panel" class="hidden">
+    <div class="fade-in">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-3xl shadow-inner"><i class="fa-solid fa-chart-line"></i></div>
+            <div>
+                <span class="text-teal-700 font-bold uppercase tracking-wider text-sm">Analítica de Aprendizaje</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-gray-800">Panel del Docente</h2>
+            </div>
+        </div>
+
+        <!-- Resumen Rápido -->
+        <div id="panel-summary" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"></div>
+
+        <!-- Módulos -->
+        <h3 class="font-bold text-xl text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-table-cells text-teal-500"></i> Desempeño por Módulo</h3>
+        <div id="panel-modules" class="grid md:grid-cols-2 gap-4 mb-8"></div>
+
+        <!-- Respuestas detalladas -->
+        <h3 class="font-bold text-xl text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-list-check text-teal-500"></i> Registro de Respuestas</h3>
+        <div id="panel-answers" class="space-y-2 mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100"></div>
+
+        <!-- Ruta de Navegación -->
+        <h3 class="font-bold text-xl text-gray-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-route text-teal-500"></i> Ruta de Navegación</h3>
+        <div id="panel-nav" class="flex flex-wrap gap-2 mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100"></div>
+
+        <!-- Exportar -->
+        <h3 class="font-bold text-xl text-gray-700 mb-4 flex items-center gap-2"><i class="fa-solid fa-file-export text-teal-500"></i> Exportar Datos</h3>
+        <div class="flex flex-wrap gap-4 mb-4">
+            <button onclick="exportCSV()" class="export-btn export-csv"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+            <button onclick="exportJSON()" class="export-btn export-json"><i class="fa-solid fa-file-code"></i> Exportar JSON</button>
+        </div>
+        <p class="text-sm text-gray-500 mb-8"><i class="fa-solid fa-circle-info mr-1"></i> El archivo CSV puede abrirse en Excel o Google Sheets para análisis estadístico.</p>
+
+        <div class="mt-4 p-4 bg-teal-50 border border-teal-200 rounded-2xl text-sm text-teal-700">
+            <i class="fa-solid fa-shield-halved mr-1"></i> <strong>Nota:</strong> Los datos se almacenan únicamente en la sesión actual del navegador y no se envían a ningún servidor externo.
+        </div>
+    </div>
+</section>
+
+</main>
+</div><!-- /flex container -->
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ═══════════════════════════════════════════════════════════════
+// 1. SISTEMA DE ANALÍTICA
+// ═══════════════════════════════════════════════════════════════
+const sections = ['inicio','mod1','mod2','mod3','evaluacion'];
+
+const analytics = {
+    sessionId: 'EVA-' + Date.now().toString(36).toUpperCase(),
+    studentName: 'Explorador',
+    avatarSeed: 'Aventura',
+    avatarStyle: 'bottts',
+    sessionStart: new Date(),
+    modules: {
+        inicio:     { visits:0, timeSpent:0, _start:null },
+        mod1:       { visits:0, timeSpent:0, _start:null, attempts:0, completed:false, score:0, total:3, answers:[] },
+        mod2:       { visits:0, timeSpent:0, _start:null, attempts:0, completed:false },
+        mod3:       { visits:0, timeSpent:0, _start:null, attempts:0, completed:false, slicesPainted:0 },
+        evaluacion: { visits:0, timeSpent:0, _start:null, attempts:0, completed:false, score:0, total:3, answers:[] }
+    },
+    navEvents: [],
+    _currentModule: null
+};
+
+// Parar timer del módulo previo, iniciar el nuevo
+function startModuleTimer(mod) {
+    const now = Date.now();
+    // Cerrar módulo anterior
+    if (analytics._currentModule && analytics.modules[analytics._currentModule]._start) {
+        const m = analytics.modules[analytics._currentModule];
+        m.timeSpent += now - m._start;
+        m._start = null;
+    }
+    analytics._currentModule = mod;
+    if (analytics.modules[mod]) {
+        analytics.modules[mod]._start = now;
+        analytics.modules[mod].visits++;
+    }
+}
+
+// Actualizar display del timer en el módulo activo
+let _timerInterval = null;
+function startTimerDisplay(mod) {
+    clearInterval(_timerInterval);
+    const el = document.getElementById('timer-' + mod);
+    if (!el) return;
+    _timerInterval = setInterval(() => {
+        const m = analytics.modules[mod];
+        if (!m) return;
+        const elapsed = Math.floor((m.timeSpent + (m._start ? Date.now() - m._start : 0)) / 1000);
+        el.textContent = fmtSeconds(elapsed);
+    }, 1000);
+}
+
+function fmtSeconds(s) {
+    return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+
+// Session clock (header)
+setInterval(() => {
+    const elapsed = Math.floor((Date.now() - analytics.sessionStart) / 1000);
+    const el = document.getElementById('session-clock');
+    if (el) el.textContent = fmtSeconds(elapsed);
+}, 1000);
+
+// ═══════════════════════════════════════════════════════════════
+// 2. ESTADO GLOBAL
+// ═══════════════════════════════════════════════════════════════
+const state = {
+    currentSection: 'inicio',
+    userName: 'Explorador',
+    avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Aventura',
+    progress: { mod1:false, mod2:false, mod3:false, evaluacion:false },
+    selectedCookie: null
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 3. AUDIO (Web Audio API)
+// ═══════════════════════════════════════════════════════════════
+let audioCtx;
+function playSound(type) {
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.setValueAtTime(659.25, now+.1);
+            osc.frequency.setValueAtTime(783.99, now+.2);
+            gain.gain.setValueAtTime(0,now); gain.gain.linearRampToValueAtTime(.3,now+.05); gain.gain.exponentialRampToValueAtTime(.01,now+.4);
+            osc.start(now); osc.stop(now+.5);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150,now); osc.frequency.exponentialRampToValueAtTime(100,now+.3);
+            gain.gain.setValueAtTime(.2,now); gain.gain.exponentialRampToValueAtTime(.01,now+.3);
+            osc.start(now); osc.stop(now+.3);
+        } else if (type === 'pop') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800,now); osc.frequency.exponentialRampToValueAtTime(1200,now+.05);
+            gain.gain.setValueAtTime(.15,now); gain.gain.exponentialRampToValueAtTime(.01,now+.1);
+            osc.start(now); osc.stop(now+.1);
+        }
+    } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 4. DATOS CUESTIONARIOS
+// ═══════════════════════════════════════════════════════════════
+const quizzes = {
+    mod1: [
+        { q:'Si tienes 5 naves espaciales y cada una lleva 6 astronautas. ¿Cuántos astronautas hay en total?', a:'30', placeholder:'Ej: 10' },
+        { q:'Un cohete gasta 8 tanques de combustible por viaje. Si hace 7 viajes, ¿cuántos gasta? (8 × 7)', a:'56', placeholder:'?' },
+        { q:'Multiplica rápidamente: 9 × 5 =', a:'45', placeholder:'?' }
+    ],
+    evaluacion: [
+        { q:'🚀 Misión 1 (Multiplicación): 12 × 4 =', a:'48' },
+        { q:'🪐 Misión 2 (División): 81 ÷ 9 =', a:'9' },
+        { q:'🍕 Misión 3 (Fracción): Tienes 5 estrellas, 2 son doradas. ¿Qué fracción representan? (usa formato numero/numero)', a:'2/5' }
+    ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 5. INICIALIZACIÓN
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    renderQuizzes();
+    updateNavigationUI();
+    setupCookieGame();
+    startModuleTimer('inicio');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// 6. USUARIO Y AVATARES
+// ═══════════════════════════════════════════════════════════════
+function selectAvatar(style, seed, el) {
+    playSound('pop');
+    analytics.avatarStyle = style;
+    analytics.avatarSeed  = seed;
+    state.avatar = `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
+    document.querySelectorAll('.avatar-option').forEach(e => {
+        e.classList.remove('border-indigo-500','scale-110');
+        e.classList.add('border-transparent');
+    });
+    el.classList.remove('border-transparent');
+    el.classList.add('border-indigo-500','scale-110');
+    document.getElementById('header-avatar').innerHTML = `<img src="${state.avatar}" class="w-full h-full object-cover" alt="Avatar">`;
+}
+
+function updateName() {
+    const v = document.getElementById('player-name').value.trim();
+    if (v) {
+        state.userName = v;
+        analytics.studentName = v;
+        document.getElementById('header-username').innerText = v;
+        document.getElementById('cert-name').innerText = v;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 7. NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════
+const navColors = {
+    inicio:    ['bg-green-50','text-green-700','border-green-500'],
+    mod1:      ['bg-red-50','text-red-700','border-red-500'],
+    mod2:      ['bg-blue-50','text-blue-700','border-blue-500'],
+    mod3:      ['bg-orange-50','text-orange-700','border-orange-500'],
+    evaluacion:['bg-purple-50','text-purple-800','border-purple-500'],
+    panel:     ['bg-teal-50','text-teal-700','border-teal-500']
+};
+
+function showSection(sectionId) {
+    playSound('pop');
+    // Analytics: registrar evento de navegación
+    analytics.navEvents.push({ from: state.currentSection, to: sectionId, ts: new Date().toISOString() });
+    startModuleTimer(sectionId);
+    startTimerDisplay(sectionId);
+
+    document.querySelectorAll('section').forEach(s => { s.classList.add('hidden'); s.classList.remove('block'); });
+    const target = document.getElementById('sec-' + sectionId);
+    if (target) { target.classList.remove('hidden'); target.classList.add('block'); }
+
+    state.currentSection = sectionId;
+    updateNavigationUI();
+    document.getElementById('main-content').scrollTo({ top:0, behavior:'smooth' });
+
+    // Actualizar panel si se abre
+    if (sectionId === 'panel') renderPanel();
+}
+
+function updateNavigationUI() {
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = 'nav-btn w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-50 text-gray-600 font-medium border-l-4 border-transparent flex items-center gap-3';
+    });
+    const active = document.getElementById('nav-' + state.currentSection);
+    if (active && navColors[state.currentSection]) {
+        const [bg,txt,brd] = navColors[state.currentSection];
+        active.classList.remove('hover:bg-gray-50','text-gray-600','font-medium','border-transparent');
+        active.classList.add('font-bold', bg, txt, brd);
+    }
+}
+
+function toggleMobileMenu() {
+    document.getElementById('mobile-menu').classList.toggle('hidden');
+}
+function closeMobileMenuOutside(e) {
+    if (e.target === document.getElementById('mobile-menu')) toggleMobileMenu();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 8. CUESTIONARIOS – RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderQuizzes() {
+    ['mod1','evaluacion'].forEach(mod => {
+        const c = document.getElementById('quiz-' + mod);
+        if (!c) return;
+        const isEval = mod === 'evaluacion';
+        c.innerHTML = quizzes[mod].map((item,i) => {
+            const inputCls = isEval
+                ? 'bg-black/40 border-2 border-white/30 text-white placeholder-white/50 px-4 py-3 rounded-xl focus:outline-none focus:border-yellow-400 w-full sm:w-36 font-bold text-center transition-all'
+                : 'border-2 border-gray-300 px-4 py-3 rounded-xl focus:outline-none focus:border-red-500 w-full sm:w-36 font-bold text-center text-lg text-gray-700 transition-all';
+            return `<div class="flex flex-col sm:flex-row sm:items-center gap-4 bg-gray-50/10 p-4 rounded-2xl">
+                <span class="flex-1">${i+1}. ${item.q}</span>
+                <input type="text" id="ans-${mod}-${i}" class="${inputCls}" placeholder="${item.placeholder||'?'}" autocomplete="off">
+            </div>`;
+        }).join('');
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 9. CUESTIONARIO MOD1
+// ═══════════════════════════════════════════════════════════════
+function checkQuiz(mod) {
+    const m = analytics.modules[mod];
+    m.attempts++;
+    document.getElementById('attempts-' + mod).textContent = m.attempts;
+
+    let correct = 0;
+    const totalQ = quizzes[mod].length;
+    const answers = [];
+
+    quizzes[mod].forEach((item, i) => {
+        const inp = document.getElementById('ans-' + mod + '-' + i);
+        const ua  = inp.value.trim().toLowerCase();
+        const ca  = item.a.toLowerCase();
+        const ok  = ua === ca;
+        if (ok) correct++;
+        inp.classList.remove('border-green-500','bg-green-50','text-green-700','border-red-500','bg-red-50','text-red-700');
+        inp.classList.add(ok ? 'border-green-500' : 'border-red-500', ok ? 'bg-green-50' : 'bg-red-50', ok ? 'text-green-700' : 'text-red-700');
+        answers.push({ question: item.q, userAnswer: ua, correct: ok, attempt: m.attempts, ts: new Date().toISOString() });
+    });
+
+    // Guardar respuestas en analítica
+    m.answers = m.answers.concat(answers);
+    m.score = correct;
+
+    const fb = document.getElementById('feedback-' + mod);
+    fb.classList.remove('hidden');
+
+    if (correct === totalQ) {
+        playSound('success'); lanzarConfeti(1);
+        fb.innerHTML = `<i class="fa-solid fa-check-circle mr-2 text-2xl align-middle"></i> ¡Misión Cumplida! Todo correcto (${correct}/${totalQ}).`;
+        fb.className = 'mt-4 font-bold p-4 rounded-xl text-lg border-2 bg-green-100 text-green-800 border-green-400 bounce-in';
+        updateProgress(mod);
+    } else {
+        playSound('error');
+        fb.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-2"></i> Tienes ${correct} de ${totalQ} correctas. Verifica los recuadros rojos.`;
+        fb.className = 'mt-4 font-bold p-4 rounded-xl text-lg border-2 bg-orange-100 text-orange-800 border-orange-400';
+        // Mostrar respuestas correctas después de 2 intentos fallidos
+        if (m.attempts >= 2 && !m.completed) {
+            const reveal = document.getElementById('reveal-' + mod);
+            const revealTxt = document.getElementById('reveal-' + mod + '-text');
+            if (reveal && revealTxt) {
+                revealTxt.textContent = quizzes[mod].map((q,i) => `P${i+1}: ${q.a}`).join(' | ');
+                reveal.classList.remove('hidden');
+            }
+        }
+    }
+}
+
+function checkFinalQuiz() {
+    const m = analytics.modules.evaluacion;
+    m.attempts++;
+    document.getElementById('attempts-evaluacion').textContent = m.attempts;
+
+    let correct = 0;
+    const totalQ = quizzes.evaluacion.length;
+    const answers = [];
+
+    quizzes.evaluacion.forEach((item, i) => {
+        const inp = document.getElementById('ans-evaluacion-' + i);
+        const ua  = inp.value.trim().toLowerCase();
+        const ca  = item.a.toLowerCase();
+        const ok  = ua === ca;
+        if (ok) correct++;
+        inp.classList.remove('border-green-400','bg-green-500/20','border-red-400','bg-red-500/20');
+        inp.classList.add(ok ? 'border-green-400' : 'border-red-400', ok ? 'bg-green-500/20' : 'bg-red-500/20');
+        answers.push({ question: item.q, userAnswer: ua, correct: ok, attempt: m.attempts, ts: new Date().toISOString() });
+    });
+
+    m.answers = m.answers.concat(answers);
+    m.score = correct;
+
+    const fb = document.getElementById('feedback-evaluacion');
+    fb.classList.remove('hidden');
+
+    if (correct === totalQ) {
+        playSound('success'); lanzarConfeti(3);
+        fb.innerHTML = '🎉 ¡CÓDIGO ACEPTADO! Eres un Experto Matemático.';
+        fb.className = 'mt-6 font-black text-2xl p-6 rounded-2xl bg-green-500/90 text-white shadow-[0_0_20px_rgba(34,197,94,0.6)] backdrop-blur-md bounce-in border-2 border-green-300 mx-auto max-w-3xl text-center';
+        updateProgress('evaluacion');
+        setTimeout(() => {
+            const cert = document.getElementById('certificate');
+            cert.classList.remove('hidden');
+            document.getElementById('cert-name').textContent = state.userName;
+            document.getElementById('cert-date').textContent = 'Fecha: ' + new Date().toLocaleDateString('es-CO', {year:'numeric',month:'long',day:'numeric'});
+            document.getElementById('main-content').scrollTo({ top: cert.offsetTop - 20, behavior:'smooth' });
+        }, 1500);
+    } else {
+        playSound('error');
+        fb.innerHTML = `⚠️ Tienes ${correct}/${totalQ} correctas. ¡Inténtalo de nuevo!`;
+        fb.className = 'mt-6 font-bold text-xl p-4 rounded-xl bg-red-600/90 text-white backdrop-blur-md border border-red-400 mx-auto max-w-3xl text-center';
+        if (m.attempts >= 2 && !m.completed) {
+            const reveal = document.getElementById('reveal-evaluacion');
+            const rt = document.getElementById('reveal-evaluacion-text');
+            if (reveal && rt) {
+                rt.textContent = quizzes.evaluacion.map((q,i) => `P${i+1}: ${q.a}`).join(' | ');
+                reveal.classList.remove('hidden');
+            }
+        }
+    }
+}
+
+function resetQuiz(mod) {
+    quizzes[mod].forEach((_,i) => {
+        const inp = document.getElementById(`ans-${mod}-${i}`);
+        if (inp) { inp.value=''; inp.className = inp.className.replace(/border-\w+-\d+|bg-\w+-\d+|text-\w+-\d+/g,'').trim(); inp.classList.add('border-gray-300'); }
+    });
+    const fb = document.getElementById('feedback-' + mod);
+    if (fb) fb.classList.add('hidden');
+    const rv = document.getElementById('reveal-' + mod);
+    if (rv) rv.classList.add('hidden');
+    playSound('pop');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 10. JUEGO GALLETAS (MOD2)
+// ═══════════════════════════════════════════════════════════════
+function setupCookieGame() {
+    const tray = document.getElementById('cookie-tray');
+    if (!tray) return;
+    tray.innerHTML = '';
+    for (let i=0; i<12; i++) {
+        const d = document.createElement('div');
+        d.id = 'cookie-' + i;
+        d.className = 'cookie drop-shadow-md text-3xl';
+        d.textContent = '🍪';
+        d.onclick = () => selectCookie(d);
+        tray.appendChild(d);
+    }
+    updateTrayCount();
+    for(let j=1;j<=3;j++) {
+        const jc = document.getElementById('jar-count-' + j);
+        if(jc) jc.textContent = '0';
+    }
+}
+
+function resetCookieGame() {
+    // Devolver todas las galletas al plato
+    for(let i=0;i<12;i++){
+        const c = document.getElementById('cookie-' + i);
+        if(c) { document.getElementById('cookie-tray').appendChild(c); c.classList.remove('selected'); }
+    }
+    state.selectedCookie = null;
+    updateTrayCount();
+    updateJarCounts();
+    const fb = document.getElementById('feedback-mod2');
+    if(fb) fb.classList.add('hidden');
+    playSound('pop');
+}
+
+function selectCookie(el) {
+    playSound('pop');
+    document.querySelectorAll('.cookie').forEach(c => c.classList.remove('selected'));
+    state.selectedCookie = el;
+    el.classList.add('selected');
+}
+
+function placeCookieInJar(jarEl, jarNum) {
+    if (state.selectedCookie) {
+        playSound('pop');
+        // Insert before the count badge
+        const badge = jarEl.querySelector('.jar-count');
+        jarEl.insertBefore(state.selectedCookie, badge);
+        state.selectedCookie.classList.remove('selected');
+        state.selectedCookie = null;
+        jarEl.classList.add('highlight');
+        setTimeout(() => jarEl.classList.remove('highlight'), 300);
+        updateTrayCount();
+        updateJarCounts();
+    }
+}
+
+function updateTrayCount() {
+    const t = document.getElementById('cookie-tray');
+    const tc = document.getElementById('tray-count');
+    if (t && tc) tc.textContent = t.querySelectorAll('.cookie').length;
+}
+
+function updateJarCounts() {
+    document.querySelectorAll('.jar').forEach((jar, idx) => {
+        const badge = document.getElementById('jar-count-' + (idx+1));
+        if (badge) badge.textContent = jar.querySelectorAll('.cookie').length;
+    });
+}
+
+function checkDivisionGame() {
+    const m = analytics.modules.mod2;
+    m.attempts++;
+    document.getElementById('attempts-mod2').textContent = m.attempts;
+
+    const jars = document.querySelectorAll('.jar');
+    let correctJars = 0;
+    jars.forEach(jar => { if(jar.querySelectorAll('.cookie').length === 4) correctJars++; });
+    const trayEmpty = document.getElementById('cookie-tray').children.length === 0;
+
+    const fb = document.getElementById('feedback-mod2');
+    fb.classList.remove('hidden');
+
+    if (correctJars === 3 && trayEmpty) {
+        playSound('success'); lanzarConfeti(1);
+        fb.innerHTML = `<i class="fa-solid fa-star text-yellow-500 mr-2"></i> ¡Perfecto! 12 ÷ 3 = <strong>4</strong> galletas por frasco. ¡Lo lograste!`;
+        fb.className = 'mt-6 font-bold p-4 rounded-xl text-center text-lg bg-green-100 text-green-800 border-2 border-green-400 bounce-in';
+        updateProgress('mod2');
+    } else {
+        playSound('error');
+        let msg = '';
+        if (!trayEmpty) msg = 'Aún hay galletas en el plato. Repártelas todas.';
+        else msg = `Solo ${correctJars} frasco(s) tienen 4 galletas. Recuerda: 12 ÷ 3 = 4.`;
+        fb.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-2"></i> ${msg}`;
+        fb.className = 'mt-6 font-bold p-4 rounded-xl text-center text-lg bg-orange-100 text-orange-800 border-2 border-orange-400';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 11. JUEGO FRACCIONES (MOD3)
+// ═══════════════════════════════════════════════════════════════
+function toggleSlice(id) {
+    playSound('pop');
+    const s = document.getElementById('slice-' + id);
+    if (s.classList.contains('fill-orange-500')) {
+        s.classList.remove('fill-orange-500'); s.classList.add('fill-white');
+    } else {
+        s.classList.remove('fill-white'); s.classList.add('fill-orange-500');
+    }
+    updateSliceCounter();
+}
+
+function updateSliceCounter() {
+    const colored = document.querySelectorAll('.pizza-slice.fill-orange-500').length;
+    const sc = document.getElementById('slice-counter');
+    if (sc) sc.textContent = `Pintadas: ${colored} / 4`;
+}
+
+function resetFractionGame() {
+    document.querySelectorAll('.pizza-slice').forEach(s => {
+        s.classList.remove('fill-orange-500'); s.classList.add('fill-white');
+    });
+    updateSliceCounter();
+    const fb = document.getElementById('feedback-mod3');
+    if(fb) fb.classList.add('hidden');
+    playSound('pop');
+}
+
+function checkFractionGame() {
+    const m = analytics.modules.mod3;
+    m.attempts++;
+    document.getElementById('attempts-mod3').textContent = m.attempts;
+
+    const colored = document.querySelectorAll('.pizza-slice.fill-orange-500').length;
+    m.slicesPainted = colored;
+
+    const fb = document.getElementById('feedback-mod3');
+    fb.classList.remove('hidden');
+
+    if (colored === 3) {
+        playSound('success'); lanzarConfeti(1.5);
+        fb.innerHTML = `<i class="fa-solid fa-medal text-yellow-500 mr-2"></i> ¡Excelente! Has pintado 3 de las 4 partes → fracción <strong>3/4</strong>.`;
+        fb.className = 'mt-6 font-bold p-4 rounded-xl text-lg bg-green-100 text-green-800 border-2 border-green-400 bounce-in text-center';
+        updateProgress('mod3');
+    } else {
+        playSound('error');
+        fb.innerHTML = `<i class="fa-solid fa-circle-info mr-2"></i> Has pintado ${colored} parte(s). El numerador (3) indica cuántas debes pintar. ¡Inténtalo de nuevo!`;
+        fb.className = 'mt-6 font-bold p-4 rounded-xl text-lg bg-orange-100 text-orange-800 border-2 border-orange-400 text-center';
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 12. PROGRESO GLOBAL
+// ═══════════════════════════════════════════════════════════════
+function updateProgress(mod) {
+    if (!state.progress[mod]) {
+        state.progress[mod] = true;
+        analytics.modules[mod].completed = true;
+        const completed = Object.values(state.progress).filter(Boolean).length;
+        const total = Object.keys(state.progress).length;
+        const pct = Math.round((completed/total)*100);
+        document.getElementById('global-progress').style.width = pct + '%';
+        const sb = document.getElementById('sidebar-progress-bar');
+        if(sb) sb.style.width = pct + '%';
+        document.getElementById('progress-text').innerText = pct + '%';
+        const navItem = document.getElementById('nav-' + mod);
+        if (navItem) {
+            const checkEl = document.createElement('span');
+            checkEl.textContent = ' ✔';
+            checkEl.className = 'text-green-500 ml-auto text-sm font-black';
+            navItem.appendChild(checkEl);
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 13. CONFETI
+// ═══════════════════════════════════════════════════════════════
+function lanzarConfeti(duration=1) {
+    if (typeof confetti==='undefined') return;
+    const end = Date.now() + duration*1000;
+    (function frame(){
+        confetti({ particleCount:5, angle:60,  spread:55, origin:{x:0}, colors:['#22c55e','#eab308','#3b82f6','#a855f7'] });
+        confetti({ particleCount:5, angle:120, spread:55, origin:{x:1}, colors:['#22c55e','#eab308','#3b82f6','#a855f7'] });
+        if(Date.now()<end) requestAnimationFrame(frame);
+    })();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 14. CERTIFICADO
+// ═══════════════════════════════════════════════════════════════
+function imprimirCertificado() {
+    window.print();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 15. PANEL DOCENTE – RENDER
+// ═══════════════════════════════════════════════════════════════
+const moduleLabels = { inicio:'Presentación', mod1:'Multiplicación', mod2:'División', mod3:'Fracciones', evaluacion:'Evaluación Final' };
+const moduleColors = { inicio:'teal', mod1:'red', mod2:'blue', mod3:'orange', evaluacion:'purple' };
+
+function calcTotalScore() {
+    let s=0, t=0;
+    ['mod1','evaluacion'].forEach(m => { s += analytics.modules[m].score||0; t += analytics.modules[m].total||0; });
+    ['mod2','mod3'].forEach(m => { if(analytics.modules[m].completed){s++;} t++; });
+    return { s, t };
+}
+
+function getSessionDuration() {
+    return fmtSeconds(Math.floor((Date.now() - analytics.sessionStart)/1000));
+}
+
+function renderPanel() {
+    // Cerrar timer actual para contarlo
+    const cm = analytics._currentModule;
+    if(cm && analytics.modules[cm]._start) {
+        analytics.modules[cm].timeSpent += Date.now() - analytics.modules[cm]._start;
+        analytics.modules[cm]._start = Date.now(); // reiniciar desde ahora
+    }
+
+    const { s, t } = calcTotalScore();
+    const completedMods = Object.entries(state.progress).filter(([,v])=>v).length;
+
+    // --- Resumen ---
+    document.getElementById('panel-summary').innerHTML = [
+        { label:'Estudiante', val: analytics.studentName, icon:'fa-user', color:'indigo' },
+        { label:'Sesión', val: getSessionDuration(), icon:'fa-clock', color:'blue' },
+        { label:'Puntaje Total', val: `${s} / ${t}`, icon:'fa-star', color:'yellow' },
+        { label:'Módulos OK', val: `${completedMods} / 4`, icon:'fa-check-circle', color:'green' }
+    ].map(c => `
+        <div class="stat-card flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-${c.color}-100 flex items-center justify-center text-${c.color}-600"><i class="fa-solid ${c.icon}"></i></div>
+            <div><div class="text-xs text-gray-500 font-semibold">${c.label}</div><div class="font-black text-gray-800 text-lg">${c.val}</div></div>
+        </div>`).join('');
+
+    // --- Módulos ---
+    const modHtml = Object.entries(analytics.modules).map(([key, m]) => {
+        const label = moduleLabels[key] || key;
+        const spent = fmtSeconds(Math.floor((m.timeSpent)/1000));
+        const done = m.completed;
+        const badge = done
+            ? `<span class="status-badge badge-ok"><i class="fa-solid fa-check text-xs"></i> Completado</span>`
+            : m.visits > 0
+                ? `<span class="status-badge badge-pend"><i class="fa-regular fa-clock text-xs"></i> En progreso</span>`
+                : `<span class="status-badge badge-no"><i class="fa-solid fa-xmark text-xs"></i> Sin visitar</span>`;
+
+        let extra = '';
+        if (m.attempts !== undefined) extra += `<span class="text-xs text-gray-500">Intentos: <b>${m.attempts}</b></span>`;
+        if (m.score !== undefined && m.total !== undefined) extra += `<span class="text-xs text-gray-500">Aciertos: <b>${m.score}/${m.total}</b></span>`;
+        if (m.slicesPainted !== undefined && m.slicesPainted > 0) extra += `<span class="text-xs text-gray-500">Porciones pintadas: <b>${m.slicesPainted}/4</b></span>`;
+
+        return `<div class="stat-card">
+            <div class="flex justify-between items-start mb-2">
+                <h4 class="font-bold text-gray-800">${label}</h4>${badge}
+            </div>
+            <div class="flex flex-wrap gap-3 text-sm mt-1">
+                <span class="text-xs text-gray-500">Tiempo: <b>${spent}</b></span>
+                <span class="text-xs text-gray-500">Visitas: <b>${m.visits}</b></span>
+                ${extra}
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('panel-modules').innerHTML = modHtml;
+
+    // --- Respuestas detalladas ---
+    const allAnswers = [];
+    ['mod1','evaluacion'].forEach(mod => {
+        (analytics.modules[mod].answers||[]).forEach(a => allAnswers.push({mod, ...a}));
+    });
+    if (allAnswers.length === 0) {
+        document.getElementById('panel-answers').innerHTML = '<p class="text-gray-400 text-sm text-center py-4">Aún no hay respuestas registradas.</p>';
+    } else {
+        document.getElementById('panel-answers').innerHTML = allAnswers.map(a => `
+            <div class="ans-row">
+                <span class="ans-tag">${moduleLabels[a.mod]}</span>
+                <span class="ans-tag">Intento #${a.attempt}</span>
+                <span class="ans-q">${a.question.replace(/[🚀🪐🍕]/g,'')}</span>
+                <span class="ans-val ${a.correct ? 'ans-ok' : 'ans-bad'}">${a.userAnswer || '(vacío)'} ${a.correct ? '✔' : '✗'}</span>
+            </div>`).join('');
+    }
+
+    // --- Navegación ---
+    if (analytics.navEvents.length === 0) {
+        document.getElementById('panel-nav').innerHTML = '<p class="text-gray-400 text-sm">Sin eventos aún.</p>';
+    } else {
+        const navHtml = analytics.navEvents.map((e,i) => {
+            const time = new Date(e.ts).toLocaleTimeString('es-CO');
+            return `${i>0 ? '<span class="text-gray-300 text-lg">→</span>' : ''}<span class="nav-event bg-white border border-gray-200 px-3 py-1 rounded-full"><b>${moduleLabels[e.to]||e.to}</b> <span class="text-gray-400">${time}</span></span>`;
+        }).join('');
+        document.getElementById('panel-nav').innerHTML = navHtml;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 16. EXPORTAR DATOS
+// ═══════════════════════════════════════════════════════════════
+function exportCSV() {
+    renderPanel(); // asegurar datos actualizados
+
+    const rows = [];
+    // Encabezado principal
+    rows.push(['=== RESUMEN DE SESIÓN ===']);
+    rows.push(['Session ID', analytics.sessionId]);
+    rows.push(['Estudiante', analytics.studentName]);
+    rows.push(['Avatar', analytics.avatarStyle + '/' + analytics.avatarSeed]);
+    rows.push(['Inicio de sesión', analytics.sessionStart.toLocaleString('es-CO')]);
+    rows.push(['Duración', getSessionDuration()]);
+    rows.push([]);
+
+    // Módulos
+    rows.push(['=== DESEMPEÑO POR MÓDULO ===']);
+    rows.push(['Módulo','Completado','Visitas','Tiempo (seg)','Intentos','Aciertos','Total']);
+    Object.entries(analytics.modules).forEach(([key, m]) => {
+        const spent = Math.floor(m.timeSpent/1000);
+        rows.push([
+            moduleLabels[key]||key,
+            m.completed ? 'Sí' : 'No',
+            m.visits,
+            spent,
+            m.attempts ?? '-',
+            m.score ?? '-',
+            m.total ?? '-'
+        ]);
+    });
+    rows.push([]);
+
+    // Respuestas
+    rows.push(['=== REGISTRO DE RESPUESTAS ===']);
+    rows.push(['Módulo','Pregunta','Respuesta del estudiante','Correcto','Intento','Fecha y Hora']);
+    ['mod1','evaluacion'].forEach(mod => {
+        (analytics.modules[mod].answers||[]).forEach(a => {
+            rows.push([moduleLabels[mod]||mod, a.question.replace(/[🚀🪐🍕]/g,''), a.userAnswer||'', a.correct?'Sí':'No', a.attempt, a.ts]);
+        });
+    });
+    rows.push([]);
+
+    // Navegación
+    rows.push(['=== RUTA DE NAVEGACIÓN ===']);
+    rows.push(['Desde','Hacia','Timestamp']);
+    analytics.navEvents.forEach(e => rows.push([moduleLabels[e.from]||e.from, moduleLabels[e.to]||e.to, e.ts]));
+
+    const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+    downloadFile('eva-analitica-' + analytics.studentName.replace(/\s/g,'_') + '-' + Date.now() + '.csv', csv, 'text/csv;charset=utf-8;');
+}
+
+function exportJSON() {
+    renderPanel();
+    // Clonar para limpiar propiedades internas
+    const data = JSON.parse(JSON.stringify({
+        sessionId: analytics.sessionId,
+        studentName: analytics.studentName,
+        avatar: analytics.avatarStyle + '/' + analytics.avatarSeed,
+        sessionStart: analytics.sessionStart.toISOString(),
+        sessionDuration: getSessionDuration(),
+        progress: state.progress,
+        modules: Object.fromEntries(Object.entries(analytics.modules).map(([k,v]) => {
+            const { _start, ...rest } = v;
+            rest.timeSpentSeconds = Math.floor(v.timeSpent/1000);
+            return [k, rest];
+        })),
+        navigationPath: analytics.navEvents
+    }));
+    downloadFile('eva-analitica-' + analytics.studentName.replace(/\s/g,'_') + '-' + Date.now() + '.json', JSON.stringify(data,null,2), 'application/json');
+}
+
+function downloadFile(filename, content, mimeType) {
+    const blob = new Blob(['\uFEFF'+content], { type: mimeType });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+}
+
+</script>
+</body>
+</html>
