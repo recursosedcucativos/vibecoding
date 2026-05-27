@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Conceptual: Plan Nacional del Buen Vivir</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        map: {
+                            teal: '#a7f3d0',     // Título principal
+                            blue: '#bae6fd',     // Ejes (Cabeceras)
+                            green: '#bbf7d0',    // Descripciones
+                            purple: '#e9d5ff',   // Eje 1
+                            yellow: '#fef08a',   // Eje 2 (Cambiado a un amarillo suave más fiel a veces)
+                            orange: '#ffedd5',   // Eje 2 original
+                            khaki: '#e6dfb8',    // Eje 3
+                            pink: '#fbcfe8',     // Eje 4
+                            aqua: '#99f6e4'      // Eje 5
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        /* Contenedor del mapa con scroll en móviles */
+        .map-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            cursor: grab; /* Indicador de paneo */
+            padding-bottom: 40px;
+        }
+        
+        .map-wrapper:active {
+            cursor: grabbing;
+        }
+
+        /* Lienzo interior con tamaño mínimo para no aplastar el diagrama */
+        .map-canvas {
+            min-width: 1200px; /* Ancho forzado para acomodar 5 columnas bien formateadas */
+            padding: 2rem;
+            margin: 0 auto;
+        }
+
+        /* Estilos de los conectores (Líneas y Flechas) */
+        .connector-vertical {
+            width: 2px;
+            height: 24px;
+            background-color: #1e293b;
+            position: relative;
+            margin: 0 auto;
+        }
+        .connector-vertical.arrow-down::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 5px 0 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+
+        /* Estilos de las cajas */
+        .box-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        /* Interacción pedagógica: Focus de columna */
+        .columns-container:hover .column-wrapper:not(:hover) {
+            opacity: 0.3;
+            filter: grayscale(40%);
+        }
+        .column-wrapper {
+            transition: opacity 0.4s ease, filter 0.4s ease;
+        }
+        .column-wrapper:hover .box-shadow {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animaciones de entrada en cascada */
+        .animate-pop {
+            animation: popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Scrollbar amigable */
+        ::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0; 
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; 
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+
+        /* Indicador móvil */
+        .swipe-indicator {
+            animation: bounceHorizontal 2s infinite;
+        }
+        @keyframes bounceHorizontal {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Indicador visible solo en pantallas pequeñas (móviles/tablets) -->
+    <div id="mobile-indicator" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-full text-sm shadow-xl z-50 flex items-center gap-2 lg:hidden opacity-90 transition-opacity duration-500">
+        <i data-lucide="move-horizontal" class="w-4 h-4 swipe-indicator"></i>
+        Desliza para ver el mapa completo
+    </div>
+
+    <!-- Contenedor con scroll horizontal -->
+    <div class="map-wrapper" id="scroll-container">
+        <!-- Lienzo del diagrama (ancho fijo mínimo) -->
+        <div class="map-canvas flex flex-col items-center">
+
+            <!-- NIVEL 1: Título Principal -->
+            <div class="bg-[#a7f3d0] px-8 py-5 rounded-xl border border-emerald-200 box-shadow text-center min-w-[350px] animate-pop" style="animation-delay: 0.1s;">
+                <h1 class="text-3xl font-bold text-slate-900 leading-tight">Plan Nacional<br>del Buen Vivir.</h1>
+            </div>
+
+            <!-- Conector -->
+            <div class="connector-vertical arrow-down animate-pop" style="animation-delay: 0.3s;"></div>
+
+            <!-- NIVEL 2: Subtítulo -->
+            <div class="bg-[#bae6fd] px-6 py-2 rounded-full border border-sky-200 box-shadow font-semibold text-slate-800 animate-pop" style="animation-delay: 0.5s;">
+                Ejes y Objetivos
+            </div>
+
+            <!-- Conector (Tallo vertical antes de dividirse) -->
+            <div class="w-[2px] h-6 bg-slate-800 animate-pop" style="animation-delay: 0.7s;"></div>
+
+            <!-- BARRA HORIZONTAL DE DISTRIBUCIÓN -->
+            <div class="w-[80%] border-t-2 border-slate-800 relative h-6 animate-pop" style="animation-delay: 0.9s;">
+                <!-- 5 líneas bajando a las cabeceras -->
+                <div class="absolute left-[0%] top-0 connector-vertical arrow-down !m-0 !w-[2px] !h-6"></div>
+                <div class="absolute left-[25%] top-0 connector-vertical arrow-down !m-0 !w-[2px] !h-6"></div>
+                <div class="absolute left-[50%] top-0 connector-vertical arrow-down !m-0 !w-[2px] !h-6"></div>
+                <div class="absolute left-[75%] top-0 connector-vertical arrow-down !m-0 !w-[2px] !h-6"></div>
+                <div class="absolute left-[100%] top-0 connector-vertical arrow-down !m-0 !w-[2px] !h-6"></div>
+            </div>
+
+            <!-- NIVEL 3: Las 5 Columnas -->
+            <div class="columns-container grid grid-cols-5 gap-6 w-full" id="columns-container">
+                <!-- Se renderizan vía JavaScript -->
+            </div>
+
+            <!-- CIERRE INFERIOR (Bracket) -->
+            <div class="w-[80%] relative h-8 mt-4 animate-pop" style="animation-delay: 3.5s;">
+                <!-- 5 líneas subiendo desde la barra horizontal hacia la última caja -->
+                <div class="absolute left-[0%] bottom-0 w-[2px] h-6 bg-slate-800"></div>
+                <div class="absolute left-[25%] bottom-0 w-[2px] h-6 bg-slate-800"></div>
+                <div class="absolute left-[50%] bottom-0 w-[2px] h-6 bg-slate-800"></div>
+                <div class="absolute left-[75%] bottom-0 w-[2px] h-6 bg-slate-800"></div>
+                <div class="absolute left-[100%] bottom-0 w-[2px] h-6 bg-slate-800"></div>
+                <!-- Barra horizontal uniendo abajo -->
+                <div class="absolute bottom-0 left-0 w-full border-b-2 border-slate-800"></div>
+            </div>
+            <div class="w-[2px] h-6 bg-slate-800 mb-2 animate-pop" style="animation-delay: 3.6s;"></div>
+            <div class="w-16 h-8 border-2 border-slate-800 rounded-md rounded-t-none animate-pop" style="border-top: none; animation-delay: 3.7s;"></div>
+
+        </div>
+    </div>
+
+    <!-- Base de Datos (Estructura de la infografía) -->
+    <script>
+        const mapData = [
+            {
+                title: 'Ordenamiento<br>Territorial',
+                colorClass: 'bg-[#e9d5ff]', // Morado claro
+                desc: 'Responde a los retos en la administración del territorio Colombiano, de cara con el desarrollo sostenible y el empoderamiento de los gobiernos locales y comunidades.',
+                items: [
+                    { icon: 'droplets', iconColor: 'text-blue-500', text: 'Ordenamiento alrededor del agua Consolidación de la base ambiental' },
+                    { icon: 'mountain', iconColor: 'text-orange-500', text: 'Protección del suelo para la seguridad alimentaria' },
+                    { icon: 'landmark', iconColor: 'text-yellow-600', text: 'Protección del patrimonio cultural y arqueológico' },
+                    { icon: 'users', iconColor: 'text-orange-600', text: 'Localización de las personas en el espacio de acuerdo a las dinámicas poblacionales y demográficas' },
+                    { icon: 'file-text', iconColor: 'text-blue-600', text: 'Consolidación de la democracia y la gobernanza<br>Base fiscal sólida' }
+                ]
+            },
+            {
+                title: 'Seguridad Humana<br>y Justicia Social',
+                colorClass: 'bg-[#ffedd5]', // Naranja/Amarillo claro
+                desc: 'Hacer de Colombia una potencia de la vida implica una transformación importante en la que toda la ciudadanía goce de una seguridad humana que garantice la seguridad e integridad física de la población; y que a su vez promueva el desarrollo integral, la reconciliación, la protección y empoderamiento de las personas, para que puedan vivir en un ambiente de paz, felicidad y libre de discriminación y exclusión.',
+                items: [
+                    { text: 'Rediseñar el sistema de protección social: cobertura universal de riesgos e inclusión del cuidado como pilar.' },
+                    { text: 'Mayores oportunidades de inclusión productiva y de trabajo decente.' },
+                    { text: 'Garantía de derechos fundamentales y la accesibilidad a bienes y servicios como fundamentos de la dignidad humana.' },
+                    { text: 'Prevención y protección para una sociedad segura y sin violencia en la que se garantizará la protección física de las personas, las comunidades y el territorio.' },
+                    { text: 'Justicia para el cambio social multicolor entendida como la justicia de las personas, los pueblos y sus territorios.' }
+                ]
+            },
+            {
+                title: 'Desarrollo Humano<br>a la Alimentación',
+                colorClass: 'bg-[#e6dfb8]', // Caqui
+                desc: 'A partir de un sistema de conjuntos agroalimentarios que incluye circuitos cortos de producción y consumos cortos que suplan las necesidades nutricionales de la población y que provean alimentos de calidad para que nadie muera de hambre.',
+                items: [
+                    { text: 'Generar una reindustrialización incluyente para producir más y mejores alimentos utilizando ciencia, tecnología e innovación.' },
+                    { icon: 'truck', iconColor: 'text-slate-600', text: 'Contar con infraestructura logística eficiente y especializada con modelos de gobernanza adecuados para la producción agropecuaria.' },
+                    { icon: 'shopping-cart', iconColor: 'text-slate-600', text: 'Reducir la intermediación y aumentar la rentabilidad en la comercialización de la producción agropecuaria.' },
+                    { icon: 'shield-check', iconColor: 'text-green-600', text: 'Promover la producción de alimentos sanos y seguros que cumplan estándares en materia de sanidad e inocuidad en la cadena alimentaria.' },
+                    { icon: 'utensils', iconColor: 'text-orange-600', text: 'Promover el consumo de alimentos adecuados y adaptados a las necesidades del curso de vida, las practicas alimentarias territoriales y poblacionales.' }
+                ]
+            },
+            {
+                title: 'Economía productiva<br>para la vida y acción<br>climática',
+                colorClass: 'bg-[#fbcfe8]', // Rosa claro
+                desc: '<ul class="list-disc pl-4 text-left space-y-1"><li>Transitar de forma gradual justa y progresiva hacia fuentes de energía renovables y confiables.</li><li>Ascenso tecnológico y mejor planeado del transporte y la promoción de la movilidad activa.</li><li>Industrias y Ciudades más humanas que funcionan en un modelo de economía circular.</li><li>Controlar las economías criminales que generan deforestación y fomentar la restauración de los ecosistemas</li></ul>',
+                items: [
+                    { text: '<b>1.</b> Programa nacional estratégico de conservación y restauración ecológica.<br><b>2.</b> Acelerar una transición energética justa con seguridad, confiabilidad y eficiencia.' },
+                    { text: '<b>3.</b> Desarrollo económico a partir de eficiencia energética, minerales estratégicos para la transición energética y nuevos energéticos.<br><b>4.</b> Ascenso tecnológico del sector transporte y promoción de la movilidad no motorizada.' },
+                    { text: '<b>5.</b> Reindustrialización: hacia una economía del conocimiento, incluyente y sostenible.<br><b>6.</b> Modernizar el Sistema Nacional de Ciencia, Tecnología e Innovación (CTI) para consolidar la reindustrialización en actividades intensivas en conocimiento.' },
+                    { text: '<b>7.</b> Fortalecimiento de la banca de desarrollo e implementación de instrumentos alternativos de financiamiento para la reindustrialización.<br><b>8.</b> Consolidar el modelo de Bioeconomía incluyente basada en el conocimiento y la innovación.' },
+                    { text: '<span class="text-xs"><b>9.</b> Construir ciudades y hábitats sostenibles.<br><b>10.</b> Avanzar en la carbono neutralidad...<br><b>11.</b> Fortalecer la justicia ambiental...<br><b>12.</b> Aumentar el financiamiento para un nuevo contrato social...</span>' }
+                ]
+            },
+            {
+                title: 'Convergencia<br>Regional',
+                colorClass: 'bg-[#99f6e4]', // Aqua/Teal
+                desc: 'La convergencia regional es el proceso de reducción de brechas sociales y económicas entre hogares y regiones en el país, que se logra al garantizar un acceso diferencial acorde a las particularidades locales en el territorio a oportunidades, bienes y servicios a todas las personas, promoviendo un mayor bienestar integral y mejorando la calidad de vida de los habitantes.',
+                items: [
+                    { text: '<b>1.</b> Aprovechamiento de la ciudad construida, de manera participativa e incluyente, para el fortalecimiento de los vínculos intraurbanos.' },
+                    { text: '<b>2.</b> Construcción e implementación de modelos de desarrollo supramunicipales para el fortalecimiento de vínculos urbano-rurales y la integración de territorios.' },
+                    { text: '<b>3.</b> Construcción e implementación de sistemas nacionales y regionales de productividad, competitividad e innovación.' },
+                    { text: '<b>4.</b> Fortalecimiento institucional como motor de cambio para recuperar la confianza de la ciudadanía y para el fortalecimiento del vínculo Estado - Ciudadanía.' },
+                    { text: '<b>5.</b> Fortalecimiento de los dispositivos democráticos de participación: decisiones desde y para el territorio.' }
+                ]
+            }
+        ];
+
+        // Lógica de Renderizado Dinámico
+        const container = document.getElementById('columns-container');
+
+        let baseDelay = 1.1; // Inicio de animaciones para las columnas
+
+        mapData.forEach((col, colIndex) => {
+            const colDelay = baseDelay + (colIndex * 0.1);
+            
+            // Contenedor de la columna
+            let html = `<div class="column-wrapper flex flex-col items-center w-full">`;
+            
+            // Cabecera (Azul clarito en todas)
+            html += `
+                <div class="bg-[#bae6fd] w-full p-4 rounded-xl border border-sky-200 box-shadow text-center font-bold text-sm min-h-[70px] flex items-center justify-center animate-pop" style="animation-delay: ${colDelay}s;">
+                    ${col.title}
+                </div>
+                <div class="connector-vertical arrow-down animate-pop" style="animation-delay: ${colDelay + 0.1}s;"></div>
+            `;
+
+            // Descripción (Verde claro en todas)
+            html += `
+                <div class="bg-[#bbf7d0] w-full p-4 rounded-xl border border-green-200 box-shadow text-xs leading-relaxed min-h-[140px] animate-pop" style="animation-delay: ${colDelay + 0.2}s;">
+                    ${col.desc}
+                </div>
+            `;
+
+            // Cajas de ítems iterativas
+            col.items.forEach((item, itemIndex) => {
+                const itemDelay = colDelay + 0.3 + (itemIndex * 0.15);
+                
+                html += `
+                    <div class="connector-vertical arrow-down animate-pop" style="animation-delay: ${itemDelay}s;"></div>
+                    <div class="${col.colorClass} w-full p-4 rounded-xl border border-black/5 box-shadow text-xs text-center flex flex-col items-center justify-center min-h-[90px] animate-pop" style="animation-delay: ${itemDelay + 0.1}s;">
+                `;
+
+                // Agregar icono si existe (simulando los circulitos del eje 1 y 3)
+                if (item.icon) {
+                    html += `
+                        <div class="bg-white/80 p-1.5 rounded-full mb-2 shadow-sm">
+                            <i data-lucide="${item.icon}" class="w-5 h-5 ${item.iconColor || 'text-slate-700'}"></i>
+                        </div>
+                    `;
+                }
+
+                html += `${item.text}</div>`;
+            });
+
+            html += `</div>`;
+            container.innerHTML += html;
+        });
+
+        // Inicializar Iconos Lucide
+        lucide.createIcons();
+
+        // Ocultar indicador móvil al hacer scroll manual
+        const scrollContainer = document.getElementById('scroll-container');
+        const mobileIndicator = document.getElementById('mobile-indicator');
+        
+        scrollContainer.addEventListener('scroll', () => {
+            if(mobileIndicator && scrollContainer.scrollLeft > 20) {
+                mobileIndicator.style.opacity = '0';
+                setTimeout(() => mobileIndicator.remove(), 500);
+            }
+        });
+
+        // Lógica para permitir "arrastrar para hacer scroll" (Drag to scroll) en Desktop
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+        });
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; // Velocidad de scroll
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
+
+    </script>
+</body>
+</html>
