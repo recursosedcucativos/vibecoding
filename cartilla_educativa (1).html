@@ -1,0 +1,2909 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartilla Educativa — Español y Matemáticas · 5.° Grado</title>
+
+<!-- Cargamos directamente html2canvas y jsPDF para renderizado página por página (Evita crash de memoria) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+/* ============================================================
+   TOKENS DE DISEÑO
+   ============================================================ */
+:root {
+  --azul:       #1B3A6B;
+  --azul-med:   #2D5FA6;
+  --azul-claro: #E8F0FB;
+  --naranja:    #E8630A;
+  --naranja-cl: #FEF0E6;
+  --verde:      #1A7A4A;
+  --verde-cl:   #E6F5EE;
+  --amarillo:   #F5C518;
+  --amarillo-cl:#FFFBE6;
+  --rojo:       #C0392B;
+  --rojo-cl:    #FDEDEC;
+  --gris-f:     #F8F9FA;
+  --gris-borde: #DEE2E6;
+  --gris-text:  #495057;
+  --negro:      #1A1A2E;
+  --blanco:     #FFFFFF;
+
+  --fuente-titulo: Georgia, 'Times New Roman', serif;
+  --fuente-cuerpo: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fuente-mono:   'Courier New', monospace;
+
+  --radio:  8px;
+  --radio-g: 14px;
+  --sombra: 0 2px 8px rgba(27,58,107,0.12);
+  --sombra-g: 0 4px 20px rgba(27,58,107,0.18);
+}
+
+/* ============================================================
+   RESET Y BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--fuente-cuerpo);
+  font-size: 11pt;
+  line-height: 1.65;
+  color: var(--negro);
+  background: #D0D8E8;
+}
+
+/* ============================================================
+   BOTÓN PDF (fuera del área imprimible)
+   ============================================================ */
+#btn-pdf {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 9999;
+  background: var(--naranja);
+  color: #fff;
+  font-family: var(--fuente-cuerpo);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 26px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(232,99,10,0.5);
+  transition: all .2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: .3px;
+}
+#btn-pdf:hover:not(:disabled) { background: #c4510a; transform: translateY(-2px); }
+#btn-pdf:active:not(:disabled) { transform: translateY(0); }
+#btn-pdf:disabled { background: #a5a5a5; cursor: not-allowed; box-shadow: none; }
+#btn-pdf svg { width: 20px; height: 20px; fill: #fff; }
+
+/* ============================================================
+   PÁGINAS — cada .pagina es una hoja A4 exacta
+   ============================================================ */
+.pagina {
+  width: 210mm;
+  height: 297mm; /* Altura estricta para evitar deformación de aspecto en la captura */
+  background: var(--blanco);
+  margin: 14px auto;
+  padding: 18mm 18mm 22mm 18mm;
+  position: relative;
+  box-shadow: var(--sombra-g);
+  overflow: hidden;
+}
+
+/* Encabezado de página */
+.enc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2.5px solid var(--azul);
+  padding-bottom: 7px;
+  margin-bottom: 16px;
+}
+.enc-logo { font-family: var(--fuente-titulo); font-size: 10pt; color: var(--azul); font-weight: 700; }
+.enc-titulo { font-size: 9pt; color: var(--gris-text); font-style: italic; }
+
+/* Pie de página */
+.pie {
+  position: absolute;
+  bottom: 12mm;
+  left: 18mm;
+  right: 18mm;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1.5px solid var(--gris-borde);
+  padding-top: 6px;
+  font-size: 8.5pt;
+  color: var(--gris-text);
+}
+.pie-num {
+  background: var(--azul);
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9pt;
+  font-weight: 700;
+}
+
+/* ============================================================
+   PORTADA
+   ============================================================ */
+.portada {
+  background: linear-gradient(145deg, var(--azul) 0%, #0F2449 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+.portada-deco {
+  position: absolute; inset: 0;
+  opacity: .06;
+  background-image: repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%);
+  background-size: 22px 22px;
+}
+.portada-banda {
+  position: absolute;
+  left: 0; right: 0;
+  height: 10px;
+}
+.portada-banda-top    { top: 0; background: linear-gradient(90deg, var(--naranja), var(--amarillo)); }
+.portada-banda-bottom { bottom: 0; background: linear-gradient(90deg, var(--verde), #22A060); }
+
+.portada-insignia {
+  background: rgba(255,255,255,.10);
+  border: 2px solid rgba(255,255,255,.25);
+  border-radius: var(--radio-g);
+  padding: 8px 22px;
+  font-size: 9.5pt;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  color: rgba(255,255,255,.85);
+}
+.portada h1 {
+  font-family: var(--fuente-titulo);
+  font-size: 42pt;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+  color: #fff;
+}
+.portada h1 span { color: var(--amarillo); }
+.portada-sub {
+  font-size: 16pt;
+  color: rgba(255,255,255,.80);
+  margin-bottom: 40px;
+  font-weight: 300;
+  font-style: italic;
+}
+.portada-materias {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.portada-materia {
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 13pt;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.pm-esp { background: var(--naranja);  color: #fff; }
+.pm-mat { background: var(--verde);    color: #fff; }
+
+.portada-svg { margin-bottom: 30px; }
+.portada-info {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 10pt;
+  color: rgba(255,255,255,.70);
+}
+.portada-info-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.portada-info-item strong { color: rgba(255,255,255,.95); font-size: 12pt; }
+
+/* ============================================================
+   ÍNDICE
+   ============================================================ */
+.indice-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 22pt;
+  color: var(--azul);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.indice-linea {
+  width: 60px; height: 4px;
+  background: var(--naranja);
+  margin: 0 auto 28px;
+  border-radius: 2px;
+}
+.indice-seccion {
+  margin-bottom: 18px;
+}
+.indice-seccion-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--blanco);
+  background: var(--azul-med);
+  padding: 8px 16px;
+  border-radius: var(--radio);
+  margin-bottom: 8px;
+}
+.indice-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 20px;
+}
+.indice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 10pt;
+}
+.indice-item:nth-child(odd)  { background: var(--gris-f); }
+.indice-item-tema { color: var(--negro); }
+.indice-item-pag  { color: var(--azul-med); font-weight: 700; min-width: 30px; text-align: right; }
+
+/* ============================================================
+   SEPARADOR DE UNIDAD
+   ============================================================ */
+.sep-unidad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0;
+  overflow: hidden;
+}
+.sep-fondo {
+  position: absolute;
+  inset: 0;
+  background: var(--azul-claro);
+}
+.sep-contenido { position: relative; z-index: 1; text-align: center; }
+.sep-num {
+  font-family: var(--fuente-titulo);
+  font-size: 80pt;
+  font-weight: 700;
+  color: rgba(27,58,107,.08);
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.sep-etiqueta {
+  display: inline-block;
+  background: var(--naranja);
+  color: #fff;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 6px 20px;
+  border-radius: 50px;
+  margin-bottom: 18px;
+}
+.sep-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 34pt;
+  font-weight: 700;
+  color: var(--azul);
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+.sep-desc {
+  font-size: 12pt;
+  color: var(--gris-text);
+  max-width: 400px;
+  margin: 0 auto 30px;
+}
+.sep-temas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 450px;
+  margin: 0 auto;
+}
+.sep-tema {
+  background: var(--blanco);
+  border: 2px solid var(--azul-med);
+  color: var(--azul);
+  font-size: 10pt;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 50px;
+}
+
+/* ============================================================
+   TIPOGRAFÍA INTERNA
+   ============================================================ */
+.titulo-tema {
+  font-family: var(--fuente-titulo);
+  font-size: 19pt;
+  font-weight: 700;
+  color: var(--azul);
+  margin-bottom: 4px;
+  border-left: 5px solid var(--naranja);
+  padding-left: 12px;
+  line-height: 1.2;
+}
+.subtitulo {
+  font-family: var(--fuente-titulo);
+  font-size: 13pt;
+  font-weight: 700;
+  color: var(--azul-med);
+  margin-top: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.subtitulo::after {
+  content: '';
+  flex: 1;
+  height: 1.5px;
+  background: var(--gris-borde);
+}
+.subtitulo3 {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--verde);
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+p { margin-bottom: 9px; }
+ul, ol { margin-left: 20px; margin-bottom: 9px; }
+li { margin-bottom: 4px; }
+strong { color: var(--azul); }
+em { color: var(--naranja); font-style: italic; }
+
+/* ============================================================
+   CUADROS ESPECIALES
+   ============================================================ */
+.cuadro {
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin: 14px 0;
+  position: relative;
+}
+.cuadro-titulo {
+  font-size: 10pt;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.cuadro-titulo svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.recuerda { background: var(--azul-claro); border-left: 5px solid var(--azul-med); }
+.recuerda .cuadro-titulo { color: var(--azul); }
+.sabias { background: var(--amarillo-cl); border-left: 5px solid var(--amarillo); }
+.sabias .cuadro-titulo { color: #8B6914; }
+.concepto { background: var(--verde-cl); border-left: 5px solid var(--verde); }
+.concepto .cuadro-titulo { color: var(--verde); }
+.atencion { background: var(--rojo-cl); border-left: 5px solid var(--rojo); }
+.atencion .cuadro-titulo { color: var(--rojo); }
+.ejemplo { background: var(--gris-f); border: 2px solid var(--gris-borde); border-top: 4px solid var(--naranja); }
+.ejemplo .cuadro-titulo { color: var(--naranja); }
+
+/* ============================================================
+   ACTIVIDADES
+   ============================================================ */
+.actividad {
+  background: #FAFBFF;
+  border: 2px solid var(--azul-med);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+.actividad-cabeza {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.actividad-num {
+  background: var(--azul);
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12pt;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.actividad-titulo {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--azul);
+}
+.actividad-instruccion {
+  font-size: 10pt;
+  color: var(--gris-text);
+  margin-bottom: 10px;
+  font-style: italic;
+}
+
+.linea-resp {
+  border: none;
+  border-bottom: 1.5px solid var(--gris-borde);
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+  height: 22px;
+  background: transparent;
+}
+.lineas-resp {
+  display: grid;
+  gap: 3px;
+  margin: 8px 0;
+}
+
+.opc-mult { list-style: none; margin: 0; padding: 0; }
+.opc-mult li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  margin-bottom: 4px;
+  font-size: 10.5pt;
+}
+.opc-mult li:nth-child(odd) { background: var(--gris-f); }
+.opc-circulo {
+  width: 18px; height: 18px;
+  border: 2px solid var(--azul-med);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--azul-med);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.reto {
+  background: linear-gradient(135deg, #FFF8E7, #FEF0E6);
+  border: 2.5px dashed var(--naranja);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+.reto-titulo {
+  font-size: 11pt;
+  font-weight: 800;
+  color: var(--naranja);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   TABLAS Y GRID
+   ============================================================ */
+.tabla-edu {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10pt;
+  margin: 12px 0;
+}
+.tabla-edu thead th {
+  background: var(--azul);
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  padding: 9px 10px;
+  border: 1px solid rgba(255,255,255,.2);
+}
+.tabla-edu tbody td {
+  padding: 7px 10px;
+  border: 1px solid var(--gris-borde);
+  vertical-align: middle;
+}
+.tabla-edu tbody tr:nth-child(even) { background: var(--gris-f); }
+.tabla-edu tbody tr:hover           { background: var(--azul-claro); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* ============================================================
+   OTROS MÓDULOS
+   ============================================================ */
+.autoevaluacion {
+  background: linear-gradient(135deg, var(--azul-claro), #EFF3FF);
+  border: 2px solid var(--azul-med);
+  border-radius: var(--radio-g);
+  padding: 18px;
+  margin: 14px 0;
+}
+.autoevaluacion-titulo {
+  font-family: var(--fuente-titulo);
+  font-size: 14pt;
+  color: var(--azul);
+  text-align: center;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.escala-eval { display: flex; justify-content: space-between; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+.escala-item { flex: 1; min-width: 80px; text-align: center; padding: 10px 6px; border-radius: var(--radio); background: #fff; border: 1.5px solid var(--gris-borde); font-size: 9pt; cursor: default; }
+.escala-item .emoji { font-size: 18pt; display: block; margin-bottom: 4px; }
+.checklist-eval { list-style: none; margin: 0; padding: 0; }
+.checklist-eval li { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 5px; font-size: 10pt; }
+.checklist-eval li:nth-child(odd) { background: rgba(255,255,255,.6); }
+.chk-box { width: 18px; height: 18px; border: 2px solid var(--azul-med); border-radius: 4px; flex-shrink: 0; background: #fff; }
+
+.respuestas-seccion { background: var(--gris-f); border-top: 4px solid var(--verde); border-radius: var(--radio); padding: 16px; margin: 12px 0; }
+.resp-titulo { font-family: var(--fuente-titulo); font-size: 13pt; color: var(--verde); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.resp-item { display: flex; gap: 10px; margin-bottom: 5px; font-size: 10pt; }
+.resp-num { background: var(--verde); color: #fff; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 8pt; font-weight: 700; flex-shrink: 0; }
+
+.glosario { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.glosario-item { background: #fff; border: 1.5px solid var(--gris-borde); border-left: 4px solid var(--azul-med); border-radius: 0 var(--radio) var(--radio) 0; padding: 8px 10px; }
+.glosario-term { font-weight: 700; color: var(--azul); font-size: 10pt; }
+.glosario-def  { font-size: 9.5pt; color: var(--gris-text); }
+
+.palabra-card { background: #fff; border: 2px solid var(--gris-borde); border-radius: var(--radio); padding: 10px 14px; text-align: center; }
+.palabra-card .silabas { font-size: 14pt; font-weight: 700; letter-spacing: 3px; color: var(--negro); }
+.palabra-card .silaba-tonica { color: var(--naranja); text-decoration: underline; text-decoration-thickness: 2px; }
+.palabra-card .tipo { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+.tipo-aguda { color: var(--naranja); } .tipo-grave { color: var(--azul-med); } .tipo-esdrujula { color: var(--verde); } .tipo-sobresd { color: var(--rojo); }
+
+.esp .titulo-tema { border-color: var(--naranja); }
+.esp .subtitulo { color: var(--naranja); }
+.esp .subtitulo::after { background: rgba(232,99,10,.25); }
+.mat .titulo-tema { border-color: var(--verde); }
+.mat .subtitulo { color: var(--verde); }
+.mat .subtitulo::after { background: rgba(26,122,74,.25); }
+</style>
+</head>
+<body>
+
+<!-- BOTÓN PDF (FUERA DEL CONTENEDOR MAESTRO) -->
+<button id="btn-pdf" onclick="descargarPDF()">
+  <svg viewBox="0 0 24 24"><path d="M12 16l-5-5 1.4-1.4 2.6 2.6V4h2v8.2l2.6-2.6L17 11l-5 5zm-6 2h12v2H6v-2z"/></svg>
+  <span>Descargar PDF</span>
+</button>
+
+<!-- CONTENEDOR MAESTRO DE LA CARTILLA -->
+<div id="contenedor-pdf">
+
+  <!-- ==================== PÁGINA 1 ==================== -->
+  <div class="pagina portada" id="p01">
+    <div class="portada-deco"></div>
+    <div class="portada-banda portada-banda-top"></div>
+    <div class="portada-banda portada-banda-bottom"></div>
+
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px 20px;">
+      <div class="portada-insignia">Educación Básica Primaria · Grado 5.°</div>
+
+      <!-- SVG decorativo -->
+      <svg class="portada-svg" width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="56" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <rect x="20" y="38" width="38" height="46" rx="3" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <rect x="62" y="38" width="38" height="46" rx="3" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <line x1="59" y1="38" x2="59" y2="84" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+        <line x1="26" y1="48" x2="52" y2="48" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="26" y1="54" x2="52" y2="54" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="26" y1="60" x2="48" y2="60" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="26" y1="66" x2="52" y2="66" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="26" y1="72" x2="44" y2="72" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="66" y1="48" x2="92" y2="48" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="66" y1="54" x2="92" y2="54" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="66" y1="60" x2="88" y2="60" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="66" y1="66" x2="92" y2="66" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <line x1="66" y1="72" x2="84" y2="72" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <polygon points="60,8 62.5,16 70,16 64,21 66.5,29 60,24 53.5,29 56,21 50,16 57.5,16" fill="#F5C518"/>
+      </svg>
+
+      <h1>Cartilla<br><span>Educativa</span></h1>
+      <p class="portada-sub">Español &amp; Matemáticas para Primaria</p>
+
+      <div class="portada-materias">
+        <span class="portada-materia pm-esp">📖 Español</span>
+        <span class="portada-materia pm-mat">🔢 Matemáticas</span>
+      </div>
+
+      <div class="portada-info">
+        <div class="portada-info-item"><span>Área</span><strong>Lengua Castellana</strong></div>
+        <div class="portada-info-item"><span>Área</span><strong>Matemáticas</strong></div>
+        <div class="portada-info-item"><span>Grado</span><strong>Quinto (5.°)</strong></div>
+        <div class="portada-info-item"><span>Páginas</span><strong>28 páginas</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 2 ==================== -->
+  <div class="pagina" id="p02">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Tabla de Contenido</span>
+    </div>
+
+    <h2 class="indice-titulo">Tabla de Contenido</h2>
+    <div class="indice-linea"></div>
+
+    <div class="indice-seccion">
+      <div class="indice-seccion-titulo" style="background:var(--naranja);">📖 Unidad 1 — Español</div>
+      <div class="indice-items">
+        <div class="indice-item"><span class="indice-item-tema">Comprensión Lectora</span><span class="indice-item-pag">4</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Idea principal e ideas secundarias</span><span class="indice-item-pag">5</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Inferencias</span><span class="indice-item-pag">6</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Orden cronológico</span><span class="indice-item-pag">7</span></div>
+        <div class="indice-item"><span class="indice-item-tema">La Coma</span><span class="indice-item-pag">8</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Ejercicios de la coma</span><span class="indice-item-pag">9</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Categorías gramaticales</span><span class="indice-item-pag">10</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Sustantivos y verbos</span><span class="indice-item-pag">11</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Acento y clasificación de palabras</span><span class="indice-item-pag">12</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Diptongo, Triptongo e Hiato</span><span class="indice-item-pag">13</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Ejercicios de silabeo</span><span class="indice-item-pag">14</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Autoevaluación Español</span><span class="indice-item-pag">15</span></div>
+      </div>
+    </div>
+
+    <div class="indice-seccion">
+      <div class="indice-seccion-titulo" style="background:var(--verde);">🔢 Unidad 2 — Matemáticas</div>
+      <div class="indice-items">
+        <div class="indice-item"><span class="indice-item-tema">Fracciones — Concepto</span><span class="indice-item-pag">17</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Tipos de fracciones</span><span class="indice-item-pag">18</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Comparación y simplificación</span><span class="indice-item-pag">19</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Problemas con fracciones</span><span class="indice-item-pag">20</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Multiplicación — Concepto</span><span class="indice-item-pag">21</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Multiplicación de 2 y 3 cifras</span><span class="indice-item-pag">22</span></div>
+        <div class="indice-item"><span class="indice-item-tema">División — Concepto</span><span class="indice-item-pag">23</span></div>
+        <div class="indice-item"><span class="indice-item-tema">División y problemas</span><span class="indice-item-pag">24</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Problemas contextualizados mixtos</span><span class="indice-item-pag">25</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Autoevaluación Matemáticas</span><span class="indice-item-pag">26</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Respuestas y Soluciones</span><span class="indice-item-pag">27</span></div>
+        <div class="indice-item"><span class="indice-item-tema">Glosario</span><span class="indice-item-pag">28</span></div>
+      </div>
+    </div>
+
+    <div class="cuadro sabias" style="margin-top:20px;">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="#8B6914"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7zm1 14v1h-2v-1h2zm1-3.27l.45-.27A5 5 0 0 0 17 9a5 5 0 1 0-5 5 5 5 0 0 0 2.55-.69l.45-.27V13h-2V10h2v2.73z"/></svg>
+        ¿Cómo usar esta cartilla?
+      </div>
+      <p>Cada tema tiene <strong>explicaciones claras</strong>, <strong>ejemplos paso a paso</strong> y <strong>actividades</strong> para practicar. Avanza de forma ordenada y responde las actividades antes de verificar las respuestas al final. ¡Tú puedes lograrlo! 🌟</p>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Español y Matemáticas</span>
+      <span class="pie-num">2</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 3 ==================== -->
+  <div class="pagina sep-unidad" id="p03">
+    <div class="sep-fondo" style="background: linear-gradient(135deg, #FEF0E6 0%, #FFF8E7 100%);"></div>
+    <div class="sep-num">1</div>
+    <div class="sep-contenido" style="position:relative;z-index:1;text-align:center;">
+      <span class="sep-etiqueta" style="background:var(--naranja);">Unidad 1</span>
+      <div style="margin-bottom:16px;">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" fill="var(--naranja-cl)" stroke="var(--naranja)" stroke-width="2"/>
+          <text x="50" y="68" font-family="Georgia,serif" font-size="58" font-weight="700" fill="var(--naranja)" text-anchor="middle">A</text>
+        </svg>
+      </div>
+      <h2 class="sep-titulo" style="color:var(--naranja);">Español</h2>
+      <p class="sep-desc">Desarrolla tu habilidad para leer, escribir y comprender el lenguaje con precisión y creatividad.</p>
+      <div class="sep-temas">
+        <span class="sep-tema" style="border-color:var(--naranja);color:var(--naranja);">📖 Comprensión lectora</span>
+        <span class="sep-tema" style="border-color:var(--naranja);color:var(--naranja);">, La coma</span>
+        <span class="sep-tema" style="border-color:var(--naranja);color:var(--naranja);">🔤 Categorías gramaticales</span>
+        <span class="sep-tema" style="border-color:var(--naranja);color:var(--naranja);">📝 Acento de palabras</span>
+        <span class="sep-tema" style="border-color:var(--naranja);color:var(--naranja);">🔗 Diptongo, triptongo e hiato</span>
+      </div>
+    </div>
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Unidad 1 — Español</span>
+      <span class="pie-num">3</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 4 ==================== -->
+  <div class="pagina esp" id="p04">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 1 — Comprensión Lectora</span>
+    </div>
+
+    <h2 class="titulo-tema">Comprensión Lectora</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es la comprensión lectora?
+      </div>
+      <p>La <strong>comprensión lectora</strong> es la capacidad de entender un texto, identificar su mensaje, relacionar ideas y sacar conclusiones. No basta con leer las palabras; hay que <em>comprender el significado</em> de lo que leemos.</p>
+    </div>
+
+    <h3 class="subtitulo">📖 Texto 1: La tortuga y el río</h3>
+
+    <div style="background:var(--gris-f);border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:14px 18px;margin-bottom:12px;font-size:10.5pt;line-height:1.75;">
+      <p>En el bosque tropical vivía una pequeña tortuga llamada <strong>Torín</strong>. Cada mañana, Torín caminaba lentamente hasta el río para beber agua fresca. Un día, el río estaba muy crecido a causa de las lluvias. Las aguas turbulentas asustaron a Torín, quien se detuvo al borde del camino.</p>
+      <p>— ¡No puedo cruzar! —dijo Torín con tristeza.</p>
+      <p>En ese momento, pasó volando una garza blanca.</p>
+      <p>— ¿Qué te pasa, amiga tortuga? —preguntó la garza.</p>
+      <p>— El río está muy crecido y no puedo beber agua —respondió Torín.</p>
+      <p>La garza le propuso llevarla al otro lado del bosque, donde había un pequeño lago tranquilo. Torín aceptó agradecida. Desde ese día, los dos animales se volvieron grandes amigos y siempre se ayudaban mutuamente.</p>
+      <p style="text-align:right;font-style:italic;font-size:9.5pt;color:var(--gris-text);">— Texto adaptado de fábulas latinoamericanas —</p>
+    </div>
+
+    <div class="actividad" id="act-1">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">1</div>
+        <span class="actividad-titulo">Actividad: Responde sobre el texto</span>
+      </div>
+      <p class="actividad-instruccion">Lee con atención y responde las siguientes preguntas:</p>
+      <p><strong>a)</strong> ¿Cuál es el nombre de la tortuga del cuento?</p>
+      <span class="linea-resp"></span>
+      <p style="margin-top:8px;"><strong>b)</strong> ¿Por qué la tortuga no podía cruzar el río?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>c)</strong> ¿Qué solución ofreció la garza?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>d)</strong> ¿Cuál fue el resultado de la historia?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <div class="actividad" id="act-2">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">2</div>
+        <span class="actividad-titulo">Selección múltiple</span>
+      </div>
+      <p class="actividad-instruccion">Encierra en un círculo la letra de la respuesta correcta:</p>
+      <p><strong>¿Cuál es la <em>idea principal</em> del texto?</strong></p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> El río estaba muy grande y nadie podía cruzarlo.</li>
+        <li><span class="opc-circulo">B</span> Una tortuga y una garza se vuelven amigas al ayudarse mutuamente.</li>
+        <li><span class="opc-circulo">C</span> Las tortugas caminan muy lento por el bosque.</li>
+        <li><span class="opc-circulo">D</span> Las garzas vuelan más rápido que las tortugas caminan.</li>
+      </ul>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Comprensión Lectora</span>
+      <span class="pie-num">4</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 5 ==================== -->
+  <div class="pagina esp" id="p05">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Comprensión Lectora — Idea principal</span>
+    </div>
+
+    <h3 class="subtitulo">🌿 Texto 2: El cuidado del agua</h3>
+
+    <div style="background:var(--gris-f);border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:14px 18px;margin-bottom:12px;font-size:10.5pt;line-height:1.75;">
+      <p>El agua es el recurso más importante del planeta. Sin ella, no podría existir ningún ser vivo. Sin embargo, en muchas partes del mundo el agua escasea debido a la contaminación y al uso irresponsable que hacemos de ella.</p>
+      <p>En los ríos y quebradas de nuestra región, todavía es posible encontrar agua limpia. Por eso, es fundamental que todos cuidemos nuestras fuentes de agua: no arrojar basuras cerca de los ríos, no usar productos químicos cerca de las quebradas y sembrar árboles en las riberas para mantener la humedad del suelo.</p>
+      <p>Recuerda: el agua que cuidas hoy será el agua que beberán los niños del mañana.</p>
+    </div>
+
+    <h3 class="subtitulo">📌 Idea principal e ideas secundarias</h3>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        Recuerda
+      </div>
+      <ul>
+        <li>La <strong>idea principal</strong> es la más importante del texto. Es el tema central.</li>
+        <li>Las <strong>ideas secundarias</strong> son los detalles, ejemplos o argumentos que apoyan la idea principal.</li>
+      </ul>
+    </div>
+
+    <div class="cuadro ejemplo">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Ejemplo resuelto
+      </div>
+      <p><strong>Texto:</strong> <em>"El agua es el recurso más importante del planeta..."</em></p>
+      <p>✅ <strong>Idea principal:</strong> El agua es un recurso vital que debemos cuidar.</p>
+      <p>🔹 <strong>Idea secundaria 1:</strong> El agua escasea por la contaminación.</p>
+      <p>🔹 <strong>Idea secundaria 2:</strong> Debemos no arrojar basuras cerca de los ríos.</p>
+      <p>🔹 <strong>Idea secundaria 3:</strong> Hay que sembrar árboles en las riberas.</p>
+    </div>
+
+    <div class="actividad" id="act-3">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">3</div>
+        <span class="actividad-titulo">Identifica las ideas del texto</span>
+      </div>
+      <p class="actividad-instruccion">Basándote en el Texto 2, completa el siguiente cuadro:</p>
+      <table class="tabla-edu">
+        <thead>
+          <tr><th style="width:30%;">Tipo de idea</th><th>Escribe la idea aquí</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Idea principal</strong></td><td><span class="linea-resp"></span></td></tr>
+          <tr><td><strong>Idea secundaria 1</strong></td><td><span class="linea-resp"></span></td></tr>
+          <tr><td><strong>Idea secundaria 2</strong></td><td><span class="linea-resp"></span></td></tr>
+          <tr><td><strong>Idea secundaria 3</strong></td><td><span class="linea-resp"></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actividad" id="act-4">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">4</div>
+        <span class="actividad-titulo">Relación causa-efecto</span>
+      </div>
+      <p class="actividad-instruccion">Une con una flecha (→) la causa con su efecto correspondiente:</p>
+      <div class="grid-2" style="gap:8px;">
+        <div style="background:var(--naranja-cl);border-radius:var(--radio);padding:10px;font-size:10pt;">
+          <p style="font-weight:700;color:var(--naranja);margin-bottom:8px;">CAUSAS</p>
+          <p style="margin-bottom:6px;">• La contaminación de los ríos</p>
+          <p style="margin-bottom:6px;">• Arrojar basura cerca del agua</p>
+          <p>• Sembrar árboles en las riberas</p>
+        </div>
+        <div style="background:var(--verde-cl);border-radius:var(--radio);padding:10px;font-size:10pt;">
+          <p style="font-weight:700;color:var(--verde);margin-bottom:8px;">EFECTOS</p>
+          <p style="margin-bottom:6px;">• Se mantiene la humedad del suelo</p>
+          <p style="margin-bottom:6px;">• Escasez de agua limpia</p>
+          <p>• Daño a los ecosistemas acuáticos</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Comprensión Lectora</span>
+      <span class="pie-num">5</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 6 ==================== -->
+  <div class="pagina esp" id="p06">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Comprensión Lectora — Inferencias y Vocabulario</span>
+    </div>
+
+    <h3 class="subtitulo">🔍 Inferencias</h3>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es una inferencia?
+      </div>
+      <p>Una <strong>inferencia</strong> es una conclusión que sacamos a partir de las pistas que nos da el texto, aunque el autor no lo diga directamente. Para inferir, debemos <em>leer entre líneas</em>.</p>
+    </div>
+
+    <div class="cuadro ejemplo">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Ejemplo resuelto
+      </div>
+      <p><strong>Frase del texto:</strong> <em>"El río estaba muy crecido a causa de las lluvias."</em></p>
+      <p><strong>Inferencia:</strong> Podemos concluir que había llovido mucho en los días anteriores, aunque el texto no lo diga explícitamente.</p>
+      <p><strong>Otra inferencia:</strong> La tortuga conocía ese camino, pues el texto dice que "cada mañana" iba al río.</p>
+    </div>
+
+    <div class="actividad" id="act-5">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">5</div>
+        <span class="actividad-titulo">Practica las inferencias</span>
+      </div>
+      <p class="actividad-instruccion">Lee las siguientes frases y escribe qué puedes inferir:</p>
+      <p><strong>a)</strong> <em>"Ana llegó al salón con el pelo mojado y la ropa empapada."</em></p>
+      <p style="font-size:10pt;color:var(--gris-text);">Inferencia: ___</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>b)</strong> <em>"Carlos llegó al colegio con ojeras y bostezando todo el día."</em></p>
+      <p style="font-size:10pt;color:var(--gris-text);">Inferencia: ___</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>c)</strong> <em>"El perro movió su cola felizmente y corrió hacia la puerta."</em></p>
+      <p style="font-size:10pt;color:var(--gris-text);">Inferencia: ___</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <h3 class="subtitulo">📚 Vocabulario en contexto</h3>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+        Estrategia: vocabulario en contexto
+      </div>
+      <p>Cuando no conoces el significado de una palabra, <strong>mira las palabras que la rodean</strong>. El contexto te dará pistas para entender su significado.</p>
+    </div>
+
+    <div class="actividad" id="act-6">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">6</div>
+        <span class="actividad-titulo">Vocabulario del Texto 1 y 2</span>
+      </div>
+      <p class="actividad-instruccion">Une cada palabra con su significado:</p>
+      <div class="grid-2" style="gap:14px;font-size:10pt;">
+        <div>
+          <p style="font-weight:700;color:var(--azul);margin-bottom:8px;">Palabras:</p>
+          <p>1. turbulento ___</p>
+          <p>2. ribera ___</p>
+          <p>3. escasear ___</p>
+          <p>4. mutuamente ___</p>
+        </div>
+        <div>
+          <p style="font-weight:700;color:var(--naranja);margin-bottom:8px;">Significados:</p>
+          <p>a) orilla del río o lago</p>
+          <p>b) el uno al otro, los dos juntos</p>
+          <p>c) agitado, revuelto</p>
+          <p>d) haber poca cantidad de algo</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Comprensión Lectora</span>
+      <span class="pie-num">6</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 7 ==================== -->
+  <div class="pagina esp" id="p07">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Comprensión Lectora — Orden cronológico y opinión</span>
+    </div>
+
+    <h3 class="subtitulo">⚽ Texto 3: El partido del barrio</h3>
+
+    <div style="background:var(--gris-f);border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:14px 18px;margin-bottom:12px;font-size:10.5pt;line-height:1.75;">
+      <p>El sábado por la mañana, los niños del barrio La Esperanza decidieron jugar un partido de fútbol. Primero, formaron dos equipos de cinco jugadores cada uno. Luego, delimitaron la cancha usando unas piedras como arcos. Después del partido, que terminó tres a dos, todos fueron a comprar raspados al puesto de doña Rosa. Al final, se reunieron a planear el próximo torneo del barrio.</p>
+    </div>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        Orden cronológico
+      </div>
+      <p>El <strong>orden cronológico</strong> es la secuencia en que ocurren los hechos, del primero al último. Las palabras <em>primero, luego, después, finalmente</em> ayudan a identificarlo.</p>
+    </div>
+
+    <div class="actividad" id="act-7">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">7</div>
+        <span class="actividad-titulo">Ordena los eventos</span>
+      </div>
+      <p class="actividad-instruccion">Numera del 1 al 4 los eventos del Texto 3 en orden cronológico:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:10pt;">
+        <div style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:10px;display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border:2px solid var(--azul-med);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul-med);flex-shrink:0;">___</div>
+          <span>Fueron a comprar raspados.</span>
+        </div>
+        <div style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:10px;display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border:2px solid var(--azul-med);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul-med);flex-shrink:0;">___</div>
+          <span>Formaron los dos equipos.</span>
+        </div>
+        <div style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:10px;display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border:2px solid var(--azul-med);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul-med);flex-shrink:0;">___</div>
+          <span>Planearon el próximo torneo.</span>
+        </div>
+        <div style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:10px;display:flex;align-items:center;gap:10px;">
+          <div style="width:28px;height:28px;border:2px solid var(--azul-med);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul-med);flex-shrink:0;">___</div>
+          <span>Delimitaron la cancha.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-8">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">8</div>
+        <span class="actividad-titulo">Tu opinión importa</span>
+      </div>
+      <p class="actividad-instruccion">Responde con tus propias palabras:</p>
+      <p><strong>¿Te parece que los niños del texto se divirtieron? ¿Por qué?</strong></p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+      <p style="margin-top:8px;"><strong>¿Qué harías tú diferente en ese partido?</strong></p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+    </div>
+
+    <div class="reto">
+      <div class="reto-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--naranja)"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.71 6 15.2 6 13.59s.62-3.12 1.76-4.24L12 5.1v14.49z"/></svg>
+        🏆 Reto de comprensión
+      </div>
+      <p>Escribe un párrafo corto (3-4 oraciones) describiendo tu actividad favorita con tus amigos. Luego, subraya la idea principal que escribiste.</p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Comprensión Lectora</span>
+      <span class="pie-num">7</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 8 ==================== -->
+  <div class="pagina esp" id="p08">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 1 — La Coma</span>
+    </div>
+
+    <h2 class="titulo-tema">, La Coma</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es la coma?
+      </div>
+      <p>La <strong>coma (,)</strong> es un signo de puntuación que sirve para <em>separar elementos</em> dentro de una oración y darle claridad al texto. Representa una pausa breve al leer.</p>
+    </div>
+
+    <h3 class="subtitulo">Usos principales de la coma</h3>
+
+    <div class="cuadro ejemplo" style="margin-bottom:8px;">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> 1. Enumeración</div>
+      <p><strong>Regla:</strong> Se usa coma para separar elementos en una lista. Antes del último elemento se usa <em>y, e, o, u</em> (sin coma).</p>
+      <p>✅ En el mercado compré <strong>mango, papaya, maracuyá, guanábana y melón</strong>.</p>
+      <p>✅ El niño saltó<strong>,</strong> corrió<strong>,</strong> gritó y se cayó.</p>
+      <p>❌ En el mercado compré mango y papaya y maracuyá y melón. (repetitivo)</p>
+    </div>
+
+    <div class="cuadro ejemplo" style="margin-bottom:8px;">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> 2. Vocativo</div>
+      <p><strong>Regla:</strong> Cuando llamamos a alguien por su nombre dentro de una oración, se separa con coma.</p>
+      <p>✅ <strong>María,</strong> ven a comer.</p>
+      <p>✅ Te digo<strong>, Carlos,</strong> que debes estudiar.</p>
+      <p>✅ ¿Cómo estás<strong>, abuela?</strong></p>
+    </div>
+
+    <div class="cuadro ejemplo" style="margin-bottom:8px;">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> 3. Inciso (aclaración)</div>
+      <p><strong>Regla:</strong> Un inciso es una explicación adicional que va entre comas. Se puede quitar sin que cambie el sentido principal.</p>
+      <p>✅ Mi profesora<strong>, la señorita Sandra,</strong> es muy paciente.</p>
+      <p>✅ El río Sinú<strong>, que pasa por Montería,</strong> es muy hermoso.</p>
+    </div>
+
+    <div class="cuadro ejemplo" style="margin-bottom:8px;">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> 4. Antes de "pero", "aunque", "sin embargo"</div>
+      <p>✅ Quiero ir al parque<strong>, pero</strong> tengo que terminar la tarea.</p>
+      <p>✅ Llovió todo el día<strong>, sin embargo</strong> los niños jugaron afuera.</p>
+      <p>✅ Es tarde<strong>, aunque</strong> todavía hay luz.</p>
+    </div>
+
+    <div class="actividad" id="act-9">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">9</div>
+        <span class="actividad-titulo">Coloca la coma donde corresponde</span>
+      </div>
+      <p class="actividad-instruccion">Agrega las comas que hacen falta en cada oración:</p>
+      <ol style="font-size:10.5pt;line-height:2.2;">
+        <li>En mi mochila llevo lápiz cuaderno borrador regla y colores.</li>
+        <li>Pedro sube al bus ahora mismo.</li>
+        <li>Mi perro llamado Manchas duerme en el patio.</li>
+        <li>Quiero jugar pero primero debo almorzar.</li>
+        <li>La mariposa un insecto hermoso voló sobre el jardín.</li>
+        <li>Estudiamos matemáticas español ciencias sociales y artística.</li>
+      </ol>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>La Coma</span>
+      <span class="pie-num">8</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 9 ==================== -->
+  <div class="pagina esp" id="p09">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">La Coma — Ejercicios</span>
+    </div>
+
+    <div class="actividad" id="act-10">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">10</div>
+        <span class="actividad-titulo">Identifica el tipo de coma</span>
+      </div>
+      <p class="actividad-instruccion">Escribe qué tipo de coma se usa: <strong>Enumeración / Vocativo / Inciso / Conectora</strong></p>
+      <table class="tabla-edu">
+        <thead>
+          <tr><th>Oración</th><th>Tipo de coma</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mamá, ya hice mis tareas.</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+          <tr><td>El loro, ese pájaro parlanchín, imita voces.</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+          <tr><td>Compré pan, leche, queso y huevos.</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+          <tr><td>Salí temprano, aunque hacía frío.</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+          <tr><td>¿Puedes ayudarme, Laura?</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+          <tr><td>Corrió, saltó, gritó y se alegró.</td><td><span class="linea-resp" style="width:120px;display:inline-block;"></span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actividad" id="act-11">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">11</div>
+        <span class="actividad-titulo">Crea tus propias oraciones</span>
+      </div>
+      <p class="actividad-instruccion">Escribe una oración para cada tipo de coma:</p>
+      <p><strong>a) Enumeración:</strong></p>
+      <span class="linea-resp"></span>
+      <p style="margin-top:8px;"><strong>b) Vocativo:</strong></p>
+      <span class="linea-resp"></span>
+      <p style="margin-top:8px;"><strong>c) Inciso:</strong></p>
+      <span class="linea-resp"></span>
+      <p style="margin-top:8px;"><strong>d) Antes de "pero":</strong></p>
+      <span class="linea-resp"></span>
+    </div>
+
+    <div class="cuadro sabias">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="#8B6914"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7zm1 14v1h-2v-1h2zm1-3.27l.45-.27A5 5 0 0 0 17 9a5 5 0 1 0-5 5 5 5 0 0 0 2.55-.69l.45-.27V13h-2V10h2v2.73z"/></svg>
+        ¿Sabías que...?
+      </div>
+      <p>En Colombia, se hablan más de <strong>65 idiomas</strong> indígenas. El español, llamado también "castellano", es nuestro idioma oficial y llegó a América en el siglo XV. Hoy, Colombia tiene más de <strong>50 millones</strong> de hablantes de español.</p>
+    </div>
+
+    <div class="reto">
+      <div class="reto-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--naranja)"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.71 6 15.2 6 13.59s.62-3.12 1.76-4.24L12 5.1v14.49z"/></svg>
+        🏆 Reto — Corrección de texto
+      </div>
+      <p>El siguiente texto tiene <strong>8 errores</strong> de coma. Encuéntralos y corrígelos:</p>
+      <div style="background:#fff;border:1.5px dashed var(--naranja);border-radius:var(--radio);padding:12px;margin-top:8px;font-size:10.5pt;line-height:1.9;">
+        <p>El día lunes María Ana y Pedro salieron a recoger frutos del bosque. Encontraron mangos guayabas papayas y piñas. Su abuela doña Lucía les dijo "niños vengan a almorzar". Ellos respondieron "ya vamos abuela pero necesitamos un poco más de tiempo". Al final aunque llovió muchísimo lograron llenar tres canastas.</p>
+      </div>
+      <p style="margin-top:8px;font-size:9.5pt;color:var(--gris-text);">Versión corregida:</p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>La Coma — Ejercicios</span>
+      <span class="pie-num">9</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 10 ==================== -->
+  <div class="pagina esp" id="p10">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 1 — Categorías Gramaticales</span>
+    </div>
+
+    <h2 class="titulo-tema">Categorías Gramaticales</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué son las categorías gramaticales?
+      </div>
+      <p>Las <strong>categorías gramaticales</strong> (o clases de palabras) son los grupos en que clasificamos las palabras según su función y significado en la oración. Cada tipo de palabra tiene un nombre y un papel específico.</p>
+    </div>
+
+    <table class="tabla-edu">
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>¿Qué hace?</th>
+          <th>Ejemplos</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--naranja);">Sustantivo</strong></td>
+          <td>Nombra personas, animales, lugares o cosas</td>
+          <td>niño, perro, río, mesa</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#8B6914;">Adjetivo</strong></td>
+          <td>Describe o califica al sustantivo</td>
+          <td>alto, bonita, azul, grande</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--verde);">Verbo</strong></td>
+          <td>Expresa acciones, estados o procesos</td>
+          <td>correr, comer, ser, jugar</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--azul-med);">Pronombre</strong></td>
+          <td>Reemplaza al sustantivo</td>
+          <td>yo, tú, él, ella, ellos</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--rojo);">Artículo</strong></td>
+          <td>Acompaña y determina al sustantivo</td>
+          <td>el, la, los, las, un, una</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#6A5ACD;">Adverbio</strong></td>
+          <td>Modifica al verbo, adjetivo u otro adverbio</td>
+          <td>rápido, bien, aquí, siempre</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#008B8B;">Preposición</strong></td>
+          <td>Relaciona palabras dentro de la oración</td>
+          <td>en, de, con, para, por</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#8B4513;">Conjunción</strong></td>
+          <td>Une palabras u oraciones</td>
+          <td>y, pero, porque, aunque</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--naranja);">Interjección</strong></td>
+          <td>Expresa sentimientos o reacciones</td>
+          <td>¡ay!, ¡oh!, ¡bravo!, ¡hola!</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="cuadro ejemplo" style="margin-top:12px;">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Ejemplo resuelto — Análisis de oración
+      </div>
+      <p style="font-size:11pt;font-weight:700;text-align:center;letter-spacing:2px;margin-bottom:10px;">"El niño rápido corre por el parque"</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:9pt;">
+        <span style="background:var(--rojo-cl);border:1.5px solid var(--rojo);border-radius:5px;padding:4px 8px;"><strong>El</strong><br><span style="color:var(--rojo);">Artículo</span></span>
+        <span style="background:var(--naranja-cl);border:1.5px solid var(--naranja);border-radius:5px;padding:4px 8px;"><strong>niño</strong><br><span style="color:var(--naranja);">Sustantivo</span></span>
+        <span style="background:var(--amarillo-cl);border:1.5px solid var(--amarillo);border-radius:5px;padding:4px 8px;"><strong>rápido</strong><br><span style="color:#8B6914;">Adjetivo</span></span>
+        <span style="background:var(--verde-cl);border:1.5px solid var(--verde);border-radius:5px;padding:4px 8px;"><strong>corre</strong><br><span style="color:var(--verde);">Verbo</span></span>
+        <span style="background:var(--gris-f);border:1.5px solid var(--gris-borde);border-radius:5px;padding:4px 8px;"><strong>por</strong><br><span style="color:#008B8B;">Preposición</span></span>
+        <span style="background:var(--rojo-cl);border:1.5px solid var(--rojo);border-radius:5px;padding:4px 8px;"><strong>el</strong><br><span style="color:var(--rojo);">Artículo</span></span>
+        <span style="background:var(--naranja-cl);border:1.5px solid var(--naranja);border-radius:5px;padding:4px 8px;"><strong>parque</strong><br><span style="color:var(--naranja);">Sustantivo</span></span>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Categorías Gramaticales</span>
+      <span class="pie-num">10</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 11 ==================== -->
+  <div class="pagina esp" id="p11">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Categorías Gramaticales — Ejercicios</span>
+    </div>
+
+    <h3 class="subtitulo">Sustantivos en detalle</h3>
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> Tipos de sustantivos</div>
+      <div class="grid-2" style="font-size:10pt;">
+        <div>
+          <p><strong>Propios:</strong> Nombres específicos de personas, ciudades, países (llevan mayúscula).<br>Ej: Colombia, Pedro, Bogotá.</p>
+          <p><strong>Comunes:</strong> Nombres genéricos. Ej: ciudad, niño, perro.</p>
+        </div>
+        <div>
+          <p><strong>Concretos:</strong> Se pueden tocar. Ej: mesa, árbol, agua.</p>
+          <p><strong>Abstractos:</strong> No se pueden tocar. Ej: amor, alegría, tristeza.</p>
+          <p><strong>Colectivos:</strong> Nombran un conjunto. Ej: bandada, rebaño, biblioteca.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-12">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">12</div>
+        <span class="actividad-titulo">Clasifica los sustantivos</span>
+      </div>
+      <p class="actividad-instruccion">Escribe en la columna correcta cada sustantivo:</p>
+      <p style="font-size:10pt;font-style:italic;text-align:center;margin-bottom:8px;color:var(--gris-text);">felicidad · Medellín · amor · bandada · silla · Colombia · rebaño · mesa · libertad · Pedro</p>
+      <table class="tabla-edu">
+        <thead>
+          <tr><th>Propio</th><th>Común</th><th>Abstracto</th><th>Colectivo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="height:26px;"></td><td></td><td></td><td></td></tr>
+          <tr><td style="height:26px;"></td><td></td><td></td><td></td></tr>
+          <tr><td style="height:26px;"></td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="subtitulo">Verbos en detalle</h3>
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> Conjugación del verbo</div>
+      <table class="tabla-edu" style="font-size:9.5pt;">
+        <thead><tr><th>Persona</th><th>Presente</th><th>Pasado</th><th>Futuro</th></tr></thead>
+        <tbody>
+          <tr><td>Yo</td><td>corro</td><td>corrí</td><td>correré</td></tr>
+          <tr><td>Tú</td><td>corres</td><td>corriste</td><td>correrás</td></tr>
+          <tr><td>Él/Ella</td><td>corre</td><td>corrió</td><td>correrá</td></tr>
+          <tr><td>Nosotros</td><td>corremos</td><td>corrimos</td><td>correremos</td></tr>
+          <tr><td>Ellos</td><td>corren</td><td>corrieron</td><td>correrán</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actividad" id="act-13">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">13</div>
+        <span class="actividad-titulo">Identifica la categoría gramatical</span>
+      </div>
+      <p class="actividad-instruccion">Escribe qué categoría gramatical es cada palabra subrayada:</p>
+      <ol style="font-size:10.5pt;line-height:2.4;">
+        <li>El <u>gato</u> negro juega en el jardín. → ___</li>
+        <li>María <u>canta</u> muy bonito. → ___</li>
+        <li>El vestido es <u>azul</u>. → ___</li>
+        <li><u>Ella</u> llegó tarde. → ___</li>
+        <li>Caminé <u>rápido</u> hacia el colegio. → ___</li>
+        <li>El libro está <u>sobre</u> la mesa. → ___</li>
+      </ol>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Categorías Gramaticales</span>
+      <span class="pie-num">11</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 12 ==================== -->
+  <div class="pagina esp" id="p12">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Clasificación de Palabras según el Acento</span>
+    </div>
+
+    <h2 class="titulo-tema">Acento y Clasificación de Palabras</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        El acento tónico
+      </div>
+      <p>Todas las palabras tienen una sílaba que se pronuncia con más fuerza: la <strong>sílaba tónica</strong>. Según la posición de esa sílaba, las palabras se clasifican en cuatro grupos.</p>
+    </div>
+
+    <div class="grid-2" style="gap:10px;margin:12px 0;">
+      <!-- AGUDAS -->
+      <div style="background:linear-gradient(135deg,#FEF0E6,#FFF8E7);border:2px solid var(--naranja);border-radius:var(--radio);padding:12px;">
+        <p style="font-weight:700;font-size:12pt;color:var(--naranja);margin-bottom:6px;">🔴 Agudas</p>
+        <p style="font-size:10pt;margin-bottom:6px;">La sílaba tónica está en la <strong>última</strong> posición.</p>
+        <p style="font-size:9pt;color:var(--gris-text);margin-bottom:6px;"><em>Llevan tilde si terminan en n, s o vocal.</em></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="palabra-card" style="border-color:var(--naranja);">
+            <div class="silabas">ca-<span class="silaba-tonica" style="color:var(--naranja);">FÉ</span></div>
+            <div class="tipo tipo-aguda">con tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--naranja);">
+            <div class="silabas">a-<span class="silaba-tonica" style="color:var(--naranja);">MOR</span></div>
+            <div class="tipo tipo-aguda">sin tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--naranja);">
+            <div class="silabas">co-<span class="silaba-tonica" style="color:var(--naranja);">MÍ</span></div>
+            <div class="tipo tipo-aguda">con tilde</div>
+          </div>
+        </div>
+      </div>
+      <!-- GRAVES -->
+      <div style="background:linear-gradient(135deg,var(--azul-claro),#EFF3FF);border:2px solid var(--azul-med);border-radius:var(--radio);padding:12px;">
+        <p style="font-weight:700;font-size:12pt;color:var(--azul-med);margin-bottom:6px;">🔵 Graves o llanas</p>
+        <p style="font-size:10pt;margin-bottom:6px;">La sílaba tónica está en la <strong>penúltima</strong> posición.</p>
+        <p style="font-size:9pt;color:var(--gris-text);margin-bottom:6px;"><em>Llevan tilde si NO terminan en n, s o vocal.</em></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="palabra-card" style="border-color:var(--azul-med);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--azul-med);">CA</span>-sa</div>
+            <div class="tipo tipo-grave">sin tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--azul-med);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--azul-med);">LÁ</span>-piz</div>
+            <div class="tipo tipo-grave">con tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--azul-med);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--azul-med);">CAR</span>-men</div>
+            <div class="tipo tipo-grave">sin tilde</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="gap:10px;margin:10px 0;">
+      <!-- ESDRÚJULAS -->
+      <div style="background:var(--verde-cl);border:2px solid var(--verde);border-radius:var(--radio);padding:12px;">
+        <p style="font-weight:700;font-size:12pt;color:var(--verde);margin-bottom:6px;">🟢 Esdrújulas</p>
+        <p style="font-size:10pt;margin-bottom:6px;">La sílaba tónica está en la <strong>antepenúltima</strong> posición.</p>
+        <p style="font-size:9pt;color:var(--gris-text);margin-bottom:6px;"><em>¡Siempre llevan tilde!</em></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="palabra-card" style="border-color:var(--verde);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--verde);">MÁ</span>-qui-na</div>
+            <div class="tipo tipo-esdrujula">con tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--verde);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--verde);">MÚ</span>-si-ca</div>
+            <div class="tipo tipo-esdrujula">con tilde</div>
+          </div>
+        </div>
+      </div>
+      <!-- SOBRESDRÚJULAS -->
+      <div style="background:var(--rojo-cl);border:2px solid var(--rojo);border-radius:var(--radio);padding:12px;">
+        <p style="font-weight:700;font-size:12pt;color:var(--rojo);margin-bottom:6px;">🔴 Sobresdrújulas</p>
+        <p style="font-size:10pt;margin-bottom:6px;">La sílaba tónica está antes de la <strong>antepenúltima</strong>.</p>
+        <p style="font-size:9pt;color:var(--gris-text);margin-bottom:6px;"><em>¡Siempre llevan tilde!</em></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <div class="palabra-card" style="border-color:var(--rojo);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--rojo);">dí</span>-ga-me-lo</div>
+            <div class="tipo tipo-sobresd">con tilde</div>
+          </div>
+          <div class="palabra-card" style="border-color:var(--rojo);">
+            <div class="silabas"><span class="silaba-tonica" style="color:var(--rojo);">há</span>-bla-me-lo</div>
+            <div class="tipo tipo-sobresd">con tilde</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-14">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">14</div>
+        <span class="actividad-titulo">Clasifica y tilda</span>
+      </div>
+      <p class="actividad-instruccion">Separa en sílabas, subraya la tónica y clasifica cada palabra:</p>
+      <table class="tabla-edu" style="font-size:10pt;">
+        <thead><tr><th>Palabra</th><th>Sílabas</th><th>Clasificación</th><th>¿Lleva tilde?</th></tr></thead>
+        <tbody>
+          <tr><td>jardin</td><td></td><td></td><td></td></tr>
+          <tr><td>arbol</td><td></td><td></td><td></td></tr>
+          <tr><td>calculo</td><td></td><td></td><td></td></tr>
+          <tr><td>camion</td><td></td><td></td><td></td></tr>
+          <tr><td>facil</td><td></td><td></td><td></td></tr>
+          <tr><td>compramelo</td><td></td><td></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Clasificación de Palabras</span>
+      <span class="pie-num">12</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 13 ==================== -->
+  <div class="pagina esp" id="p13">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Diptongo, Triptongo e Hiato</span>
+    </div>
+
+    <h2 class="titulo-tema">Diptongo, Triptongo e Hiato</h2>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> Las vocales: fuertes y débiles</div>
+      <div class="grid-2">
+        <div style="text-align:center;background:#fff;border-radius:var(--radio);padding:10px;">
+          <p style="font-weight:700;font-size:16pt;color:var(--naranja);">A · E · O</p>
+          <p style="font-size:10pt;color:var(--gris-text);">Vocales <strong>fuertes</strong> (abiertas)</p>
+        </div>
+        <div style="text-align:center;background:#fff;border-radius:var(--radio);padding:10px;">
+          <p style="font-weight:700;font-size:16pt;color:var(--azul-med);">I · U</p>
+          <p style="font-size:10pt;color:var(--gris-text);">Vocales <strong>débiles</strong> (cerradas)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIPTONGO -->
+    <div style="background:var(--verde-cl);border:2px solid var(--verde);border-radius:var(--radio);padding:14px;margin:10px 0;page-break-inside:avoid;">
+      <p style="font-weight:700;font-size:13pt;color:var(--verde);margin-bottom:6px;">🔗 Diptongo</p>
+      <p style="font-size:10.5pt;margin-bottom:8px;">Un <strong>diptongo</strong> es la unión de <em>dos vocales</em> que se pronuncian en <em>una sola sílaba</em>. Se forma cuando hay:</p>
+      <ul style="font-size:10.5pt;margin-bottom:8px;">
+        <li>Una vocal <strong>fuerte + débil</strong>: <em>ai, au, ei, eu, oi, ou</em></li>
+        <li>Una vocal <strong>débil + fuerte</strong>: <em>ia, ie, io, ua, ue, uo</em></li>
+        <li>Dos vocales <strong>débiles</strong>: <em>iu, ui</em></li>
+      </ul>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="palabra-card" style="border-color:var(--verde);">
+          <div class="silabas" style="font-size:11pt;">vio-<strong style="color:var(--verde);">len</strong>-to</div>
+          <div style="font-size:8.5pt;color:var(--verde);">io → diptongo</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--verde);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--verde);">bai</strong>-le</div>
+          <div style="font-size:8.5pt;color:var(--verde);">ai → diptongo</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--verde);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--verde);">puer</strong>-ta</div>
+          <div style="font-size:8.5pt;color:var(--verde);">ue → diptongo</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--verde);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--verde);">cau</strong>-sa</div>
+          <div style="font-size:8.5pt;color:var(--verde);">au → diptongo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRIPTONGO -->
+    <div style="background:var(--azul-claro);border:2px solid var(--azul-med);border-radius:var(--radio);padding:14px;margin:10px 0;page-break-inside:avoid;">
+      <p style="font-weight:700;font-size:13pt;color:var(--azul-med);margin-bottom:6px;">🔗🔗 Triptongo</p>
+      <p style="font-size:10.5pt;margin-bottom:8px;">Un <strong>triptongo</strong> es la unión de <em>tres vocales</em> en <em>una sola sílaba</em>: <strong>débil + fuerte + débil</strong>.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="palabra-card" style="border-color:var(--azul-med);">
+          <div class="silabas" style="font-size:11pt;">bue-<strong style="color:var(--azul-med);">yes</strong></div>
+          <div style="font-size:8.5pt;color:var(--azul-med);">uey → triptongo</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--azul-med);">
+          <div class="silabas" style="font-size:11pt;">Pa-ra-<strong style="color:var(--azul-med);">guai</strong></div>
+          <div style="font-size:8.5pt;color:var(--azul-med);">uai → triptongo</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--azul-med);">
+          <div class="silabas" style="font-size:11pt;">a-<strong style="color:var(--azul-med);">veis</strong></div>
+          <div style="font-size:8.5pt;color:var(--azul-med);">iei → triptongo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HIATO -->
+    <div style="background:var(--naranja-cl);border:2px solid var(--naranja);border-radius:var(--radio);padding:14px;margin:10px 0;page-break-inside:avoid;">
+      <p style="font-weight:700;font-size:13pt;color:var(--naranja);margin-bottom:6px;">✂️ Hiato</p>
+      <p style="font-size:10.5pt;margin-bottom:8px;">Un <strong>hiato</strong> es cuando dos vocales juntas se pronuncian en <em>sílabas separadas</em>. Ocurre cuando:</p>
+      <ul style="font-size:10.5pt;margin-bottom:8px;">
+        <li>Dos vocales <strong>fuertes</strong> están juntas: <em>caer, leer, toalla</em></li>
+        <li>Una vocal <strong>débil tónica</strong> está junto a una fuerte: <em>maíz, baúl, tío</em></li>
+      </ul>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div class="palabra-card" style="border-color:var(--naranja);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--naranja);">ma</strong>-<strong style="color:var(--azul);">íz</strong></div>
+          <div style="font-size:8.5pt;color:var(--naranja);">a·í → hiato</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--naranja);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--naranja);">le</strong>-<strong style="color:var(--azul);">er</strong></div>
+          <div style="font-size:8.5pt;color:var(--naranja);">e·e → hiato</div>
+        </div>
+        <div class="palabra-card" style="border-color:var(--naranja);">
+          <div class="silabas" style="font-size:11pt;"><strong style="color:var(--naranja);">ba</strong>-<strong style="color:var(--azul);">úl</strong></div>
+          <div style="font-size:8.5pt;color:var(--naranja);">a·ú → hiato</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Diptongo, Triptongo e Hiato</span>
+      <span class="pie-num">13</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 14 ==================== -->
+  <div class="pagina esp" id="p14">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Diptongo, Triptongo e Hiato — Ejercicios</span>
+    </div>
+
+    <div class="actividad" id="act-15">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">15</div>
+        <span class="actividad-titulo">Clasifica: ¿Diptongo, Triptongo o Hiato?</span>
+      </div>
+      <p class="actividad-instruccion">Marca con una X la categoría correspondiente:</p>
+      <table class="tabla-edu">
+        <thead>
+          <tr><th>Palabra</th><th>Diptongo</th><th>Triptongo</th><th>Hiato</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>piano</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>poema</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>buey</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>país</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>ciudad</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>Uruguay</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>héroe</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+          <tr><td>viuda</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td><td style="text-align:center;">□</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="actividad" id="act-16">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">16</div>
+        <span class="actividad-titulo">Separa en sílabas</span>
+      </div>
+      <p class="actividad-instruccion">Divide las siguientes palabras en sílabas. Recuerda si hay diptongo, no lo separes:</p>
+      <div class="grid-2" style="font-size:10.5pt;line-height:2.5;">
+        <div>
+          <p>a) maíz → _______________</p>
+          <p>b) puerta → _______________</p>
+          <p>c) toalla → _______________</p>
+          <p>d) viaje → _______________</p>
+        </div>
+        <div>
+          <p>e) teatro → _______________</p>
+          <p>f) cuento → _______________</p>
+          <p>g) baúl → _______________</p>
+          <p>h) muelle → _______________</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-17">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">17</div>
+        <span class="actividad-titulo">Encuentra los diptongos ocultos</span>
+      </div>
+      <p class="actividad-instruccion">Subraya la pareja vocálica que forma diptongo en cada palabra:</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12pt;font-weight:600;margin-top:8px;">
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">cuidado</span>
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">paisaje</span>
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">acuerdo</span>
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">caucho</span>
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">fiesta</span>
+        <span style="border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:6px 12px;">boina</span>
+      </div>
+    </div>
+
+    <div class="reto" style="margin-top:12px;">
+      <div class="reto-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--naranja)"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.71 6 15.2 6 13.59s.62-3.12 1.76-4.24L12 5.1v14.49z"/></svg>
+        🏆 Reto — Escribe tu propio ejemplo
+      </div>
+      <p>Escribe una palabra para cada categoría y sepárala en sílabas:</p>
+      <div style="font-size:10.5pt;line-height:2.4;">
+        <p>Diptongo: _______________ → sílabas: _______________</p>
+        <p>Triptongo: _______________ → sílabas: _______________</p>
+        <p>Hiato: _______________ → sílabas: _______________</p>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Diptongo, Triptongo e Hiato</span>
+      <span class="pie-num">14</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 15 ==================== -->
+  <div class="pagina esp" id="p15">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Autoevaluación — Unidad 1: Español</span>
+    </div>
+
+    <h2 class="titulo-tema">Autoevaluación — Español</h2>
+
+    <div class="autoevaluacion">
+      <p class="autoevaluacion-titulo">¿Cómo me fue en Español? 🎯</p>
+      <p style="text-align:center;font-size:10pt;color:var(--gris-text);margin-bottom:12px;">Marca con una X cómo te sientes con cada habilidad:</p>
+      <div class="escala-eval" style="margin-bottom:16px;">
+        <div class="escala-item"><span class="emoji">😕</span>Necesito repasar</div>
+        <div class="escala-item"><span class="emoji">🙂</span>Entiendo un poco</div>
+        <div class="escala-item"><span class="emoji">😊</span>Lo entiendo bien</div>
+        <div class="escala-item"><span class="emoji">🌟</span>¡Lo domino!</div>
+      </div>
+      <ul class="checklist-eval">
+        <li><div class="chk-box"></div>Puedo encontrar la idea principal de un texto.</li>
+        <li><div class="chk-box"></div>Identifico las ideas secundarias que apoyan la principal.</li>
+        <li><div class="chk-box"></div>Hago inferencias a partir de pistas del texto.</li>
+        <li><div class="chk-box"></div>Ordeno eventos en secuencia cronológica.</li>
+        <li><div class="chk-box"></div>Identifico relaciones de causa y efecto.</li>
+        <li><div class="chk-box"></div>Uso la coma correctamente en enumeraciones.</li>
+        <li><div class="chk-box"></div>Uso el vocativo con coma.</li>
+        <li><div class="chk-box"></div>Reconozco y uso incisos entre comas.</li>
+        <li><div class="chk-box"></div>Identifico sustantivos, adjetivos y verbos.</li>
+        <li><div class="chk-box"></div>Reconozco pronombres, adverbios y preposiciones.</li>
+        <li><div class="chk-box"></div>Clasifico palabras en agudas, graves y esdrújulas.</li>
+        <li><div class="chk-box"></div>Aplico las reglas de acentuación correctamente.</li>
+        <li><div class="chk-box"></div>Distingo diptongo, triptongo e hiato.</li>
+        <li><div class="chk-box"></div>Separo correctamente las palabras en sílabas.</li>
+      </ul>
+    </div>
+
+    <div class="actividad" id="act-18">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">18</div>
+        <span class="actividad-titulo">Pregunta de selección múltiple final</span>
+      </div>
+      <p class="actividad-instruccion">Encierra la letra correcta en cada pregunta:</p>
+      <p style="font-size:10.5pt;"><strong>1.</strong> ¿En qué palabras hay diptongo?</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> maíz – baúl</li>
+        <li><span class="opc-circulo">B</span> puerta – viaje</li>
+        <li><span class="opc-circulo">C</span> leer – caer</li>
+        <li><span class="opc-circulo">D</span> héroe – poema</li>
+      </ul>
+      <p style="font-size:10.5pt;margin-top:10px;"><strong>2.</strong> La palabra "música" es:</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> Aguda</li>
+        <li><span class="opc-circulo">B</span> Grave</li>
+        <li><span class="opc-circulo">C</span> Esdrújula</li>
+        <li><span class="opc-circulo">D</span> Sobresdrújula</li>
+      </ul>
+      <p style="font-size:10.5pt;margin-top:10px;"><strong>3.</strong> "Laura, ven a comer." — El tipo de coma usado es:</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> Enumeración</li>
+        <li><span class="opc-circulo">B</span> Inciso</li>
+        <li><span class="opc-circulo">C</span> Vocativo</li>
+        <li><span class="opc-circulo">D</span> Conectora</li>
+      </ul>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Autoevaluación — Español</span>
+      <span class="pie-num">15</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 16 ==================== -->
+  <div class="pagina sep-unidad" id="p16">
+    <div class="sep-fondo" style="background: linear-gradient(135deg, #E6F5EE 0%, #E8F0FB 100%);"></div>
+    <div class="sep-num">2</div>
+    <div class="sep-contenido" style="position:relative;z-index:1;text-align:center;">
+      <span class="sep-etiqueta" style="background:var(--verde);">Unidad 2</span>
+      <div style="margin-bottom:16px;">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" fill="var(--verde-cl)" stroke="var(--verde)" stroke-width="2"/>
+          <text x="50" y="65" font-family="Georgia,serif" font-size="46" font-weight="700" fill="var(--verde)" text-anchor="middle">∑</text>
+        </svg>
+      </div>
+      <h2 class="sep-titulo" style="color:var(--verde);">Matemáticas</h2>
+      <p class="sep-desc">Domina los números y las operaciones con lógica, práctica y mucha confianza.</p>
+      <div class="sep-temas">
+        <span class="sep-tema" style="border-color:var(--verde);color:var(--verde);">½ Fracciones</span>
+        <span class="sep-tema" style="border-color:var(--verde);color:var(--verde);">✖ Multiplicación</span>
+        <span class="sep-tema" style="border-color:var(--verde);color:var(--verde);">÷ División</span>
+        <span class="sep-tema" style="border-color:var(--verde);color:var(--verde);">📐 Problemas</span>
+      </div>
+    </div>
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Unidad 2 — Matemáticas</span>
+      <span class="pie-num">16</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 17 ==================== -->
+  <div class="pagina mat" id="p17">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 2 — Fracciones</span>
+    </div>
+
+    <h2 class="titulo-tema">Fracciones</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es una fracción?
+      </div>
+      <p>Una <strong>fracción</strong> es una forma de representar partes de un entero. Se escribe con dos números separados por una línea horizontal:</p>
+      <div style="text-align:center;margin:14px 0;">
+        <svg width="300" height="90" viewBox="0 0 300 90">
+          <line x1="110" y1="48" x2="190" y2="48" stroke="#1A1A2E" stroke-width="3"/>
+          <text x="150" y="38" font-size="28" font-weight="700" fill="#E8630A" text-anchor="middle">3</text>
+          <text x="150" y="80" font-size="28" font-weight="700" fill="#1B3A6B" text-anchor="middle">4</text>
+          <rect x="0" y="18" width="95" height="28" rx="6" fill="#FEF0E6"/>
+          <text x="47" y="37" font-size="12" fill="#E8630A" text-anchor="middle" font-weight="700">Numerador</text>
+          <rect x="205" y="58" width="95" height="28" rx="6" fill="#E8F0FB"/>
+          <text x="252" y="77" font-size="12" fill="#1B3A6B" text-anchor="middle" font-weight="700">Denominador</text>
+          <line x1="95" y1="32" x2="140" y2="36" stroke="#E8630A" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="205" y1="72" x2="165" y2="68" stroke="#1B3A6B" stroke-width="1.5" marker-end="url(#arr2)"/>
+          <defs>
+            <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#E8630A"/>
+            </marker>
+            <marker id="arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#1B3A6B"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+      <div class="grid-2" style="font-size:10.5pt;gap:10px;">
+        <div style="background:#fff;border-radius:var(--radio);padding:10px;border:1.5px solid var(--naranja);">
+          <p><strong style="color:var(--naranja);">Numerador (3):</strong> indica cuántas partes tomamos.</p>
+        </div>
+        <div style="background:#fff;border-radius:var(--radio);padding:10px;border:1.5px solid var(--azul-med);">
+          <p><strong style="color:var(--azul-med);">Denominador (4):</strong> indica en cuántas partes iguales se divide el entero.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subtitulo">Representación gráfica de fracciones</h3>
+
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:10px 0;">
+      <!-- 1/2 -->
+      <div style="text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="36" fill="#E8F0FB" stroke="var(--azul-med)" stroke-width="2"/>
+          <path d="M40,4 A36,36 0 0,1 40,76 L40,40 Z" fill="var(--azul-med)" opacity=".7"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="var(--azul-med)" stroke-width="2"/>
+        </svg>
+        <p style="font-size:16pt;font-weight:700;color:var(--azul-med);">½</p>
+        <p style="font-size:9pt;color:var(--gris-text);">un medio</p>
+      </div>
+      <!-- 3/4 -->
+      <div style="text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="36" fill="#E8F0FB" stroke="var(--verde)" stroke-width="2"/>
+          <path d="M40,4 A36,36 0 1,1 4,40 L40,40 Z" fill="var(--verde)" opacity=".7"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#fff" stroke-width="2"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#fff" stroke-width="2"/>
+        </svg>
+        <p style="font-size:16pt;font-weight:700;color:var(--verde);">¾</p>
+        <p style="font-size:9pt;color:var(--gris-text);">tres cuartos</p>
+      </div>
+      <!-- 2/6 -->
+      <div style="text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="4" y="4" width="72" height="72" rx="6" fill="#FEF0E6" stroke="var(--naranja)" stroke-width="2"/>
+          <rect x="4" y="4" width="24" height="72" rx="6" fill="var(--naranja)" opacity=".7"/>
+          <line x1="28" y1="4" x2="28" y2="76" stroke="#fff" stroke-width="2"/>
+          <line x1="52" y1="4" x2="52" y2="76" stroke="var(--naranja)" stroke-width="2"/>
+        </svg>
+        <p style="font-size:16pt;font-weight:700;color:var(--naranja);">⅙+⅙</p>
+        <p style="font-size:9pt;color:var(--gris-text);">dos sextos</p>
+      </div>
+      <!-- 4/5 -->
+      <div style="text-align:center;">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <rect x="4" y="20" width="72" height="44" rx="4" fill="#E6F5EE" stroke="var(--verde)" stroke-width="2"/>
+          <rect x="4" y="20" width="57.6" height="44" rx="4" fill="var(--verde)" opacity=".7"/>
+          <line x1="18.4" y1="20" x2="18.4" y2="64" stroke="#fff" stroke-width="1.5"/>
+          <line x1="32.8" y1="20" x2="32.8" y2="64" stroke="#fff" stroke-width="1.5"/>
+          <line x1="47.2" y1="20" x2="47.2" y2="64" stroke="#fff" stroke-width="1.5"/>
+        </svg>
+        <p style="font-size:16pt;font-weight:700;color:var(--verde);">⅘</p>
+        <p style="font-size:9pt;color:var(--gris-text);">cuatro quintos</p>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-19">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">19</div>
+        <span class="actividad-titulo">Lee y escribe fracciones</span>
+      </div>
+      <p class="actividad-instruccion">Escribe la fracción correspondiente a cada situación:</p>
+      <ol style="font-size:10.5pt;line-height:2.3;">
+        <li>De una pizza con 8 porciones, María comió 3. → ___</li>
+        <li>Un pastel dividido en 6 partes, del cual se sirvieron 5. → ___</li>
+        <li>De 10 colores, Juan usó 7 en su dibujo. → ___</li>
+        <li>Una cuerda dividida en 4 partes iguales, de la cual se tomó 1 parte. → ___</li>
+      </ol>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Fracciones</span>
+      <span class="pie-num">17</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 18 ==================== -->
+  <div class="pagina mat" id="p18">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Fracciones — Tipos</span>
+    </div>
+
+    <h3 class="subtitulo">Tipos de fracciones</h3>
+
+    <div class="grid-3" style="gap:10px;margin-bottom:14px;">
+      <!-- Propia -->
+      <div style="background:var(--verde-cl);border:2px solid var(--verde);border-radius:var(--radio);padding:12px;text-align:center;page-break-inside:avoid;">
+        <p style="font-weight:700;color:var(--verde);font-size:11pt;margin-bottom:6px;">✅ Propia</p>
+        <p style="font-size:28pt;font-weight:700;color:var(--verde);line-height:1;">3<br><span style="display:block;border-top:3px solid var(--verde);padding-top:2px;">5</span></p>
+        <p style="font-size:9.5pt;margin-top:8px;color:var(--gris-text);">Numerador &lt; Denominador</p>
+        <p style="font-size:9pt;font-style:italic;">El resultado es menos que 1</p>
+      </div>
+      <!-- Impropia -->
+      <div style="background:var(--naranja-cl);border:2px solid var(--naranja);border-radius:var(--radio);padding:12px;text-align:center;page-break-inside:avoid;">
+        <p style="font-weight:700;color:var(--naranja);font-size:11pt;margin-bottom:6px;">⚠️ Impropia</p>
+        <p style="font-size:28pt;font-weight:700;color:var(--naranja);line-height:1;">7<br><span style="display:block;border-top:3px solid var(--naranja);padding-top:2px;">4</span></p>
+        <p style="font-size:9.5pt;margin-top:8px;color:var(--gris-text);">Numerador &gt; Denominador</p>
+        <p style="font-size:9pt;font-style:italic;">El resultado es mayor que 1</p>
+      </div>
+      <!-- Mixta -->
+      <div style="background:var(--azul-claro);border:2px solid var(--azul-med);border-radius:var(--radio);padding:12px;text-align:center;page-break-inside:avoid;">
+        <p style="font-weight:700;color:var(--azul-med);font-size:11pt;margin-bottom:6px;">🔢 Mixta</p>
+        <p style="font-size:28pt;font-weight:700;color:var(--azul-med);line-height:1.3;">2 <span style="font-size:20pt;">¾</span></p>
+        <p style="font-size:9.5pt;margin-top:8px;color:var(--gris-text);">Número entero + fracción propia</p>
+        <p style="font-size:9pt;font-style:italic;">Ej: 2 pizzas y ¾ de otra</p>
+      </div>
+    </div>
+
+    <div class="cuadro ejemplo">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Convertir fracción impropia a mixta</div>
+      <p><strong>Problema:</strong> Convierte <strong>7/4</strong> a número mixto.</p>
+      <p><strong>Paso 1:</strong> Divide el numerador entre el denominador: 7 ÷ 4 = <strong>1</strong> (cociente) con residuo <strong>3</strong></p>
+      <p><strong>Paso 2:</strong> El cociente es la parte entera, el residuo es el nuevo numerador.</p>
+      <p><strong>Resultado:</strong> 7/4 = <strong>1 ¾</strong></p>
+      <div style="display:flex;align-items:center;gap:18px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
+        <div style="text-align:center;font-size:22pt;font-weight:700;color:var(--naranja);">7<br><span style="display:block;border-top:3px solid var(--naranja);">4</span></div>
+        <div style="font-size:18pt;color:var(--gris-text);">=</div>
+        <div style="text-align:center;font-size:22pt;font-weight:700;color:var(--verde);">1 <span style="font-size:18pt;">¾</span></div>
+      </div>
+    </div>
+
+    <h3 class="subtitulo">Fracciones equivalentes</h3>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> ¿Qué son fracciones equivalentes?</div>
+      <p>Dos fracciones son <strong>equivalentes</strong> cuando representan la <em>misma cantidad</em>, aunque tengan números diferentes.</p>
+      <p style="text-align:center;font-size:14pt;font-weight:700;margin-top:8px;">
+        <span style="color:var(--naranja);">1/2</span> = <span style="color:var(--verde);">2/4</span> = <span style="color:var(--azul-med);">3/6</span> = <span style="color:var(--rojo);">4/8</span>
+      </p>
+      <p style="margin-top:8px;"><strong>Para encontrar fracciones equivalentes:</strong> multiplica o divide el numerador y el denominador por el mismo número.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:10.5pt;">
+        <div style="background:#fff;border-radius:var(--radio);padding:8px 14px;text-align:center;">
+          <p style="color:var(--gris-text);font-size:9pt;">× 3</p>
+          <p><strong style="color:var(--naranja);">1/2</strong> → <strong style="color:var(--verde);">3/6</strong></p>
+          <p style="color:var(--gris-text);font-size:9pt;">× 3</p>
+        </div>
+        <div style="background:#fff;border-radius:var(--radio);padding:8px 14px;text-align:center;">
+          <p style="color:var(--gris-text);font-size:9pt;">÷ 2</p>
+          <p><strong style="color:var(--naranja);">4/8</strong> → <strong style="color:var(--verde);">2/4</strong></p>
+          <p style="color:var(--gris-text);font-size:9pt;">÷ 2</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-20">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">20</div>
+        <span class="actividad-titulo">Fracciones equivalentes</span>
+      </div>
+      <p class="actividad-instruccion">Completa las fracciones equivalentes:</p>
+      <div class="grid-2" style="font-size:11pt;line-height:2.5;font-weight:600;">
+        <div>
+          <p>a) 1/3 = ___/9 = ___/12</p>
+          <p>b) 2/5 = ___/10 = ___/15</p>
+        </div>
+        <div>
+          <p>c) 4/6 = 2/___ = ___/3</p>
+          <p>d) 3/4 = ___/8 = 6/___</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Fracciones — Tipos y Equivalencia</span>
+      <span class="pie-num">18</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 19 ==================== -->
+  <div class="pagina mat" id="p19">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Fracciones — Comparación y Simplificación</span>
+    </div>
+
+    <h3 class="subtitulo">Comparación de fracciones</h3>
+
+    <div class="cuadro ejemplo">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Método: mismo denominador</div>
+      <p>Para comparar fracciones con <strong>diferente denominador</strong>, primero las convertimos al mismo denominador.</p>
+      <div style="background:#fff;border-radius:var(--radio);padding:10px;margin-top:8px;font-size:10.5pt;">
+        <p><strong>Compara:</strong> 2/3 y 3/5</p>
+        <p>Mínimo Común Denominador (MCD) de 3 y 5 = <strong>15</strong></p>
+        <p>2/3 = 10/15 &nbsp;&nbsp;|&nbsp;&nbsp; 3/5 = 9/15</p>
+        <p style="color:var(--verde);font-weight:700;">Como 10 > 9, entonces 2/3 > 3/5 ✅</p>
+      </div>
+    </div>
+
+    <h3 class="subtitulo">Simplificación de fracciones</h3>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> ¿Cómo simplificar?</div>
+      <p>Simplificar es encontrar una fracción <strong>equivalente más pequeña</strong>. Dividimos numerador y denominador entre su <em>Máximo Común Divisor (MCD)</em>.</p>
+      <div style="background:#fff;border-radius:var(--radio);padding:10px;margin-top:8px;">
+        <p><strong>Simplifica:</strong> 12/16</p>
+        <p>MCD(12, 16) = <strong>4</strong></p>
+        <p>12 ÷ 4 = 3 &nbsp;&nbsp;|&nbsp;&nbsp; 16 ÷ 4 = 4</p>
+        <p style="color:var(--verde);font-weight:700;">12/16 = 3/4 ✅ (mínima expresión)</p>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-21">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">21</div>
+        <span class="actividad-titulo">Compara y ordena fracciones</span>
+      </div>
+      <p class="actividad-instruccion">Escribe &gt;, &lt; o = entre cada par de fracciones:</p>
+      <div class="grid-2" style="font-size:12pt;font-weight:700;line-height:2.8;">
+        <div>
+          <p>a) 1/2 ___ 3/4</p>
+          <p>b) 2/3 ___ 4/6</p>
+          <p>c) 3/5 ___ 2/4</p>
+        </div>
+        <div>
+          <p>d) 5/8 ___ 3/4</p>
+          <p>e) 1/3 ___ 2/7</p>
+          <p>f) 7/10 ___ 3/5</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-22">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">22</div>
+        <span class="actividad-titulo">Simplifica las fracciones</span>
+      </div>
+      <p class="actividad-instruccion">Reduce cada fracción a su mínima expresión:</p>
+      <div class="grid-3" style="font-size:12pt;font-weight:700;line-height:2.5;text-align:center;">
+        <div>
+          <p>6/8 = ___</p>
+          <p>4/10 = ___</p>
+        </div>
+        <div>
+          <p>9/12 = ___</p>
+          <p>15/20 = ___</p>
+        </div>
+        <div>
+          <p>6/9 = ___</p>
+          <p>8/24 = ___</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cuadro sabias">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="#8B6914"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7zm1 14v1h-2v-1h2zm1-3.27l.45-.27A5 5 0 0 0 17 9a5 5 0 1 0-5 5 5 5 0 0 0 2.55-.69l.45-.27V13h-2V10h2v2.73z"/></svg>
+        ¿Sabías que...?
+      </div>
+      <p>Las fracciones se usan en la vida diaria: cuando repartimos pizza, medimos ingredientes para cocinar, calculamos descuentos en una tienda o dividimos tiempo. ¡Las fracciones están en todas partes!</p>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Fracciones — Comparación y Simplificación</span>
+      <span class="pie-num">19</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 20 ==================== -->
+  <div class="pagina mat" id="p20">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Fracciones — Ejercicios y Problemas</span>
+    </div>
+
+    <div class="actividad" id="act-23">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">23</div>
+        <span class="actividad-titulo">Problemas con fracciones</span>
+      </div>
+      <p class="actividad-instruccion">Lee con atención y resuelve:</p>
+
+      <p><strong>a)</strong> La mamá de Juan preparó una torta y la dividió en 8 porciones iguales. Después del almuerzo quedaron 3 porciones. ¿Qué fracción de la torta quedó?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+
+      <p style="margin-top:8px;"><strong>b)</strong> En el huerto de la escuela hay 12 matas de tomate, 12 de cilantro y 12 de ají. ¿Qué fracción del total representan las matas de tomate?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+
+      <p style="margin-top:8px;"><strong>c)</strong> Andrea corrió 3/5 de kilómetro por la mañana y 1/5 de kilómetro por la tarde. ¿Cuánto corrió en total?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+
+      <p style="margin-top:8px;"><strong>d)</strong> De una cinta de 1 metro, Sofía usó 3/8 para un regalo. ¿Cuánto le quedó?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <div class="actividad" id="act-24">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">24</div>
+        <span class="actividad-titulo">Clasifica las fracciones</span>
+      </div>
+      <p class="actividad-instruccion">Escribe si cada fracción es <strong>propia, impropia o mixta</strong>:</p>
+      <table class="tabla-edu">
+        <thead><tr><th>Fracción</th><th>Tipo</th><th>Fracción</th><th>Tipo</th></tr></thead>
+        <tbody>
+          <tr><td style="text-align:center;font-size:13pt;font-weight:700;">5/7</td><td></td><td style="text-align:center;font-size:13pt;font-weight:700;">9/4</td><td></td></tr>
+          <tr><td style="text-align:center;font-size:13pt;font-weight:700;">2 ½</td><td></td><td style="text-align:center;font-size:13pt;font-weight:700;">3/3</td><td></td></tr>
+          <tr><td style="text-align:center;font-size:13pt;font-weight:700;">11/8</td><td></td><td style="text-align:center;font-size:13pt;font-weight:700;">1 ¾</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="reto">
+      <div class="reto-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--naranja)"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.71 6 15.2 6 13.59s.62-3.12 1.76-4.24L12 5.1v14.49z"/></svg>
+        🏆 Reto — El reparto justo
+      </div>
+      <p>En el colegio compraron 3 sandías para compartir entre 4 cursos de igual tamaño. ¿Qué fracción de sandía le corresponde a cada curso? Exprésalo como fracción y como número mixto. Explica cómo lo resolviste.</p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Fracciones — Problemas</span>
+      <span class="pie-num">20</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 21 ==================== -->
+  <div class="pagina mat" id="p21">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 2 — Multiplicación</span>
+    </div>
+
+    <h2 class="titulo-tema">Multiplicación</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es multiplicar?
+      </div>
+      <p>La <strong>multiplicación</strong> es una operación que permite sumar un número varias veces de forma rápida. Es una <em>suma abreviada</em>.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-top:12px;flex-wrap:wrap;">
+        <div style="background:#fff;border-radius:var(--radio);padding:10px 16px;border:1.5px solid var(--gris-borde);font-size:12pt;text-align:center;">
+          <p>5 + 5 + 5 + 5 = <strong>20</strong></p>
+          <p style="color:var(--gris-text);font-size:9pt;">(sumar 5 cuatro veces)</p>
+        </div>
+        <div style="font-size:18pt;color:var(--gris-text);">=</div>
+        <div style="background:var(--verde-cl);border-radius:var(--radio);padding:10px 16px;border:2px solid var(--verde);font-size:12pt;text-align:center;">
+          <p><strong style="color:var(--verde);">5 × 4 = 20</strong></p>
+          <p style="color:var(--gris-text);font-size:9pt;">(multiplicación)</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subtitulo">Partes de la multiplicación</h3>
+
+    <div style="display:flex;justify-content:center;margin:10px 0;">
+      <svg width="380" height="70" viewBox="0 0 380 70">
+        <text x="60" y="45" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">34</text>
+        <text x="120" y="45" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">×</text>
+        <text x="180" y="45" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">7</text>
+        <text x="240" y="45" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">=</text>
+        <text x="310" y="45" font-size="26" font-weight="700" fill="#1A7A4A" text-anchor="middle">238</text>
+        <!-- Etiquetas -->
+        <rect x="18" y="52" width="84" height="18" rx="4" fill="#FEF0E6"/>
+        <text x="60" y="64" font-size="10" fill="#E8630A" text-anchor="middle" font-weight="700">Multiplicando</text>
+        <rect x="148" y="52" width="64" height="18" rx="4" fill="#E6F5EE"/>
+        <text x="180" y="64" font-size="10" fill="#1A7A4A" text-anchor="middle" font-weight="700">Multiplicador</text>
+        <rect x="264" y="52" width="92" height="18" rx="4" fill="#E8F0FB"/>
+        <text x="310" y="64" font-size="10" fill="#1B3A6B" text-anchor="middle" font-weight="700">Producto</text>
+      </svg>
+    </div>
+
+    <h3 class="subtitulo">Propiedades de la multiplicación</h3>
+
+    <table class="tabla-edu">
+      <thead>
+        <tr><th>Propiedad</th><th>Definición</th><th>Ejemplo</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--naranja);">Conmutativa</strong></td>
+          <td>El orden no altera el resultado</td>
+          <td>4 × 3 = 3 × 4 = 12</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--verde);">Asociativa</strong></td>
+          <td>Cómo agrupemos no cambia el resultado</td>
+          <td>(2×3)×4 = 2×(3×4) = 24</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--azul-med);">Distributiva</strong></td>
+          <td>a×(b+c) = a×b + a×c</td>
+          <td>3×(4+2) = 3×4 + 3×2 = 18</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#6A5ACD;">Elemento neutro</strong></td>
+          <td>Multiplicar por 1 da el mismo número</td>
+          <td>7 × 1 = 7</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--rojo);">Elemento absorbente</strong></td>
+          <td>Multiplicar por 0 da siempre 0</td>
+          <td>15 × 0 = 0</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="actividad" id="act-25">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">25</div>
+        <span class="actividad-titulo">Identifica la propiedad</span>
+      </div>
+      <p class="actividad-instruccion">Escribe qué propiedad se aplica en cada caso:</p>
+      <div style="font-size:10.5pt;line-height:2.3;">
+        <p>a) 6 × 9 = 9 × 6 → ___</p>
+        <p>b) 5 × (3+4) = 5×3 + 5×4 → ___</p>
+        <p>c) 8 × 0 = 0 → ___</p>
+        <p>d) (2×4)×5 = 2×(4×5) → ___</p>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Multiplicación</span>
+      <span class="pie-num">21</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 22 ==================== -->
+  <div class="pagina mat" id="p22">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Multiplicación — Algoritmo y Problemas</span>
+    </div>
+
+    <h3 class="subtitulo">Multiplicación de 2 y 3 cifras — Paso a paso</h3>
+
+    <div class="grid-2" style="gap:14px;">
+      <div class="cuadro ejemplo" style="margin:0;">
+        <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Ejemplo 1: 43 × 6</div>
+        <div style="font-family:var(--fuente-mono);font-size:13pt;text-align:center;margin:10px 0;background:#fff;border-radius:var(--radio);padding:12px;">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+            <span style="color:var(--azul);">  43</span>
+            <span style="color:var(--verde);">×  6</span>
+            <span style="border-top:2px solid #333;padding-top:4px;width:60px;display:block;"></span>
+            <span style="font-weight:700;">258</span>
+          </div>
+        </div>
+        <p style="font-size:9.5pt;">6×3=18 → escribe 8, llevo 1<br>6×4=24+1=25 → escribe 25</p>
+      </div>
+
+      <div class="cuadro ejemplo" style="margin:0;">
+        <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Ejemplo 2: 135 × 24</div>
+        <div style="font-family:var(--fuente-mono);font-size:11pt;text-align:center;margin:10px 0;background:#fff;border-radius:var(--radio);padding:12px;">
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;">
+            <span style="color:var(--azul);">   135</span>
+            <span style="color:var(--verde);">×   24</span>
+            <span style="border-top:2px solid #333;padding-top:4px;width:80px;display:block;"></span>
+            <span>   540 <span style="font-size:8pt;color:var(--gris-text);">(135×4)</span></span>
+            <span>  2700 <span style="font-size:8pt;color:var(--gris-text);">(135×20)</span></span>
+            <span style="border-top:2px solid #333;padding-top:4px;width:80px;display:block;"></span>
+            <span style="font-weight:700;color:var(--verde);">  3240</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-26">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">26</div>
+        <span class="actividad-titulo">Resuelve las multiplicaciones</span>
+      </div>
+      <p class="actividad-instruccion">Desarrolla cada multiplicación mostrando el procedimiento:</p>
+      <div class="grid-3" style="gap:10px;">
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">78 × 5 =</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">126 × 8 =</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">47 × 12 =</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">205 × 6 =</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">63 × 15 =</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:80px;">
+          <p style="font-family:var(--fuente-mono);text-align:right;font-size:12pt;">148 × 23 =</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-27">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">27</div>
+        <span class="actividad-titulo">Problemas de multiplicación</span>
+      </div>
+      <p><strong>a)</strong> En la tienda escolar venden 45 lápices cada semana. ¿Cuántos lápices venderán en 8 semanas?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>b)</strong> Una canasta tiene 24 mangos. Si hay 15 canastas, ¿cuántos mangos hay en total?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>c)</strong> Cada estudiante debe leer 18 páginas por día. ¿Cuántas páginas leerá en 30 días?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Multiplicación</span>
+      <span class="pie-num">22</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 23 ==================== -->
+  <div class="pagina mat" id="p23">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Unidad 2 — División</span>
+    </div>
+
+    <h2 class="titulo-tema">División</h2>
+
+    <div class="cuadro concepto">
+      <div class="cuadro-titulo">
+        <svg viewBox="0 0 24 24" fill="var(--verde)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        ¿Qué es dividir?
+      </div>
+      <p>La <strong>división</strong> permite repartir una cantidad en partes iguales o averiguar cuántas veces cabe un número en otro. Es la operación <em>inversa de la multiplicación</em>.</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin-top:12px;flex-wrap:wrap;font-size:11pt;">
+        <div style="background:#fff;border-radius:var(--radio);padding:10px 14px;border:1.5px solid var(--gris-borde);text-align:center;">
+          <p>12 mangos repartidos entre 4 niños</p>
+          <p style="font-size:14pt;font-weight:700;color:var(--verde);margin-top:4px;">12 ÷ 4 = <span style="color:var(--naranja);">3 mangos</span> por niño</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="subtitulo">Partes de la división</h3>
+
+    <div style="display:flex;justify-content:center;margin:14px 0;">
+      <svg width="380" height="80" viewBox="0 0 380 80">
+        <!-- División estilo colombiano -->
+        <text x="60" y="50" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">28</text>
+        <text x="105" y="50" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">÷</text>
+        <text x="150" y="50" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">4</text>
+        <text x="200" y="50" font-size="26" font-weight="700" fill="#1A1A2E" text-anchor="middle">=</text>
+        <text x="255" y="50" font-size="26" font-weight="700" fill="#1A7A4A" text-anchor="middle">7</text>
+        <text x="310" y="50" font-size="26" font-weight="700" fill="#888" text-anchor="middle">R 0</text>
+        <rect x="18" y="58" width="84" height="18" rx="4" fill="#FEF0E6"/>
+        <text x="60" y="70" font-size="10" fill="#E8630A" text-anchor="middle" font-weight="700">Dividendo</text>
+        <rect x="118" y="58" width="64" height="18" rx="4" fill="#E6F5EE"/>
+        <text x="150" y="70" font-size="10" fill="#1A7A4A" text-anchor="middle" font-weight="700">Divisor</text>
+        <rect x="222" y="58" width="66" height="18" rx="4" fill="#E8F0FB"/>
+        <text x="255" y="70" font-size="10" fill="#1B3A6B" text-anchor="middle" font-weight="700">Cociente</text>
+        <rect x="290" y="58" width="66" height="18" rx="4" fill="#FDEDEC"/>
+        <text x="323" y="70" font-size="10" fill="#C0392B" text-anchor="middle" font-weight="700">Residuo</text>
+      </svg>
+    </div>
+
+    <div class="grid-2" style="gap:12px;margin-bottom:12px;">
+      <div class="cuadro ejemplo" style="margin:0;">
+        <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> División exacta</div>
+        <p style="font-size:10.5pt;">El residuo es <strong>0</strong>. El divisor cabe un número exacto de veces en el dividendo.</p>
+        <div style="font-family:var(--fuente-mono);font-size:12pt;text-align:center;margin-top:8px;background:#fff;border-radius:5px;padding:8px;">
+          <p>48 ÷ 6 = <strong style="color:var(--verde);">8</strong> R <strong style="color:var(--gris-text);">0</strong></p>
+          <p style="font-size:9pt;color:var(--gris-text);">Verificación: 8 × 6 = 48 ✅</p>
+        </div>
+      </div>
+
+      <div class="cuadro ejemplo" style="margin:0;">
+        <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> División inexacta</div>
+        <p style="font-size:10.5pt;">El residuo es <strong>diferente de 0</strong>. Hay una parte que "sobra".</p>
+        <div style="font-family:var(--fuente-mono);font-size:12pt;text-align:center;margin-top:8px;background:#fff;border-radius:5px;padding:8px;">
+          <p>17 ÷ 5 = <strong style="color:var(--verde);">3</strong> R <strong style="color:var(--rojo);">2</strong></p>
+          <p style="font-size:9pt;color:var(--gris-text);">Verificación: 3×5 + 2 = 17 ✅</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> Fórmula de verificación</div>
+      <p style="text-align:center;font-size:13pt;font-weight:700;margin-top:6px;color:var(--azul);">Dividendo = (Cociente × Divisor) + Residuo</p>
+      <p style="text-align:center;font-size:10pt;color:var(--gris-text);margin-top:4px;">Usa esta fórmula para comprobar tus divisiones.</p>
+    </div>
+
+    <div class="actividad" id="act-28">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">28</div>
+        <span class="actividad-titulo">Practica divisiones</span>
+      </div>
+      <p class="actividad-instruccion">Resuelve y verifica cada división:</p>
+      <div class="grid-3" style="gap:10px;font-size:11pt;">
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:70px;">
+          <p style="font-family:var(--fuente-mono);">72 ÷ 8 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:6px;">C: ___ R: ___</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:70px;">
+          <p style="font-family:var(--fuente-mono);">95 ÷ 7 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:6px;">C: ___ R: ___</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:70px;">
+          <p style="font-family:var(--fuente-mono);">144 ÷ 12 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:6px;">C: ___ R: ___</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>División</span>
+      <span class="pie-num">23</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 24 ==================== -->
+  <div class="pagina mat" id="p24">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">División — Algoritmo y Problemas</span>
+    </div>
+
+    <h3 class="subtitulo">División de 3 cifras — Paso a paso</h3>
+
+    <div class="cuadro ejemplo">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--naranja)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg> Ejemplo resuelto: 486 ÷ 6</div>
+      <div class="grid-2" style="gap:16px;align-items:start;">
+        <div style="font-family:var(--fuente-mono);font-size:11.5pt;background:#fff;border-radius:var(--radio);padding:12px;">
+          <p>486 | 6</p>
+          <p>-48   81</p>
+          <p style="border-top:1.5px solid #333;"> 06</p>
+          <p>  -6</p>
+          <p style="border-top:1.5px solid #333;">   0</p>
+        </div>
+        <div style="font-size:10pt;">
+          <p><strong>Paso 1:</strong> ¿Cuántas veces cabe 6 en 4? No cabe → tomo 48.</p>
+          <p><strong>Paso 2:</strong> 6 × 8 = 48. Escribo 8 en el cociente. Resto: 48-48=0.</p>
+          <p><strong>Paso 3:</strong> Bajo el 6. ¿Cuántas veces cabe 6 en 6? Una vez.</p>
+          <p><strong>Paso 4:</strong> 6 × 1 = 6. Resto: 0. ¡División exacta!</p>
+          <p style="color:var(--verde);font-weight:700;margin-top:6px;">Resultado: 486 ÷ 6 = 81</p>
+          <p style="font-size:9pt;color:var(--gris-text);">Verificación: 81 × 6 = 486 ✅</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-29">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">29</div>
+        <span class="actividad-titulo">Resuelve las divisiones</span>
+      </div>
+      <p class="actividad-instruccion">Realiza el algoritmo y verifica con la prueba:</p>
+      <div class="grid-2" style="gap:12px;">
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:100px;">
+          <p style="font-family:var(--fuente-mono);font-size:12pt;">336 ÷ 4 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:8px;">Verificación: ___ × ___ + ___ = ___</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:100px;">
+          <p style="font-family:var(--fuente-mono);font-size:12pt;">275 ÷ 9 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:8px;">Verificación: ___ × ___ + ___ = ___</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:100px;">
+          <p style="font-family:var(--fuente-mono);font-size:12pt;">504 ÷ 7 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:8px;">Verificación: ___ × ___ + ___ = ___</p>
+        </div>
+        <div style="background:#fff;border:1.5px solid var(--gris-borde);border-radius:var(--radio);padding:12px;min-height:100px;">
+          <p style="font-family:var(--fuente-mono);font-size:12pt;">847 ÷ 12 =</p>
+          <p style="font-size:9pt;color:var(--gris-text);margin-top:8px;">Verificación: ___ × ___ + ___ = ___</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-30">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">30</div>
+        <span class="actividad-titulo">Problemas con división</span>
+      </div>
+      <p><strong>a)</strong> En el colegio hay 360 libros para repartir equitativamente entre 8 salones. ¿Cuántos libros le corresponden a cada salón?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>b)</strong> Una cosecha produjo 245 mangos que se empacaron en cajas de 6. ¿Cuántas cajas completas hubo? ¿Cuántos mangos sobraron?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+      <p style="margin-top:8px;"><strong>c)</strong> Si 7 amigos se ganan $\$980$ en una rifa y quieren repartirlo en partes iguales, ¿cuánto recibe cada uno?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>División</span>
+      <span class="pie-num">24</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 25 ==================== -->
+  <div class="pagina mat" id="p25">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Matemáticas — Problemas Contextualizados</span>
+    </div>
+
+    <h2 class="titulo-tema" style="border-color:var(--verde);">Problemas de la Vida Real</h2>
+
+    <div class="cuadro recuerda">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--azul)"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg> Estrategia para resolver problemas</div>
+      <div class="grid-2" style="font-size:10pt;">
+        <ol style="line-height:1.9;">
+          <li><strong>Lee</strong> el problema con atención.</li>
+          <li><strong>Identifica</strong> los datos y la pregunta.</li>
+          <li><strong>Elige</strong> la operación correcta.</li>
+        </ol>
+        <ol start="4" style="line-height:1.9;">
+          <li><strong>Desarrolla</strong> el procedimiento.</li>
+          <li><strong>Verifica</strong> el resultado.</li>
+          <li><strong>Responde</strong> con unidades.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="actividad" id="act-31">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">31</div>
+        <span class="actividad-titulo">Problemas variados</span>
+      </div>
+      <p><strong>🐄 Situación 1 — La finca:</strong> Don Aurelio tiene una finca con 3/5 sembrada en maíz y 1/5 en yuca. ¿Qué fracción de la finca está sembrada en total? ¿Qué fracción está sin sembrar?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span></div>
+
+      <p style="margin-top:10px;"><strong>🏫 Situación 2 — El restaurante escolar:</strong> El lunes prepararon 240 almuerzos. El martes prepararon el doble. El miércoles prepararon la mitad del martes. ¿Cuántos almuerzos en total se sirvieron esos tres días?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span><span class="linea-resp"></span></div>
+
+      <p style="margin-top:10px;"><strong>🛒 Situación 3 — La tienda:</strong> En la tienda de doña Carmen hay 168 naranjas. Ella vende 6 naranjas por bolsa. ¿Cuántas bolsas puede armar? Si cada bolsa cuesta $800, ¿cuánto dinero recibirá si vende todas las bolsas?</p>
+      <div class="lineas-resp"><span class="linea-resp"></span><span class="linea-resp"></span><span class="linea-resp"></span></div>
+    </div>
+
+    <div class="reto">
+      <div class="reto-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--naranja)"><path d="M17.66 7.93L12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31zM12 19.59c-1.6 0-3.11-.62-4.24-1.76C6.62 16.71 6 15.2 6 13.59s.62-3.12 1.76-4.24L12 5.1v14.49z"/></svg>
+        🏆 Súper Reto — El torneo escolar
+      </div>
+      <p>En el torneo interescolar participan 9 equipos de 8 jugadores cada uno. La organización compró 288 botellas de agua para repartir entre todos los jugadores por igual durante el torneo. ¿Cuántas botellas le corresponden a cada jugador? Si el torneo dura 3 días, ¿cuántas botellas consume cada jugador por día?</p>
+      <div class="lineas-resp">
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+        <span class="linea-resp"></span>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Problemas Contextualizados</span>
+      <span class="pie-num">25</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 26 ==================== -->
+  <div class="pagina mat" id="p26">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Autoevaluación — Unidad 2: Matemáticas</span>
+    </div>
+
+    <h2 class="titulo-tema" style="border-color:var(--verde);">Autoevaluación — Matemáticas</h2>
+
+    <div class="autoevaluacion">
+      <p class="autoevaluacion-titulo">¿Cómo me fue en Matemáticas? 🔢</p>
+      <p style="text-align:center;font-size:10pt;color:var(--gris-text);margin-bottom:12px;">Marca con una X según cómo te sientes:</p>
+      <div class="escala-eval">
+        <div class="escala-item"><span class="emoji">😕</span>Necesito repasar</div>
+        <div class="escala-item"><span class="emoji">🙂</span>Entiendo un poco</div>
+        <div class="escala-item"><span class="emoji">😊</span>Lo entiendo bien</div>
+        <div class="escala-item"><span class="emoji">🌟</span>¡Lo domino!</div>
+      </div>
+      <ul class="checklist-eval" style="margin-top:12px;">
+        <li><div class="chk-box"></div>Identifico el numerador y el denominador de una fracción.</li>
+        <li><div class="chk-box"></div>Represento fracciones gráficamente.</li>
+        <li><div class="chk-box"></div>Clasifico fracciones en propias, impropias y mixtas.</li>
+        <li><div class="chk-box"></div>Encuentro fracciones equivalentes.</li>
+        <li><div class="chk-box"></div>Simplifico fracciones a su mínima expresión.</li>
+        <li><div class="chk-box"></div>Comparo fracciones usando &gt;, &lt; o =.</li>
+        <li><div class="chk-box"></div>Conozco las propiedades de la multiplicación.</li>
+        <li><div class="chk-box"></div>Resuelvo multiplicaciones de 2 y 3 cifras.</li>
+        <li><div class="chk-box"></div>Identifico las partes de una división.</li>
+        <li><div class="chk-box"></div>Distingo divisiones exactas e inexactas.</li>
+        <li><div class="chk-box"></div>Verifico divisiones con la prueba.</li>
+        <li><div class="chk-box"></div>Resuelvo problemas contextualizados paso a paso.</li>
+      </ul>
+    </div>
+
+    <div class="actividad" id="act-32">
+      <div class="actividad-cabeza">
+        <div class="actividad-num">32</div>
+        <span class="actividad-titulo">Prueba final de Matemáticas</span>
+      </div>
+      <p class="actividad-instruccion">Responde las siguientes preguntas de selección múltiple:</p>
+      <p><strong>1.</strong> ¿Cuál de las siguientes fracciones es impropia?</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> 3/7</li>
+        <li><span class="opc-circulo">B</span> 5/5</li>
+        <li><span class="opc-circulo">C</span> 8/5</li>
+        <li><span class="opc-circulo">D</span> 1/4</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>2.</strong> ¿Cuál es el resultado de 123 × 5?</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> 505</li>
+        <li><span class="opc-circulo">B</span> 615</li>
+        <li><span class="opc-circulo">C</span> 625</li>
+        <li><span class="opc-circulo">D</span> 615</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>3.</strong> Al dividir 85 ÷ 8, el residuo es:</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> 1</li>
+        <li><span class="opc-circulo">B</span> 5</li>
+        <li><span class="opc-circulo">C</span> 3</li>
+        <li><span class="opc-circulo">D</span> 2</li>
+      </ul>
+      <p style="margin-top:8px;"><strong>4.</strong> ¿Cuál es la fracción simplificada de 6/9?</p>
+      <ul class="opc-mult">
+        <li><span class="opc-circulo">A</span> 3/4</li>
+        <li><span class="opc-circulo">B</span> 2/3</li>
+        <li><span class="opc-circulo">C</span> 1/2</li>
+        <li><span class="opc-circulo">D</span> 4/6</li>
+      </ul>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Autoevaluación — Matemáticas</span>
+      <span class="pie-num">26</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 27 ==================== -->
+  <div class="pagina" id="p27">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Respuestas y Soluciones</span>
+    </div>
+
+    <h2 class="titulo-tema" style="border-color:var(--verde);">Respuestas y Soluciones</h2>
+
+    <div class="cuadro atencion">
+      <div class="cuadro-titulo"><svg viewBox="0 0 24 24" fill="var(--rojo)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg> Importante</div>
+      <p>Consulta estas respuestas <strong>solo después</strong> de haber intentado resolver las actividades por tu cuenta. El verdadero aprendizaje ocurre cuando practicas y te esfuerzas. ¡Recuerda que los errores son oportunidades para aprender!</p>
+    </div>
+
+    <!-- RESPUESTAS ESPAÑOL -->
+    <div class="respuestas-seccion">
+      <p class="resp-titulo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--verde)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Respuestas — Español
+      </p>
+      <div class="grid-2" style="gap:6px;font-size:9.5pt;">
+        <div>
+          <div class="resp-item"><div class="resp-num">2</div><span><strong>Opción B:</strong> Una tortuga y una garza se vuelven amigas al ayudarse mutuamente.</span></div>
+          <div class="resp-item"><div class="resp-num">4</div><span>Causa: contaminación → Efecto: escasez. Basura → Daño ecosistema. Árboles → Humedad del suelo.</span></div>
+          <div class="resp-item"><div class="resp-num">6</div><span>1-c (turbulento), 2-a (ribera), 3-d (escasear), 4-b (mutuamente).</span></div>
+          <div class="resp-item"><div class="resp-num">7</div><span>Orden correcto: 2 (formaron equipos), 4 (delimitaron), 1 (compraron raspados), 3 (planearon torneo).</span></div>
+          <div class="resp-item"><div class="resp-num">9</div><span>1. mochila llevo <strong>lápiz, cuaderno, borrador, regla</strong> y colores. 2. <strong>Pedro,</strong> sube. 3. Mi perro<strong>, llamado Manchas,</strong> duerme. 4. jugar<strong>, pero</strong> primero. 5. La mariposa<strong>, un insecto hermoso,</strong> voló. 6. matemáticas<strong>, español, ciencias sociales</strong> y artística.</span></div>
+        </div>
+        <div>
+          <div class="resp-item"><div class="resp-num">10</div><span>Mamá, ya hice: Vocativo. El loro, ese pájaro: Inciso. pan, leche: Enumeración. aunque hacía frío: Conectora. ¿ayudarme, Laura?: Vocativo. Corrió, saltó: Enumeración.</span></div>
+          <div class="resp-item"><div class="resp-num">13</div><span>gato: Sustantivo. canta: Verbo. azul: Adjetivo. Ella: Pronombre. rápido: Adverbio. sobre: Preposición.</span></div>
+          <div class="resp-item"><div class="resp-num">14</div><span>jardín: jar-dín, aguda, SÍ. árbol: ár-bol, grave, SÍ. cálculo: cál-cu-lo, esdrújula, SÍ. camión: ca-mión, aguda, SÍ. fácil: fá-cil, grave, SÍ. cómpramelo: esdrújula, SÍ.</span></div>
+          <div class="resp-item"><div class="resp-num">15</div><span>piano: Diptongo (ia). poema: Hiato (oe). buey: Triptongo (uey). país: Hiato (aí). ciudad: Diptongo (iu). Uruguay: Triptongo (uay). héroe: Hiato (oe). viuda: Diptongo (iu).</span></div>
+          <div class="resp-item"><div class="resp-num">18</div><span>1-B, 2-C, 3-C</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESPUESTAS MATEMÁTICAS -->
+    <div class="respuestas-seccion" style="margin-top:12px;border-top-color:var(--azul-med);">
+      <p class="resp-titulo" style="color:var(--azul-med);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--azul-med)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+        Respuestas — Matemáticas
+      </p>
+      <div class="grid-2" style="gap:6px;font-size:9.5pt;">
+        <div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">19</div><span>a) 3/8 b) 5/6 c) 7/10 d) 1/4</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">20</div><span>a) 3/9, 4/12 b) 4/10, 6/15 c) 2/3, 1/3 d) 6/8, 6/8</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">21</div><span>a) < b) = c) > d) < e) > f) ></span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">22</div><span>6/8=3/4. 4/10=2/5. 9/12=3/4. 15/20=3/4. 6/9=2/3. 8/24=1/3.</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">25</div><span>a) Conmutativa b) Distributiva c) Elemento absorbente d) Asociativa</span></div>
+        </div>
+        <div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">26</div><span>78×5=390. 126×8=1008. 47×12=564. 205×6=1230. 63×15=945. 148×23=3404.</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">28</div><span>72÷8=9 R0. 95÷7=13 R4. 144÷12=12 R0.</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">29</div><span>336÷4=84 R0. 275÷9=30 R5. 504÷7=72 R0. 847÷12=70 R7.</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">30</div><span>a) 45 libros b) 40 cajas, 5 mangos sobran c) $140 cada uno.</span></div>
+          <div class="resp-item"><div class="resp-num" style="background:var(--azul-med);">32</div><span>1-C, 2-B, 3-A, 4-B</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Respuestas y Soluciones</span>
+      <span class="pie-num">27</span>
+    </div>
+  </div>
+
+  <!-- ==================== PÁGINA 28 ==================== -->
+  <div class="pagina" id="p28">
+    <div class="enc">
+      <span class="enc-logo">📚 Cartilla Educativa · Grado 5.°</span>
+      <span class="enc-titulo">Glosario</span>
+    </div>
+
+    <h2 class="titulo-tema" style="border-color:var(--azul);">Glosario</h2>
+
+    <h3 class="subtitulo" style="color:var(--naranja);">📖 Términos de Español</h3>
+    <div class="glosario">
+      <div class="glosario-item">
+        <p class="glosario-term">Comprensión lectora</p>
+        <p class="glosario-def">Habilidad para entender el significado de un texto.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Idea principal</p>
+        <p class="glosario-def">El tema más importante de un texto.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Inferencia</p>
+        <p class="glosario-def">Conclusión que sacamos a partir de pistas del texto.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Vocativo</p>
+        <p class="glosario-def">Nombre de la persona a quien nos dirigimos, separado con coma.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Inciso</p>
+        <p class="glosario-def">Explicación adicional que va entre comas dentro de una oración.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Sílaba tónica</p>
+        <p class="glosario-def">La sílaba que se pronuncia con mayor fuerza.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Diptongo</p>
+        <p class="glosario-def">Dos vocales que se pronuncian en una misma sílaba.</p>
+      </div>
+      <div class="glosario-item">
+        <p class="glosario-term">Hiato</p>
+        <p class="glosario-def">Dos vocales juntas que se pronuncian en sílabas separadas.</p>
+      </div>
+    </div>
+
+    <h3 class="subtitulo" style="color:var(--verde);margin-top:14px;">🔢 Términos de Matemáticas</h3>
+    <div class="glosario">
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Fracción</p>
+        <p class="glosario-def">Representación de partes de un entero.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Numerador</p>
+        <p class="glosario-def">Número superior de una fracción; indica cuántas partes se tomaron.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Denominador</p>
+        <p class="glosario-def">Número inferior; indica en cuántas partes se dividió el entero.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Fracciones equivalentes</p>
+        <p class="glosario-def">Fracciones distintas que representan la misma cantidad.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Producto</p>
+        <p class="glosario-def">Resultado de una multiplicación.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Cociente</p>
+        <p class="glosario-def">Resultado de una división.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">Residuo</p>
+        <p class="glosario-def">Lo que sobra en una división inexacta.</p>
+      </div>
+      <div class="glosario-item" style="border-left-color:var(--verde);">
+        <p class="glosario-term" style="color:var(--verde);">MCD</p>
+        <p class="glosario-def">Máximo Común Divisor: el mayor número que divide exactamente a dos o más números.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:18px;background:linear-gradient(135deg,var(--azul),#0F2449);border-radius:var(--radio-g);padding:20px;text-align:center;color:#fff;">
+      <p style="font-family:var(--fuente-titulo);font-size:15pt;font-weight:700;margin-bottom:8px;">¡Felicitaciones! 🎉</p>
+      <p style="font-size:11pt;opacity:.85;max-width:380px;margin:0 auto;">Has completado la <strong>Cartilla Educativa de Español y Matemáticas</strong> para Grado 5.°. El aprendizaje es un viaje maravilloso — ¡sigue adelante con curiosidad y esfuerzo!</p>
+      <div style="margin-top:12px;font-size:18pt;">⭐ ⭐ ⭐ ⭐ ⭐</div>
+    </div>
+
+    <div class="pie">
+      <span>Cartilla Educativa · Grado 5.°</span>
+      <span>Glosario</span>
+      <span class="pie-num">28</span>
+    </div>
+  </div>
+
+</div> <!-- FIN DEL CONTENEDOR MAESTRO DEL PDF -->
+
+<script>
+/**
+ * descargarPDF()
+ * Usando html2canvas y jsPDF manualmente para procesar las 28 páginas.
+ */
+async function descargarPDF() {
+  const btn = document.getElementById('btn-pdf');
+  const span = btn.querySelector('span');
+  
+  const textoOriginal = span.innerText;
+  btn.disabled = true;
+  span.innerText = "Generando PDF (esto puede tardar)...";
+  
+  // Desplazar arriba por seguridad en la captura
+  window.scrollTo(0, 0);
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const paginas = document.querySelectorAll('.pagina');
+
+    for (let i = 0; i < paginas.length; i++) {
+      const pagina = paginas[i];
+      
+      // Aislar temporalmente la página para que no haya márgenes/sombras que alteren las medidas
+      const originalMargin = pagina.style.margin;
+      const originalShadow = pagina.style.boxShadow;
+      pagina.style.margin = '0';
+      pagina.style.boxShadow = 'none';
+
+      // Capturar la página individual con buena escala
+      const canvas = await html2canvas(pagina, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        scrollY: 0,
+        scrollX: 0,
+        backgroundColor: '#ffffff'
+      });
+
+      // Restaurar los estilos visuales
+      pagina.style.margin = originalMargin;
+      pagina.style.boxShadow = originalShadow;
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      
+      if (i > 0) {
+        pdf.addPage();
+      }
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth(); // 210mm
+      const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+      
+      // Dibujar la imagen ajustada a la hoja A4
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    }
+
+    pdf.save('Cartilla_Educativa_Grado5.pdf');
+  } catch (error) {
+    console.error('Error generando PDF:', error);
+    alert('Hubo un error al exportar. Revisa la consola o recarga la página e inténtalo de nuevo.');
+  } finally {
+    btn.disabled = false;
+    span.innerText = textoOriginal;
+  }
+}
+</script>
+</body>
+</html>
