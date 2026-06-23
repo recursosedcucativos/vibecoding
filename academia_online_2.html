@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Academia Pro | Curso Exclusivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#3b82f6', 
+                        dark: '#0a0f1a',  /* Fondo aún más oscuro para mayor contraste */
+                        panel: '#151f32'  
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -4px;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
+
+        /* HACK 3: Sombras internas profundas para comerse la UI de YouTube en los bordes */
+        .vignette-overlay {
+            box-shadow: inset 0 80px 60px -50px rgba(0,0,0,0.9), 
+                        inset 0 -80px 60px -50px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-dark text-slate-200 h-screen flex flex-col md:flex-row overflow-hidden font-sans">
+
+    <!-- BARRA LATERAL -->
+    <aside class="w-full md:w-80 bg-panel border-r border-slate-800/50 flex flex-col h-1/3 md:h-full shrink-0 z-40 relative shadow-2xl">
+        <div class="p-6 border-b border-slate-800/50">
+            <h1 class="text-xl font-bold text-white flex items-center gap-3">
+                <div class="p-2 bg-brand/20 rounded-lg">
+                    <i class="ph-fill ph-graduation-cap text-brand text-2xl"></i>
+                </div>
+                Academia Pro
+            </h1>
+            <p class="text-sm text-slate-400 mt-2">Arquitectura de Software</p>
+            
+            <div class="mt-5">
+                <div class="flex justify-between text-xs mb-1.5 font-medium">
+                    <span class="text-slate-400">Tu progreso</span>
+                    <span id="progress-text" class="text-brand">0%</span>
+                </div>
+                <div class="w-full bg-slate-800/50 rounded-full h-2 overflow-hidden">
+                    <div id="progress-bar" class="bg-gradient-to-r from-brand to-blue-400 h-full rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="playlist" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2"></div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="flex-1 flex flex-col h-2/3 md:h-full relative bg-dark">
+        <!-- ECOSISTEMA DEL VIDEO -->
+        <div class="w-full bg-black relative flex items-center justify-center flex-1 overflow-hidden" id="video-wrapper">
+            
+            <!-- HACK 1: EL PÓSTER FACHADA. Cubre completamente YT hasta que el video arranca -->
+            <div id="poster-layer" class="absolute inset-0 z-40 bg-slate-900 bg-cover bg-center flex items-center justify-center cursor-pointer group transition-opacity duration-500" onclick="startVideo()">
+                <!-- Overlay oscuro sobre el póster -->
+                <div class="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
+                <!-- Nuestro botón de Play Premium -->
+                <div class="relative z-10 w-24 h-24 bg-brand/90 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-transform duration-300">
+                    <i class="ph-fill ph-play text-white text-5xl ml-2"></i>
+                </div>
+            </div>
+
+            <div id="preloader" class="absolute inset-0 z-50 bg-dark flex flex-col items-center justify-center transition-opacity duration-300">
+                <i class="ph-bold ph-circle-notch animate-spin text-4xl text-brand mb-4"></i>
+            </div>
+
+            <!-- IFRAME YOUTUBE -->
+            <!-- Hemos escalado ligeramente el contenedor (scale-105) para empujar los logos hacia afuera de la pantalla -->
+            <div class="w-full h-full md:aspect-video md:h-auto max-w-6xl relative pointer-events-none transform scale-[1.02]">
+                <div id="yt-player" class="absolute inset-0 w-full h-full"></div>
+            </div>
+
+            <!-- HACK 3: Viñeta CSS. Sombras internas que tapan la zona donde aparece el título de YT -->
+            <div class="absolute inset-0 z-10 vignette-overlay"></div>
+
+            <!-- GLASS WALL & HACK 2: MÁSCARA DE PAUSA -->
+            <div id="glass-wall" class="absolute inset-0 z-20 cursor-pointer flex items-center justify-center group" onclick="togglePlay()">
+                <!-- Esta máscara se activa SOLO al pausar. Difumina el fondo para esconder el texto de YouTube -->
+                <div id="pause-mask" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                    <div class="bg-black/60 px-8 py-4 rounded-2xl flex items-center gap-3 border border-white/10">
+                        <i class="ph-fill ph-pause text-white text-3xl"></i>
+                        <span class="text-white font-bold tracking-widest text-lg">PAUSADO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="end-screen" class="absolute inset-0 z-40 bg-dark/95 backdrop-blur-xl hidden flex-col items-center justify-center">
+                <i class="ph-fill ph-medal text-7xl text-amber-400 mb-6 drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]"></i>
+                <h3 class="text-4xl font-bold text-white mb-3">Lección Superada</h3>
+                <p class="text-slate-400 mb-10 text-lg">Excelente trabajo. Continuemos construyendo.</p>
+                <button onclick="playNext()" class="px-10 py-4 bg-brand hover:bg-blue-500 text-white rounded-xl font-bold transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] flex items-center gap-3 text-lg">
+                    Siguiente Clase <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- CONTROLES -->
+            <div class="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black via-black/90 to-transparent p-4 md:px-8 md:pb-6 md:pt-12 opacity-0 hover:opacity-100 transition-opacity duration-300" id="custom-controls">
+                <div class="flex items-center gap-4 mb-3">
+                    <span id="time-current" class="text-sm font-mono text-slate-300 w-12 text-right">0:00</span>
+                    <input type="range" id="seek-bar" value="0" step="0.1" class="flex-1 group-hover:h-2 transition-all">
+                    <span id="time-total" class="text-sm font-mono text-slate-400 w-12">0:00</span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-6">
+                        <button onclick="togglePlay()" class="text-white hover:text-brand transition-colors outline-none" id="btn-play">
+                            <i class="ph-fill ph-play text-4xl"></i>
+                        </button>
+                        <div class="flex items-center gap-3 group/vol">
+                            <button onclick="toggleMute()" class="text-slate-300 hover:text-white transition-colors outline-none" id="btn-mute">
+                                <i class="ph-fill ph-speaker-high text-2xl"></i>
+                            </button>
+                            <input type="range" id="volume-bar" value="100" class="w-0 overflow-hidden group-hover/vol:w-24 transition-all duration-300 opacity-0 group-hover/vol:opacity-100 h-1.5">
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleFullscreen()" class="text-slate-300 hover:text-white transition-colors outline-none">
+                        <i class="ph-bold ph-corners-out text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO -->
+        <div class="p-6 md:p-10 bg-dark shrink-0">
+            <div class="max-w-4xl">
+                <span class="inline-block px-3 py-1 bg-brand/10 text-brand text-xs font-bold rounded-full mb-3" id="lesson-badge">Módulo 1</span>
+                <h2 id="lesson-title" class="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">Cargando...</h2>
+                <p id="lesson-desc" class="text-slate-400 text-base md:text-lg leading-relaxed">Preparando la información de la lección.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const lessons = [
+            { id: '7-B-JRC58pQ', title: '1. Configuración de Entorno', desc: 'Aprende a preparar tus herramientas antes de escribir la primera línea de código.', completed: false },
+            { id: 'afK9LermqzM', title: '2. Arquitectura de Software', desc: 'Diseño de sistemas escalables. Cómo estructurar la base de datos y los servicios.', completed: false },
+            { id: 'S6409_LjzcU', title: '3. Despliegue Zero-Cost', desc: 'Lleva tu aplicación a la web de forma gratuita utilizando Vercel y GitHub Pages.', completed: false }
+        ];
+
+        let currentIndex = 0;
+        let player;
+        let progressInterval;
+        let isFirstLoad = true;
+
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                videoId: lessons[currentIndex].id,
+                playerVars: {
+                    'controls': 0, 'disablekb': 1, 'fs': 0, 
+                    'modestbranding': 1, 'rel': 0, 'showinfo': 0, 'iv_load_policy': 3,
+                    'playsinline': 1 // Vital para móviles
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+            renderPlaylist();
+            updateLessonInfo();
+        }
+
+        function onPlayerReady(event) {
+            document.getElementById('preloader').classList.add('opacity-0', 'pointer-events-none');
+            setupThumbnail(); // Cargar la imagen del póster
+            
+            document.getElementById('volume-bar').addEventListener('input', function() {
+                player.setVolume(this.value);
+                updateVolumeIcon(this.value);
+            });
+
+            document.getElementById('seek-bar').addEventListener('input', function() {
+                const newTime = player.getDuration() * (this.value / 100);
+                player.seekTo(newTime, true);
+            });
+        }
+
+        // Obtiene la miniatura máxima de YouTube y la pone como fondo
+        function setupThumbnail() {
+            const videoId = lessons[currentIndex].id;
+            const poster = document.getElementById('poster-layer');
+            // maxresdefault es la calidad HD secreta de YouTube
+            poster.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/maxresdefault.jpg')`;
+            poster.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // Acción exclusiva del póster fachada
+        function startVideo() {
+            player.playVideo();
+            // Inmediatamente mostramos controles para experiencia fluida
+            document.getElementById('custom-controls').classList.remove('opacity-0');
+        }
+
+        function onPlayerStateChange(event) {
+            const btnPlay = document.getElementById('btn-play');
+            const poster = document.getElementById('poster-layer');
+            const pauseMask = document.getElementById('pause-mask');
+            
+            // UNSTARTED o BUFFERING
+            if (event.data == YT.PlayerState.UNSTARTED) {
+                // Si está cargando y no es el inicio, mantenemos el póster un segundo
+                if(!isFirstLoad) poster.classList.remove('opacity-0', 'pointer-events-none');
+            }
+            
+            // PLAYING
+            if (event.data == YT.PlayerState.PLAYING) {
+                isFirstLoad = false;
+                btnPlay.innerHTML = '<i class="ph-fill ph-pause text-4xl"></i>';
+                startProgressTimer();
+                
+                // Ocultar fachada suavemente
+                poster.classList.add('opacity-0', 'pointer-events-none');
+                // Ocultar máscara de pausa
+                pauseMask.classList.remove('opacity-100');
+                pauseMask.classList.add('opacity-0');
+                
+                document.getElementById('end-screen').classList.add('hidden');
+                document.getElementById('end-screen').classList.remove('flex');
+            } 
+            // PAUSED
+            else if (event.data == YT.PlayerState.PAUSED) {
+                btnPlay.innerHTML = '<i class="ph-fill ph-play text-4xl"></i>';
+                clearInterval(progressInterval);
+                
+                // Activar el Velo de Pausa para ocultar títulos de YT
+                pauseMask.classList.remove('opacity-0');
+                pauseMask.classList.add('opacity-100');
+            }
+            // ENDED
+            else if (event.data == YT.PlayerState.ENDED) {
+                btnPlay.innerHTML = '<i class="ph-fill ph-play text-4xl"></i>';
+                clearInterval(progressInterval);
+                markAsCompleted(currentIndex);
+                document.getElementById('end-screen').classList.remove('hidden');
+                document.getElementById('end-screen').classList.add('flex');
+            }
+        }
+
+        function togglePlay() {
+            if (!player || typeof player.getPlayerState !== 'function') return;
+            if (player.getPlayerState() == YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function toggleMute() {
+            if (player.isMuted()) {
+                player.unMute();
+                updateVolumeIcon(player.getVolume());
+            } else {
+                player.mute();
+                document.getElementById('btn-mute').innerHTML = '<i class="ph-fill ph-speaker-x text-2xl text-red-400"></i>';
+            }
+        }
+
+        function updateVolumeIcon(vol) {
+            const btn = document.getElementById('btn-mute');
+            if (vol == 0) btn.innerHTML = '<i class="ph-fill ph-speaker-none text-2xl"></i>';
+            else if (vol < 50) btn.innerHTML = '<i class="ph-fill ph-speaker-low text-2xl"></i>';
+            else btn.innerHTML = '<i class="ph-fill ph-speaker-high text-2xl"></i>';
+        }
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('video-wrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {});
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function startProgressTimer() {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                const currentTime = player.getCurrentTime();
+                const duration = player.getDuration();
+                
+                if (duration > 0) {
+                    const progressPercentage = (currentTime / duration) * 100;
+                    document.getElementById('seek-bar').value = progressPercentage;
+                    document.getElementById('time-current').textContent = formatTime(currentTime);
+                    document.getElementById('time-total').textContent = formatTime(duration);
+                }
+            }, 500);
+        }
+
+        function formatTime(timeInSeconds) {
+            const minutes = Math.floor(timeInSeconds / 60);
+            const seconds = Math.floor(timeInSeconds % 60);
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        function loadLesson(index) {
+            if (index < 0 || index >= lessons.length) return;
+            
+            currentIndex = index;
+            isFirstLoad = true;
+            
+            // Reactivar el póster fachada inmediatamente para esconder el iframe viejo
+            setupThumbnail();
+            
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('flex');
+            
+            // Cargamos el video (queda en background detrás de la fachada)
+            player.loadVideoById(lessons[currentIndex].id);
+            // Pausamos inmediatamente para que el usuario sea quien de Play en la fachada
+            setTimeout(() => { player.pauseVideo(); }, 200); 
+
+            updateLessonInfo();
+            renderPlaylist();
+        }
+
+        function playNext() {
+            if (currentIndex < lessons.length - 1) {
+                loadLesson(currentIndex + 1);
+            }
+        }
+
+        function markAsCompleted(index) {
+            lessons[index].completed = true;
+            renderPlaylist();
+            updateGlobalProgress();
+        }
+
+        function updateLessonInfo() {
+            document.getElementById('lesson-badge').textContent = `Lección ${currentIndex + 1}`;
+            document.getElementById('lesson-title').textContent = lessons[currentIndex].title.split('. ')[1] || lessons[currentIndex].title;
+            document.getElementById('lesson-desc').textContent = lessons[currentIndex].desc;
+        }
+
+        function updateGlobalProgress() {
+            const completed = lessons.filter(l => l.completed).length;
+            const percentage = Math.round((completed / lessons.length) * 100);
+            document.getElementById('progress-text').textContent = `${percentage}%`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlist');
+            container.innerHTML = '';
+            
+            lessons.forEach((lesson, index) => {
+                const isActive = index === currentIndex;
+                const isCompleted = lesson.completed;
+                
+                const btn = document.createElement('button');
+                btn.onclick = () => loadLesson(index);
+                btn.className = `w-full text-left p-3.5 rounded-xl flex items-start gap-4 transition-all duration-300 group ${
+                    isActive ? 'bg-brand/15 border border-brand/40 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'hover:bg-slate-800/80 border border-transparent'
+                }`;
+                
+                let icon = '';
+                if (isActive) icon = `<div class="p-2 bg-brand rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"><i class="ph-bold ph-play text-white text-sm"></i></div>`;
+                else if (isCompleted) icon = `<div class="p-2 bg-emerald-500/20 rounded-full"><i class="ph-bold ph-check text-emerald-400 text-sm"></i></div>`;
+                else icon = `<div class="p-2 bg-slate-800 rounded-full group-hover:bg-slate-700 transition-colors"><i class="ph-bold ph-lock-key-open text-slate-400 text-sm"></i></div>`;
+
+                // Limpiar el número del título para la UI
+                const cleanTitle = lesson.title.split('. ')[1] || lesson.title;
+
+                btn.innerHTML = `
+                    <div class="mt-0.5">${icon}</div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold ${isActive ? 'text-white' : 'text-slate-300 group-hover:text-white transition-colors'} leading-tight">${cleanTitle}</h4>
+                        <div class="text-xs text-slate-500 mt-1.5 flex items-center gap-1 font-mono">
+                            <i class="ph ph-clock"></i> 10:00
+                        </div>
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+        
+        // Auto-hide inmersivo
+        let timeout;
+        document.getElementById('video-wrapper').addEventListener('mousemove', () => {
+            const controls = document.getElementById('custom-controls');
+            controls.style.opacity = '1';
+            document.body.style.cursor = 'default';
+            
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    controls.style.opacity = '0';
+                    document.body.style.cursor = 'none';
+                }
+            }, 3000);
+        });
+
+    </script>
+</body>
+</html>
