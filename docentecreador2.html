@@ -4,731 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Academia Pro | Curso Exclusivo</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
     <style>
-        /* Tipografías para la Academia y el Certificado */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Montserrat:wght@300;400;600&family=Pinyon+Script&display=swap');
-
-        /* ----- ESTILOS DE LA ACADEMIA ----- */
-        body { 
-            font-family: 'Montserrat', sans-serif; 
-            background-color: #0a0f1a; 
-            color: #e2e8f0;
-            margin: 0;
-            /* 100dvh asegura que la barra de navegación del móvil no tape el contenido */
-            height: 100dvh; 
-            overflow: hidden;
-        }
-        ::-webkit-scrollbar { width: 4px; }
-        @media (min-width: 768px) { ::-webkit-scrollbar { width: 6px; } }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; /* Más grande para el dedo */
-            background: #3b82f6; cursor: pointer; margin-top: -6px;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-        }
-        @media (min-width: 768px) {
-            input[type=range]::-webkit-slider-thumb { height: 12px; width: 12px; margin-top: -4px; }
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%; height: 4px; cursor: pointer;
-            background: rgba(255,255,255,0.2); border-radius: 2px;
-        }
-
-        .vignette-overlay {
-            box-shadow: inset 0 80px 60px -40px rgba(10, 15, 26, 1), 
-                        inset 0 -80px 60px -40px rgba(10, 15, 26, 1);
-            pointer-events: none;
-        }
-        @media (min-width: 768px) {
-            .vignette-overlay {
-                box-shadow: inset 0 120px 80px -50px rgba(10, 15, 26, 1), 
-                            inset 0 -120px 80px -50px rgba(10, 15, 26, 1);
-            }
-        }
-
-        /* ----- ESTILOS DEL CERTIFICADO (EMBEBIDO) ----- */
-        .cert-font-title { font-family: 'Cinzel', serif; }
-        .cert-font-signature { font-family: 'Pinyon Script', cursive; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .cert-container {
-            width: 297mm;
-            height: 210mm;
-            background-color: #ffffff;
-            position: relative;
-            overflow: hidden;
-            padding: 20mm;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform-origin: center top;
-        }
-
-        .cert-bg-pattern {
-            position: absolute; inset: 0; opacity: 0.03; z-index: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230f172a' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        
-        .cert-border-layer { position: absolute; inset: 8mm; border: 2px solid #1e293b; z-index: 1; }
-        .cert-border-inner { position: absolute; inset: 10mm; border: 1px solid #d97706; z-index: 1; }
-
-        /* ----- MAGIA DE IMPRESIÓN (AISLAMIENTO) ----- */
-        @media print {
-            @page { size: A4 landscape; margin: 0; }
-            html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
-            #academy-app, #name-modal, #donate-modal { display: none !important; }
-
-            #certificate-modal {
-                position: static !important; background-color: white !important;
-                display: block !important; padding: 0 !important; margin: 0 !important;
-                height: auto !important; width: auto !important; overflow: visible !important;
-                inset: auto !important; backdrop-filter: none !important;
-            }
-            /* El contenedor que escala el certificado en pantalla debe quedar a tamaño real al imprimir */
-            #cert-scaler {
-                transform: none !important;
-                margin: 0 !important;
-                max-width: none !important;
-                width: 297mm !important;
-                display: block !important;
-            }
-            .cert-container {
-                box-shadow: none !important; transform: scale(1) !important;
-                width: 297mm !important; height: 210mm !important; margin: 0 !important;
-                page-break-inside: avoid; break-inside: avoid;
-                -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
-            }
-            .no-print { display: none !important; }
-        }
-        /* Garantiza que los colores e imágenes del certificado se conserven en el PDF */
-        .cert-container { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #0a0f1a; color: #e2e8f0; margin: 0; height: 100dvh; overflow: hidden; }
+        .cert-container { width: 297mm; height: 210mm; background-color: #ffffff; position: relative; overflow: hidden; padding: 20mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
     </style>
 </head>
-<body class="text-slate-200">
-
-    <!-- ========================================== -->
-    <!-- CONTENEDOR PRINCIPAL: Adaptativo Móvil/PC  -->
-    <!-- ========================================== -->
+<body>
     <div id="academy-app" class="flex flex-col md:flex-row h-full w-full">
-        
-        <!-- ÁREA PRINCIPAL DE VIDEO (Arriba en móvil, Derecha en PC) -->
-        <main class="w-full md:flex-1 flex flex-col h-auto md:h-full relative bg-[#0a0f1a] order-1 md:order-2 shrink-0 md:shrink z-20 shadow-2xl md:shadow-none">
-            
-            <!-- ECOSISTEMA DEL VIDEO -->
-            <!-- En móvil: aspect-video mantiene el 16:9 perfecto. En PC: flex-1 llena la pantalla -->
-            <div class="w-full aspect-video md:aspect-auto md:flex-1 relative flex items-center justify-center bg-black overflow-hidden shrink-0" id="video-wrapper">
-                
-                <!-- PÓSTER FACHADA -->
-                <div id="poster-layer" class="absolute inset-0 z-40 bg-slate-900 bg-cover bg-center flex items-center justify-center cursor-pointer group transition-opacity duration-500" onclick="startVideo()">
-                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
-                    <div class="relative z-10 w-16 h-16 md:w-24 md:h-24 bg-blue-500/90 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.6)] group-hover:scale-110 transition-transform duration-300">
-                        <i class="ph-fill ph-play text-white text-3xl md:text-5xl ml-1 md:ml-2"></i>
-                    </div>
-                </div>
-
-                <div id="preloader" class="absolute inset-0 z-50 bg-[#0a0f1a] flex flex-col items-center justify-center transition-opacity duration-300">
-                    <i class="ph-bold ph-circle-notch animate-spin text-3xl md:text-4xl text-blue-500 mb-4"></i>
-                </div>
-
-                <!-- IFRAME YOUTUBE: Escalado seguro para móvil (1.05) y PC (1.08) -->
-                <div class="w-full h-full md:aspect-video md:h-auto max-w-6xl relative pointer-events-none transform scale-[1.05] md:scale-[1.08]">
-                    <div id="yt-player" class="absolute inset-0 w-full h-full"></div>
-                </div>
-
-                <!-- Viñeta CSS ultra oscura -->
-                <div class="absolute inset-0 z-10 vignette-overlay"></div>
-
-                <!-- ESCUDO DE MARCA (Oculto en móviles muy pequeños para no estorbar) -->
-                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20 pointer-events-none flex items-center gap-3 opacity-90 hidden sm:flex">
-                    <div class="bg-blue-500/90 p-2 md:p-2.5 rounded-lg shadow-[0_0_20px_rgba(59,130,246,0.6)]">
-                        <i class="ph-bold ph-graduation-cap text-white text-xl md:text-2xl"></i>
-                    </div>
-                    <span class="text-white font-black tracking-widest text-xs md:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] hidden md:block">ACADEMIA PRO</span>
-                </div>
-
-                <!-- MÁSCARA DE PAUSA (Telones de Censura Adaptativos) -->
-                <div id="glass-wall" class="absolute inset-0 z-20 cursor-pointer flex items-center justify-center group" onclick="togglePlay()">
-                    <div id="pause-mask" class="absolute inset-0 opacity-0 transition-opacity duration-300 flex flex-col justify-between items-center pointer-events-none">
-                        <div class="w-full h-20 md:h-32 bg-gradient-to-b from-[#0a0f1a] via-[#0a0f1a]/95 to-transparent"></div>
-                        <div class="bg-black/80 px-6 py-3 md:px-10 md:py-5 rounded-2xl md:rounded-3xl flex items-center gap-3 md:gap-4 border border-white/10 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.8)] mt-4 md:mt-8">
-                            <i class="ph-fill ph-pause text-white text-2xl md:text-4xl"></i>
-                            <span class="text-white font-bold tracking-widest text-base md:text-xl">PAUSADO</span>
-                        </div>
-                        <div class="w-full h-20 md:h-32 bg-gradient-to-t from-[#0a0f1a] via-[#0a0f1a]/95 to-transparent flex items-end justify-center pb-4 md:pb-8">
-                            <p class="text-slate-400 text-xs md:text-sm tracking-widest uppercase font-bold">Toca para reanudar</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PANTALLA FINAL DE LECCIÓN / CURSO -->
-                <div id="end-screen" class="absolute inset-0 z-40 bg-[#0a0f1a]/95 backdrop-blur-xl hidden flex-col items-center justify-center text-center px-4">
-                    <i id="end-icon" class="ph-fill ph-medal text-5xl md:text-7xl text-amber-400 mb-4 md:mb-6 drop-shadow-[0_0_30px_rgba(251,191,36,0.4)]"></i>
-                    <h3 id="end-title" class="text-2xl md:text-4xl font-bold text-white mb-2 md:mb-3">Lección Superada</h3>
-                    <p id="end-desc" class="text-slate-400 mb-6 md:mb-10 text-sm md:text-lg max-w-xl">Excelente trabajo. Continuemos construyendo.</p>
-                    
-                    <button id="btn-next" onclick="playNext()" style="display: flex;" class="px-6 py-3 md:px-10 md:py-4 bg-blue-500 hover:bg-blue-400 text-white rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_40px_rgba(59,130,246,0.4)] items-center gap-2 md:gap-3 text-sm md:text-lg">
-                        <span id="btn-next-text">Siguiente Clase</span> <i id="btn-next-icon" class="ph-bold ph-arrow-right"></i>
-                    </button>
-
-                    <!-- BOTÓN DE CERTIFICADO -->
-                    <button id="btn-cert" onclick="openCertificate()" style="display: none;" class="px-6 py-3 md:px-10 md:py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_40px_rgba(245,158,11,0.4)] items-center gap-2 md:gap-3 text-sm md:text-lg mt-2 md:mt-4 border border-amber-300/30">
-                        <i class="ph-bold ph-certificate text-xl md:text-2xl"></i> Generar Constancia Legal
-                    </button>
-
-                    <!-- BOTÓN DE DONACIÓN (Pantalla final) -->
-                    <button id="btn-donate-end" onclick="openDonateModal()" style="display: none;" class="px-5 py-2.5 md:px-8 md:py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 rounded-xl font-bold transition-all hover:scale-105 items-center gap-2 text-xs md:text-base mt-3 md:mt-4 border border-emerald-500/30">
-                        <i class="ph-fill ph-hand-heart text-lg md:text-xl"></i> Apoyar el proyecto
-                    </button>
-                </div>
-
-                <!-- CONTROLES PERSONALIZADOS (Diseño Táctil Integrado) -->
-                <div class="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black via-black/90 to-transparent p-3 md:px-8 md:pb-6 md:pt-12 opacity-0 transition-opacity duration-300" id="custom-controls">
-                    <div class="flex items-center gap-3 md:gap-4 mb-2 md:mb-3">
-                        <span id="time-current" class="text-xs md:text-sm font-mono text-slate-300 w-10 md:w-12 text-right">0:00</span>
-                        <!-- La barra de tiempo es más gruesa en móviles (h-1 nativo, pulgar de 16px) -->
-                        <input type="range" id="seek-bar" value="0" step="0.1" class="flex-1 transition-all">
-                        <span id="time-total" class="text-xs md:text-sm font-mono text-slate-400 w-10 md:w-12">0:00</span>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4 md:gap-6">
-                            <button onclick="togglePlay()" class="text-white hover:text-blue-500 transition-colors outline-none p-1" id="btn-play">
-                                <i class="ph-fill ph-play text-3xl md:text-4xl"></i>
-                            </button>
-                            <div class="flex items-center gap-3 group/vol">
-                                <button onclick="toggleMute()" class="text-slate-300 hover:text-white transition-colors outline-none p-1" id="btn-mute">
-                                    <i class="ph-fill ph-speaker-high text-xl md:text-2xl"></i>
-                                </button>
-                                <!-- El control de volumen en slider se oculta en móvil, ya que usan los botones físicos del celular -->
-                                <input type="range" id="volume-bar" value="100" class="hidden md:block w-0 overflow-hidden group-hover/vol:w-24 transition-all duration-300 opacity-0 group-hover/vol:opacity-100 h-1.5">
-                            </div>
-                        </div>
-                        <button onclick="toggleFullscreen()" class="text-slate-300 hover:text-white transition-colors outline-none p-1">
-                            <i class="ph-bold ph-corners-out text-xl md:text-2xl"></i>
-                        </button>
-                    </div>
+        <main class="w-full md:flex-1 flex flex-col h-full bg-[#0a0f1a] relative z-20">
+            <div id="video-wrapper" class="w-full aspect-video relative bg-black flex items-center justify-center">
+                <div id="yt-player" class="absolute inset-0 w-full h-full"></div>
+                <div id="poster-layer" class="absolute inset-0 z-40 bg-cover bg-center cursor-pointer flex items-center justify-center" onclick="startVideo()">
+                    <div class="w-20 h-20 bg-blue-500/90 rounded-full flex items-center justify-center shadow-lg"><i class="ph-fill ph-play text-white text-4xl"></i></div>
                 </div>
             </div>
-
-            <!-- INFO LECCIÓN (Visible debajo del video en móviles) -->
-            <div class="p-5 md:p-10 bg-[#0a0f1a] shrink-0 border-b border-slate-800/50 md:border-none z-10">
-                <div class="max-w-4xl">
-                    <span class="inline-block px-3 py-1 bg-blue-500/10 text-blue-500 text-[10px] md:text-xs font-bold rounded-full mb-2 md:mb-3" id="lesson-badge">Módulo 1</span>
-                    <h2 id="lesson-title" class="text-2xl md:text-4xl font-extrabold text-white mb-2 md:mb-4 tracking-tight">Cargando...</h2>
-                    <p id="lesson-desc" class="text-slate-400 text-sm md:text-lg leading-relaxed line-clamp-2 md:line-clamp-none">Preparando la información.</p>
-                </div>
+            <div class="p-8">
+                <h2 id="lesson-title" class="text-3xl font-bold text-white">Selecciona una clase</h2>
+                <p id="lesson-desc" class="text-slate-400 mt-2">Explora los módulos de la barra lateral.</p>
             </div>
         </main>
 
-        <!-- BARRA LATERAL / PLAYLIST (Abajo en móvil, Izquierda en PC) -->
-        <aside class="w-full md:w-[22rem] lg:w-[26rem] bg-[#151f32] md:border-r border-slate-800/50 flex flex-col flex-1 md:flex-none min-h-0 order-2 md:order-1 z-30 shadow-2xl relative">
-            <div class="p-5 md:p-6 border-b border-slate-800/50 shrink-0">
-                <h1 class="text-lg md:text-xl font-bold text-white flex items-center gap-3">
-                    <div class="p-1.5 md:p-2 bg-blue-500/20 rounded-lg">
-                        <i class="ph-fill ph-graduation-cap text-blue-500 text-xl md:text-2xl"></i>
-                    </div>
-                    Academia Pro
-                </h1>
-                <p class="text-xs md:text-sm text-slate-400 mt-1 md:mt-2">Arquitectura de Software</p>
-                
-                <div class="mt-4 md:mt-5">
-                    <div class="flex justify-between text-[10px] md:text-xs mb-1.5 font-medium">
-                        <span class="text-slate-400">Tu progreso</span>
-                        <span id="progress-text" class="text-blue-500">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-800/50 rounded-full h-1.5 md:h-2 overflow-hidden">
-                        <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-blue-400 h-full rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
-                    </div>
-                </div>
+        <aside class="w-full md:w-96 bg-[#151f32] overflow-y-auto">
+            <div class="p-6 border-b border-slate-800">
+                <h1 class="text-xl font-bold text-white">Academia Pro</h1>
             </div>
-            <!-- Contenedor con Scroll para la lista -->
-            <div id="playlist" class="flex-1 overflow-y-auto p-3 md:p-4 flex flex-col gap-2 bg-[#0d1424] md:bg-transparent"></div>
-
-            <!-- FOOTER: BOTÓN DE APOYO / DONACIÓN -->
-            <div class="p-3 md:p-4 border-t border-slate-800/50 shrink-0 bg-[#151f32]">
-                <button onclick="openDonateModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-emerald-600/10 hover:from-emerald-500/25 hover:to-emerald-600/20 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 font-bold text-xs md:text-sm transition-all hover:scale-[1.02]">
-                    <i class="ph-fill ph-hand-heart text-base md:text-lg"></i> Donar / Apoyar el proyecto
-                </button>
-            </div>
+            <div id="playlist" class="p-4 space-y-6"></div>
         </aside>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL DEL CERTIFICADO (Escalado Móvil)     -->
-    <!-- ========================================== -->
-    <div id="certificate-modal" class="hidden fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md overflow-y-auto items-center justify-center p-2 md:p-10">
-        
-        <div class="no-print absolute top-4 right-4 md:top-6 md:right-6 flex gap-2 md:gap-4 z-[110]">
-            <button onclick="closeCertificate()" class="bg-slate-800 text-slate-300 hover:text-white px-3 md:px-5 py-2 md:py-2.5 rounded-lg text-sm md:text-base font-semibold transition-colors flex items-center gap-2">
-                <i class="ph-bold ph-x"></i> <span class="hidden sm:inline">Volver</span>
-            </button>
-            <button onclick="printCertificate()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-lg text-sm md:text-base font-bold shadow-[0_0_20px_rgba(217,119,6,0.4)] transition-all hover:scale-105 flex items-center gap-2">
-                <i class="ph-bold ph-printer"></i> <span class="hidden sm:inline">Imprimir / PDF</span> <span class="sm:hidden">PDF</span>
-            </button>
-        </div>
-
-        <!-- Escala dinámica progresiva: Muy pequeño en móviles portrait, más grande en tablets, tamaño real en PC -->
-        <div id="cert-scaler" class="w-full max-w-[297mm] mx-auto flex items-center justify-center transform scale-[0.3] min-[375px]:scale-[0.35] min-[425px]:scale-[0.4] sm:scale-[0.55] md:scale-90 lg:scale-100 origin-top mt-20 md:mt-0 transition-transform">
-            <div class="cert-container text-[#0f172a]">
-                <div class="cert-bg-pattern"></div>
-                <div class="cert-border-layer"></div>
-                <div class="cert-border-inner"></div>
-
-                <div class="relative z-10 text-center flex flex-col h-full">
-                    <!-- Encabezado corporativo -->
-                    <div class="mt-8 flex justify-between items-start px-12">
-                        <div class="text-left">
-                            <h2 class="font-bold text-[#0f172a] tracking-widest text-sm">ACADEMIA PRO</h2>
-                            <p class="text-xs text-[#64748b] tracking-wider mt-1">INNOVACIÓN TECNOLÓGICA</p>
-                        </div>
-                        <svg width="60" height="60" viewBox="0 0 100 100" class="text-[#d97706] opacity-80">
-                            <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="2"/>
-                            <circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 4"/>
-                            <path d="M30 50 L45 65 L70 35" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-
-                    <!-- Título Principal -->
-                    <div class="mt-8">
-                        <p class="text-[#64748b] tracking-[0.3em] text-sm uppercase mb-3 font-semibold">Otorga la presente</p>
-                        <h1 class="cert-font-title text-5xl font-bold text-[#0f172a] tracking-wider mb-8">CONSTANCIA DE PARTICIPACIÓN</h1>
-                        <p class="text-[#64748b] italic text-lg">a nombre de:</p>
-                    </div>
-
-                    <!-- Nombre del Estudiante (Dinámico) -->
-                    <div class="mt-2 mb-6">
-                        <h2 id="cert-student-name" class="text-4xl font-bold text-[#d97706] uppercase tracking-wide border-b border-[#cbd5e1] inline-block px-12 pb-2 min-w-[500px]">
-                            <!-- Se llena con JS -->
-                        </h2>
-                    </div>
-
-                    <!-- Cuerpo del Certificado -->
-                    <div class="max-w-3xl mx-auto px-4">
-                        <p class="text-[#334155] leading-relaxed text-lg">
-                            Por haber asistido y completado satisfactoriamente los requisitos del programa de formación informal denominado 
-                            <strong class="text-[#0f172a] font-semibold">Arquitectura de Software y Despliegue Zero-Cost</strong>, 
-                            con una duración equivalente a <strong class="text-[#0f172a]">10 horas</strong> teórico-prácticas.
-                        </p>
-                    </div>
-
-                    <!-- Firmas -->
-                    <div class="mt-auto mb-10 flex justify-center items-end px-20">
-                        <div class="text-center">
-                            <p class="cert-font-signature text-5xl text-[#0f172a] mb-[-12px] opacity-90">Rubén Sierra Carrascal</p>
-                            <div class="w-72 h-px bg-[#94a3b8] mx-auto mb-2"></div>
-                            <p class="font-bold text-[#0f172a] text-sm tracking-wider uppercase">Rubén Sierra Carrascal</p>
-                            <p class="text-xs text-[#64748b] mt-1">Ing. de Sistemas</p>
-                            <p class="text-xs text-[#64748b]">Magíster en Proyectos Educativos TIC</p>
-                        </div>
-                    </div>
-
-                    <!-- BLINDAJE LEGAL EXACTO -->
-                    <div class="mt-auto mb-4 px-16 text-justify">
-                        <p class="text-[9px] text-[#94a3b8] leading-tight font-mono">
-                            <strong>AVISO LEGAL:</strong> La presente constancia se expide bajo la modalidad de educación informal, en concordancia con el Artículo 2.6.6.8 del Decreto 1075 de 2015 del Ministerio de Educación Nacional de la República de Colombia. Este programa tiene como objetivo brindar oportunidades para adquirir, perfeccionar, renovar o profundizar conocimientos, habilidades, técnicas y prácticas. Esta constancia certifica la participación y asistencia, pero <strong>no conduce a título alguno ni certificado de aptitud ocupacional</strong>. Emitido el <span id="cert-date" class="font-bold"></span>.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ========================================== -->
-    <!-- MODAL: ENTRADA DE NOMBRE (reemplaza prompt) -->
-    <!-- ========================================== -->
-    <div id="name-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/90 backdrop-blur-md items-center justify-center p-4 no-print">
-        <div class="bg-[#151f32] border border-slate-700/60 rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-[fadeIn_0.2s_ease]">
-            <button onclick="closeNameModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
-                <i class="ph-bold ph-x text-xl"></i>
-            </button>
-            <div class="text-center">
-                <div class="inline-flex p-3 bg-amber-500/15 rounded-2xl mb-4">
-                    <i class="ph-fill ph-certificate text-3xl text-amber-400"></i>
-                </div>
-                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">¡Felicidades por culminar!</h3>
-                <p class="text-slate-400 text-sm leading-relaxed mb-5">
-                    Escribe tu <strong class="text-white">nombre completo</strong> exactamente como deseas que aparezca en tu constancia legal.
-                </p>
-                <input id="name-input" type="text" maxlength="60" autocomplete="name"
-                    placeholder="Ej. Juan David Pérez"
-                    class="w-full bg-[#0d1424] border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-4 py-3 text-white text-center text-lg outline-none transition-colors mb-2"/>
-                <p id="name-error" class="text-red-400 text-xs mb-3 h-4"></p>
-                <button onclick="confirmName()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl font-bold transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(245,158,11,0.3)]">
-                    <i class="ph-bold ph-check-circle text-xl"></i> Generar mi constancia
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- MODAL: DONACIÓN / APOYO AL PROYECTO        -->
-    <!-- ========================================== -->
-    <div id="donate-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/90 backdrop-blur-md items-center justify-center p-4 no-print">
-        <div class="bg-[#151f32] border border-slate-700/60 rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-[fadeIn_0.2s_ease]">
-            <button onclick="closeDonateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
-                <i class="ph-bold ph-x text-xl"></i>
-            </button>
-            <div class="text-center">
-                <div class="inline-flex p-3 bg-emerald-500/15 rounded-2xl mb-4">
-                    <i class="ph-fill ph-hand-heart text-3xl text-emerald-400"></i>
-                </div>
-                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Apoya este proyecto</h3>
-                <p class="text-slate-400 text-sm leading-relaxed mb-3">
-                    Este curso normalmente tiene un valor de <strong class="text-white">$50.000 COP</strong>.
-                </p>
-                <p class="text-slate-400 text-sm leading-relaxed mb-5">
-                    Si sientes que recibiste un valor mayor, o simplemente quieres ayudar a que este contenido siga llegando a más docentes y estudiantes, puedes aportar de forma <strong class="text-emerald-300">totalmente voluntaria</strong>. Cada granito de arena cuenta. 🙏
-                </p>
-                <button onclick="goToWhatsApp()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white rounded-xl font-bold transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-                    <i class="ph-fill ph-whatsapp-logo text-xl"></i> Donar por WhatsApp
-                </button>
-                <button onclick="closeDonateModal()" class="mt-3 text-slate-500 hover:text-slate-300 text-sm transition-colors">
-                    Quizás más tarde
-                </button>
-            </div>
-        </div>
-    </div>
-
-
     <script>
-        const lessons = [
-            { id: '7-B-JRC58pQ', title: '1. Configuración de Entorno', desc: 'Aprende a preparar tus herramientas antes de escribir la primera línea de código. Todo desde cero.', completed: false },
-            { id: 'afK9LermqzM', title: '2. Arquitectura de Software', desc: 'Diseño de sistemas escalables. Cómo estructurar la base de datos y los servicios.', completed: false },
-            { id: 'S6409_LjzcU', title: '3. Despliegue Zero-Cost', desc: 'Lleva tu aplicación a la web de forma gratuita.', completed: false }
+        const modules = [
+            {
+                title: "Módulo 1: Fundamentos y Configuración",
+                lessons: [
+                    { id: '7-B-JRC58pQ', title: 'Configuración de Entorno' },
+                    { id: 'afK9LermqzM', title: 'Arquitectura de Software' },
+                    { id: 'S6409_LjzcU', title: 'Introducción al Despliegue' }
+                ]
+            },
+            {
+                title: "Módulo 2: Desarrollo Avanzado",
+                lessons: [
+                    { id: 'g_gbWsoK7IQ', title: 'Buenas Prácticas de Código' },
+                    { id: '7GWP6n81my8', title: 'Patrones de Diseño' },
+                    { id: 'qukfzI-jyTo', title: 'Seguridad en Aplicaciones' },
+                    { id: 'kgrRb8ZQPNM', title: 'Optimización de Rendimiento' }
+                ]
+            },
+            {
+                title: "Módulo 3: Despliegue y Cloud",
+                lessons: [
+                    { id: 'U4uxUGfftkg', title: 'Estrategias de Cloud' },
+                    { id: 'zFU-ODLcJ4I', title: 'CI/CD Pipelines' },
+                    { id: '-vmfMEB9nNA', title: 'Escalabilidad en la Nube' },
+                    { id: 'Nvf30k-Kpik', title: 'Monitoreo de Servicios' },
+                    { id: 'Cbt6oFkI1Uo', title: 'Zero-Cost Deployments' },
+                    { id: 'An9keaX12a0', title: 'Mantenimiento y Logs' }
+                ]
+            }
         ];
 
-        let currentIndex = 0;
         let player;
-        let progressInterval;
-        let isFirstLoad = true;
-        let savedStudentName = ""; 
-        let controlsTimeout;
-
-        // INYECCIÓN API YOUTUBE
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        document.head.appendChild(tag);
 
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('yt-player', {
-                videoId: lessons[currentIndex].id,
-                playerVars: {
-                    'controls': 0, 'disablekb': 1, 'fs': 0, 
-                    'modestbranding': 1, 'rel': 0, 'showinfo': 0, 'iv_load_policy': 3,
-                    'playsinline': 1 
-                },
-                events: { 'onReady': onPlayerReady, 'onStateChange': onPlayerStateChange }
-            });
+            player = new YT.Player('yt-player', { videoId: modules[0].lessons[0].id });
             renderPlaylist();
-            updateLessonInfo();
         }
 
-        function onPlayerReady(event) {
-            document.getElementById('preloader').classList.add('opacity-0', 'pointer-events-none');
-            setupThumbnail(); 
-            
-            document.getElementById('volume-bar').addEventListener('input', function() {
-                player.setVolume(this.value); updateVolumeIcon(this.value);
-            });
-            document.getElementById('seek-bar').addEventListener('input', function() {
-                const newTime = player.getDuration() * (this.value / 100); player.seekTo(newTime, true);
-            });
-        }
-
-        function setupThumbnail() {
-            const poster = document.getElementById('poster-layer');
-            poster.style.backgroundImage = `url('https://img.youtube.com/vi/${lessons[currentIndex].id}/maxresdefault.jpg')`;
-            poster.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function startVideo() {
-            player.playVideo();
-            wakeUpControls();
-        }
-
-        function onPlayerStateChange(event) {
-            const btnPlay = document.getElementById('btn-play');
-            const poster = document.getElementById('poster-layer');
-            const pauseMask = document.getElementById('pause-mask');
-            const endScreen = document.getElementById('end-screen');
-            
-            if (event.data == YT.PlayerState.UNSTARTED && !isFirstLoad) {
-                poster.classList.remove('opacity-0', 'pointer-events-none');
-            }
-            
-            if (event.data == YT.PlayerState.PLAYING) {
-                isFirstLoad = false;
-                btnPlay.innerHTML = '<i class="ph-fill ph-pause text-3xl md:text-4xl"></i>';
-                startProgressTimer();
-                poster.classList.add('opacity-0', 'pointer-events-none');
-                pauseMask.classList.remove('opacity-100'); pauseMask.classList.add('opacity-0');
-                endScreen.classList.add('hidden'); endScreen.classList.remove('flex');
-            } 
-            else if (event.data == YT.PlayerState.PAUSED) {
-                btnPlay.innerHTML = '<i class="ph-fill ph-play text-3xl md:text-4xl"></i>';
-                clearInterval(progressInterval);
-                pauseMask.classList.remove('opacity-0'); pauseMask.classList.add('opacity-100');
-            }
-            else if (event.data == YT.PlayerState.ENDED) {
-                btnPlay.innerHTML = '<i class="ph-fill ph-play text-3xl md:text-4xl"></i>';
-                clearInterval(progressInterval);
-                markAsCompleted(currentIndex);
-                
-                // Forzar validación matemática robusta
-                const totalCompleted = lessons.filter(l => l.completed).length;
-                const isAllCompleted = totalCompleted === lessons.length;
-                const isLastLesson = currentIndex === lessons.length - 1;
-
-                const title = document.getElementById('end-title');
-                const desc = document.getElementById('end-desc');
-                const btnNext = document.getElementById('btn-next');
-                const btnNextText = document.getElementById('btn-next-text');
-                const btnNextIcon = document.getElementById('btn-next-icon');
-                const btnCert = document.getElementById('btn-cert');
-                const btnDonateEnd = document.getElementById('btn-donate-end');
-                const icon = document.getElementById('end-icon');
-
-                if (isAllCompleted) {
-                    title.textContent = "¡Curso Completado!";
-                    title.classList.add('text-amber-400');
-                    desc.textContent = "Felicidades, has demostrado excelencia técnica. Es momento de reclamar tu constancia.";
-                    icon.classList.remove('ph-medal');
-                    icon.classList.add('ph-trophy');
-                    
-                    // Bloqueo visual estricto para evitar conflictos de CSS
-                    btnNext.style.display = 'none';
-                    btnCert.style.display = 'flex';
-                    btnDonateEnd.style.display = 'flex';
-                } else {
-                    title.textContent = "Lección Superada";
-                    title.classList.remove('text-amber-400');
-                    desc.textContent = "Excelente trabajo. Continuemos construyendo.";
-                    icon.classList.remove('ph-trophy');
-                    icon.classList.add('ph-medal');
-                    
-                    btnCert.style.display = 'none';
-                    btnDonateEnd.style.display = 'none';
-                    btnNext.style.display = 'flex';
-
-                    // Si terminó el último video, pero se había saltado videos anteriores:
-                    if (isLastLesson) {
-                        btnNextText.textContent = 'Lecciones Pendientes';
-                        btnNextIcon.className = 'ph-bold ph-arrow-counter-clockwise';
-                        btnNext.onclick = function() {
-                            const firstPending = lessons.findIndex(l => !l.completed);
-                            if(firstPending !== -1) loadLesson(firstPending);
-                        };
-                    } else {
-                        btnNextText.textContent = 'Siguiente Clase';
-                        btnNextIcon.className = 'ph-bold ph-arrow-right';
-                        btnNext.onclick = function() { playNext(); };
-                    }
-                }
-                endScreen.classList.remove('hidden'); endScreen.classList.add('flex');
-            }
-        }
-
-        // LÓGICA DE EVENTOS TÁCTILES Y HOVER
-        function wakeUpControls() {
-            const controls = document.getElementById('custom-controls');
-            controls.style.opacity = '1'; 
-            document.body.style.cursor = 'default';
-            clearTimeout(controlsTimeout);
-            controlsTimeout = setTimeout(() => {
-                if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
-                    controls.style.opacity = '0'; 
-                    document.body.style.cursor = 'none';
-                }
-            }, 3000);
-        }
-
-        const videoWrapper = document.getElementById('video-wrapper');
-        videoWrapper.addEventListener('mousemove', wakeUpControls);
-        videoWrapper.addEventListener('touchstart', wakeUpControls, {passive: true});
-
-        function togglePlay() { 
-            if(player) player.getPlayerState() == YT.PlayerState.PLAYING ? player.pauseVideo() : player.playVideo(); 
-            wakeUpControls();
-        }
-        
-        function toggleMute() { 
-            if(player.isMuted()) { player.unMute(); updateVolumeIcon(player.getVolume()); } 
-            else { player.mute(); document.getElementById('btn-mute').innerHTML = '<i class="ph-fill ph-speaker-x text-xl md:text-2xl text-red-400"></i>'; }
-        }
-        
-        function updateVolumeIcon(vol) {
-            const btn = document.getElementById('btn-mute');
-            if (vol == 0) btn.innerHTML = '<i class="ph-fill ph-speaker-none text-xl md:text-2xl"></i>';
-            else if (vol < 50) btn.innerHTML = '<i class="ph-fill ph-speaker-low text-xl md:text-2xl"></i>';
-            else btn.innerHTML = '<i class="ph-fill ph-speaker-high text-xl md:text-2xl"></i>';
-        }
-        
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) document.getElementById('video-wrapper').requestFullscreen().catch(e => {});
-            else document.exitFullscreen();
-        }
-        
-        function startProgressTimer() {
-            clearInterval(progressInterval);
-            progressInterval = setInterval(() => {
-                if (player && player.getDuration() > 0) {
-                    document.getElementById('seek-bar').value = (player.getCurrentTime() / player.getDuration()) * 100;
-                    document.getElementById('time-current').textContent = formatTime(player.getCurrentTime());
-                    document.getElementById('time-total').textContent = formatTime(player.getDuration());
-                }
-            }, 500);
-        }
-        function formatTime(t) { const m = Math.floor(t/60), s = Math.floor(t%60); return `${m}:${s<10?'0':''}${s}`; }
-
-        function loadLesson(index) {
-            if (index < 0 || index >= lessons.length) return;
-            currentIndex = index; isFirstLoad = true;
-            setupThumbnail();
-            document.getElementById('end-screen').classList.add('hidden'); document.getElementById('end-screen').classList.remove('flex');
-            player.loadVideoById(lessons[currentIndex].id);
-            setTimeout(() => { player.pauseVideo(); }, 200); 
-            updateLessonInfo(); renderPlaylist();
-        }
-        function playNext() { if (currentIndex < lessons.length - 1) loadLesson(currentIndex + 1); }
-        function markAsCompleted(index) {
-            lessons[index].completed = true;
-            renderPlaylist(); updateGlobalProgress();
-        }
-        function updateLessonInfo() {
-            document.getElementById('lesson-badge').textContent = `Módulo ${currentIndex + 1}`;
-            document.getElementById('lesson-title').textContent = lessons[currentIndex].title.split('. ')[1] || lessons[currentIndex].title;
-            document.getElementById('lesson-desc').textContent = lessons[currentIndex].desc;
-        }
-        function updateGlobalProgress() {
-            const completed = lessons.filter(l => l.completed).length;
-            const percentage = Math.round((completed / lessons.length) * 100);
-            document.getElementById('progress-text').textContent = `${percentage}%`;
-            document.getElementById('progress-bar').style.width = `${percentage}%`;
-        }
         function renderPlaylist() {
             const container = document.getElementById('playlist');
-            container.innerHTML = '';
-            lessons.forEach((lesson, index) => {
-                const isActive = index === currentIndex;
-                const isCompleted = lesson.completed;
-                const btn = document.createElement('button');
-                btn.onclick = () => loadLesson(index);
-                btn.className = `w-full text-left p-3.5 rounded-xl flex items-start gap-3 md:gap-4 transition-all duration-300 group ${isActive ? 'bg-blue-500/15 border border-blue-500/40 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : 'hover:bg-slate-800/80 border border-transparent'}`;
-                let icon = isActive ? `<div class="p-2 bg-blue-500 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]"><i class="ph-bold ph-play text-white text-xs md:text-sm"></i></div>` : (isCompleted ? `<div class="p-2 bg-emerald-500/20 rounded-full"><i class="ph-bold ph-check text-emerald-400 text-xs md:text-sm"></i></div>` : `<div class="p-2 bg-slate-800 rounded-full group-hover:bg-slate-700"><i class="ph-bold ph-lock-key-open text-slate-400 text-xs md:text-sm"></i></div>`);
-                btn.innerHTML = `<div class="mt-0.5">${icon}</div><div class="flex-1"><h4 class="text-xs md:text-sm font-bold ${isActive ? 'text-white' : 'text-slate-300'} leading-tight">${lesson.title.split('. ')[1] || lesson.title}</h4></div>`;
-                container.appendChild(btn);
+            modules.forEach(mod => {
+                const section = document.createElement('div');
+                section.innerHTML = `<h3 class="text-blue-400 font-bold mb-3 uppercase text-xs tracking-widest">${mod.title}</h3>`;
+                mod.lessons.forEach(l => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-3 hover:bg-slate-800 rounded-lg text-sm text-slate-300 transition";
+                    btn.textContent = l.title;
+                    btn.onclick = () => {
+                        player.loadVideoById(l.id);
+                        document.getElementById('lesson-title').textContent = l.title;
+                        document.getElementById('poster-layer').classList.add('hidden');
+                    };
+                    section.appendChild(btn);
+                });
+                container.appendChild(section);
             });
         }
 
-        // ---- FLUJO DE CONSTANCIA (sin prompt/alert: usa modal) ----
-        function openCertificate() {
-            if (!savedStudentName) {
-                openNameModal();
-                return;
-            }
-            renderCertificate();
-        }
-
-        function openNameModal() {
-            const input = document.getElementById('name-input');
-            input.value = savedStudentName || '';
-            document.getElementById('name-error').textContent = '';
-            const modal = document.getElementById('name-modal');
-            modal.classList.remove('hidden'); modal.classList.add('flex');
-            setTimeout(() => input.focus(), 120);
-        }
-
-        function closeNameModal() {
-            const modal = document.getElementById('name-modal');
-            modal.classList.add('hidden'); modal.classList.remove('flex');
-        }
-
-        function confirmName() {
-            const input = document.getElementById('name-input');
-            const val = input.value.trim();
-            if (val === '') {
-                document.getElementById('name-error').textContent = 'Por favor escribe tu nombre para continuar.';
-                input.focus();
-                return;
-            }
-            savedStudentName = val;
-            closeNameModal();
-            renderCertificate();
-        }
-
-        function renderCertificate() {
-            document.getElementById('cert-student-name').innerText = savedStudentName;
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('cert-date').innerText = new Date().toLocaleDateString('es-CO', options);
-
-            const modal = document.getElementById('certificate-modal');
-            modal.classList.remove('hidden'); modal.classList.add('flex');
-        }
-
-        function closeCertificate() {
-            const modal = document.getElementById('certificate-modal');
-            modal.classList.add('hidden'); modal.classList.remove('flex');
-        }
-
-        function printCertificate() {
-            window.print();
-        }
-
-        // ---- DONACIÓN / APOYO AL PROYECTO ----
-        function openDonateModal() {
-            const modal = document.getElementById('donate-modal');
-            modal.classList.remove('hidden'); modal.classList.add('flex');
-        }
-
-        function closeDonateModal() {
-            const modal = document.getElementById('donate-modal');
-            modal.classList.add('hidden'); modal.classList.remove('flex');
-        }
-
-        // Número de contacto protegido (ofuscado, no editar manualmente)
-        function _wa() {
-            const k = 13;
-            const enc = [66,68,64,61,61,69,65,67,61,64,63,68];
-            return enc.map(c => String.fromCharCode(c - k)).join('');
-        }
-
-        function goToWhatsApp() {
-            const phone = _wa();
-            const msg = encodeURIComponent(
-                "¡Hola Rubén! 👋 Acabo de completar tu curso \"Arquitectura de Software y Despliegue Zero-Cost\" y me gustaría apoyar el proyecto con una donación voluntaria. ¿Me indicas cómo puedo hacerlo? 🙏"
-            );
-            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank', 'noopener');
-            closeDonateModal();
-        }
-
-        // Enter dentro del campo de nombre confirma la constancia
-        document.getElementById('name-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') { e.preventDefault(); confirmName(); }
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                e.preventDefault(); togglePlay();
-            }
-            if (e.code === 'Escape') {
-                closeCertificate();
-                closeNameModal();
-                closeDonateModal();
-            }
-        });
+        function startVideo() { player.playVideo(); document.getElementById('poster-layer').classList.add('hidden'); }
     </script>
 </body>
 </html>
