@@ -23,7 +23,8 @@
             height: 100dvh; 
             overflow: hidden;
         }
-        ::-webkit-scrollbar { width: 4px; md:width: 6px; }
+        ::-webkit-scrollbar { width: 4px; }
+        @media (min-width: 768px) { ::-webkit-scrollbar { width: 6px; } }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         
@@ -56,6 +57,8 @@
         /* ----- ESTILOS DEL CERTIFICADO (EMBEBIDO) ----- */
         .cert-font-title { font-family: 'Cinzel', serif; }
         .cert-font-signature { font-family: 'Pinyon Script', cursive; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         
         .cert-container {
             width: 297mm;
@@ -83,20 +86,33 @@
         /* ----- MAGIA DE IMPRESIÓN (AISLAMIENTO) ----- */
         @media print {
             @page { size: A4 landscape; margin: 0; }
-            body { background-color: white !important; margin: 0; padding: 0; height: auto !important; }
-            #academy-app { display: none !important; }
-            
+            html, body { background-color: white !important; margin: 0 !important; padding: 0 !important; height: auto !important; overflow: visible !important; }
+            #academy-app, #name-modal, #donate-modal { display: none !important; }
+
             #certificate-modal {
                 position: static !important; background-color: white !important;
-                display: flex !important; padding: 0 !important;
-                height: auto !important; overflow: visible !important;
+                display: block !important; padding: 0 !important; margin: 0 !important;
+                height: auto !important; width: auto !important; overflow: visible !important;
+                inset: auto !important; backdrop-filter: none !important;
+            }
+            /* El contenedor que escala el certificado en pantalla debe quedar a tamaño real al imprimir */
+            #cert-scaler {
+                transform: none !important;
+                margin: 0 !important;
+                max-width: none !important;
+                width: 297mm !important;
+                display: block !important;
             }
             .cert-container {
                 box-shadow: none !important; transform: scale(1) !important;
                 width: 297mm !important; height: 210mm !important; margin: 0 !important;
+                page-break-inside: avoid; break-inside: avoid;
+                -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
             }
             .no-print { display: none !important; }
         }
+        /* Garantiza que los colores e imágenes del certificado se conserven en el PDF */
+        .cert-container { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     </style>
 </head>
 <body class="text-slate-200">
@@ -169,6 +185,11 @@
                     <button id="btn-cert" onclick="openCertificate()" style="display: none;" class="px-6 py-3 md:px-10 md:py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_40px_rgba(245,158,11,0.4)] items-center gap-2 md:gap-3 text-sm md:text-lg mt-2 md:mt-4 border border-amber-300/30">
                         <i class="ph-bold ph-certificate text-xl md:text-2xl"></i> Generar Constancia Legal
                     </button>
+
+                    <!-- BOTÓN DE DONACIÓN (Pantalla final) -->
+                    <button id="btn-donate-end" onclick="openDonateModal()" style="display: none;" class="px-5 py-2.5 md:px-8 md:py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 hover:text-emerald-200 rounded-xl font-bold transition-all hover:scale-105 items-center gap-2 text-xs md:text-base mt-3 md:mt-4 border border-emerald-500/30">
+                        <i class="ph-fill ph-hand-heart text-lg md:text-xl"></i> Apoyar el proyecto
+                    </button>
                 </div>
 
                 <!-- CONTROLES PERSONALIZADOS (Diseño Táctil Integrado) -->
@@ -233,6 +254,13 @@
             </div>
             <!-- Contenedor con Scroll para la lista -->
             <div id="playlist" class="flex-1 overflow-y-auto p-3 md:p-4 flex flex-col gap-2 bg-[#0d1424] md:bg-transparent"></div>
+
+            <!-- FOOTER: BOTÓN DE APOYO / DONACIÓN -->
+            <div class="p-3 md:p-4 border-t border-slate-800/50 shrink-0 bg-[#151f32]">
+                <button onclick="openDonateModal()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500/15 to-emerald-600/10 hover:from-emerald-500/25 hover:to-emerald-600/20 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 font-bold text-xs md:text-sm transition-all hover:scale-[1.02]">
+                    <i class="ph-fill ph-hand-heart text-base md:text-lg"></i> Donar / Apoyar el proyecto
+                </button>
+            </div>
         </aside>
     </div>
 
@@ -251,7 +279,7 @@
         </div>
 
         <!-- Escala dinámica progresiva: Muy pequeño en móviles portrait, más grande en tablets, tamaño real en PC -->
-        <div class="w-full max-w-[297mm] mx-auto flex items-center justify-center transform scale-[0.3] min-[375px]:scale-[0.35] min-[425px]:scale-[0.4] sm:scale-[0.55] md:scale-90 lg:scale-100 origin-top mt-20 md:mt-0 transition-transform">
+        <div id="cert-scaler" class="w-full max-w-[297mm] mx-auto flex items-center justify-center transform scale-[0.3] min-[375px]:scale-[0.35] min-[425px]:scale-[0.4] sm:scale-[0.55] md:scale-90 lg:scale-100 origin-top mt-20 md:mt-0 transition-transform">
             <div class="cert-container text-[#0f172a]">
                 <div class="cert-bg-pattern"></div>
                 <div class="cert-border-layer"></div>
@@ -312,6 +340,63 @@
                         </p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MODAL: ENTRADA DE NOMBRE (reemplaza prompt) -->
+    <!-- ========================================== -->
+    <div id="name-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/90 backdrop-blur-md items-center justify-center p-4 no-print">
+        <div class="bg-[#151f32] border border-slate-700/60 rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-[fadeIn_0.2s_ease]">
+            <button onclick="closeNameModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+            <div class="text-center">
+                <div class="inline-flex p-3 bg-amber-500/15 rounded-2xl mb-4">
+                    <i class="ph-fill ph-certificate text-3xl text-amber-400"></i>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">¡Felicidades por culminar!</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                    Escribe tu <strong class="text-white">nombre completo</strong> exactamente como deseas que aparezca en tu constancia legal.
+                </p>
+                <input id="name-input" type="text" maxlength="60" autocomplete="name"
+                    placeholder="Ej. Juan David Pérez"
+                    class="w-full bg-[#0d1424] border border-slate-700 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-xl px-4 py-3 text-white text-center text-lg outline-none transition-colors mb-2"/>
+                <p id="name-error" class="text-red-400 text-xs mb-3 h-4"></p>
+                <button onclick="confirmName()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white rounded-xl font-bold transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+                    <i class="ph-bold ph-check-circle text-xl"></i> Generar mi constancia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL: DONACIÓN / APOYO AL PROYECTO        -->
+    <!-- ========================================== -->
+    <div id="donate-modal" class="hidden fixed inset-0 z-[120] bg-slate-900/90 backdrop-blur-md items-center justify-center p-4 no-print">
+        <div class="bg-[#151f32] border border-slate-700/60 rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 relative animate-[fadeIn_0.2s_ease]">
+            <button onclick="closeDonateModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+            <div class="text-center">
+                <div class="inline-flex p-3 bg-emerald-500/15 rounded-2xl mb-4">
+                    <i class="ph-fill ph-hand-heart text-3xl text-emerald-400"></i>
+                </div>
+                <h3 class="text-xl md:text-2xl font-bold text-white mb-2">Apoya este proyecto</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-3">
+                    Este curso normalmente tiene un valor de <strong class="text-white">$50.000 COP</strong>.
+                </p>
+                <p class="text-slate-400 text-sm leading-relaxed mb-5">
+                    Si sientes que recibiste un valor mayor, o simplemente quieres ayudar a que este contenido siga llegando a más docentes y estudiantes, puedes aportar de forma <strong class="text-emerald-300">totalmente voluntaria</strong>. Cada granito de arena cuenta. 🙏
+                </p>
+                <button onclick="goToWhatsApp()" class="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white rounded-xl font-bold transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                    <i class="ph-fill ph-whatsapp-logo text-xl"></i> Donar por WhatsApp
+                </button>
+                <button onclick="closeDonateModal()" class="mt-3 text-slate-500 hover:text-slate-300 text-sm transition-colors">
+                    Quizás más tarde
+                </button>
             </div>
         </div>
     </div>
@@ -413,6 +498,7 @@
                 const btnNextText = document.getElementById('btn-next-text');
                 const btnNextIcon = document.getElementById('btn-next-icon');
                 const btnCert = document.getElementById('btn-cert');
+                const btnDonateEnd = document.getElementById('btn-donate-end');
                 const icon = document.getElementById('end-icon');
 
                 if (isAllCompleted) {
@@ -425,6 +511,7 @@
                     // Bloqueo visual estricto para evitar conflictos de CSS
                     btnNext.style.display = 'none';
                     btnCert.style.display = 'flex';
+                    btnDonateEnd.style.display = 'flex';
                 } else {
                     title.textContent = "Lección Superada";
                     title.classList.remove('text-amber-400');
@@ -433,6 +520,7 @@
                     icon.classList.add('ph-medal');
                     
                     btnCert.style.display = 'none';
+                    btnDonateEnd.style.display = 'none';
                     btnNext.style.display = 'flex';
 
                     // Si terminó el último video, pero se había saltado videos anteriores:
@@ -545,16 +633,43 @@
             });
         }
 
+        // ---- FLUJO DE CONSTANCIA (sin prompt/alert: usa modal) ----
         function openCertificate() {
             if (!savedStudentName) {
-                let inputName = prompt("¡Felicidades por culminar tu formación!\n\nIngresa tu Nombre Completo EXACTAMENTE como deseas que aparezca en tu constancia legal:", "Ej. Juan David Pérez");
-                if (inputName && inputName.trim() !== '') {
-                    savedStudentName = inputName;
-                } else {
-                    savedStudentName = "Estudiante Destacado";
-                }
+                openNameModal();
+                return;
             }
+            renderCertificate();
+        }
 
+        function openNameModal() {
+            const input = document.getElementById('name-input');
+            input.value = savedStudentName || '';
+            document.getElementById('name-error').textContent = '';
+            const modal = document.getElementById('name-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => input.focus(), 120);
+        }
+
+        function closeNameModal() {
+            const modal = document.getElementById('name-modal');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+        }
+
+        function confirmName() {
+            const input = document.getElementById('name-input');
+            const val = input.value.trim();
+            if (val === '') {
+                document.getElementById('name-error').textContent = 'Por favor escribe tu nombre para continuar.';
+                input.focus();
+                return;
+            }
+            savedStudentName = val;
+            closeNameModal();
+            renderCertificate();
+        }
+
+        function renderCertificate() {
             document.getElementById('cert-student-name').innerText = savedStudentName;
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('cert-date').innerText = new Date().toLocaleDateString('es-CO', options);
@@ -572,11 +687,47 @@
             window.print();
         }
 
+        // ---- DONACIÓN / APOYO AL PROYECTO ----
+        function openDonateModal() {
+            const modal = document.getElementById('donate-modal');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function closeDonateModal() {
+            const modal = document.getElementById('donate-modal');
+            modal.classList.add('hidden'); modal.classList.remove('flex');
+        }
+
+        // Número de contacto protegido (ofuscado, no editar manualmente)
+        function _wa() {
+            const k = 13;
+            const enc = [66,68,64,61,61,69,65,67,61,64,63,68];
+            return enc.map(c => String.fromCharCode(c - k)).join('');
+        }
+
+        function goToWhatsApp() {
+            const phone = _wa();
+            const msg = encodeURIComponent(
+                "¡Hola Rubén! 👋 Acabo de completar tu curso \"Arquitectura de Software y Despliegue Zero-Cost\" y me gustaría apoyar el proyecto con una donación voluntaria. ¿Me indicas cómo puedo hacerlo? 🙏"
+            );
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank', 'noopener');
+            closeDonateModal();
+        }
+
+        // Enter dentro del campo de nombre confirma la constancia
+        document.getElementById('name-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); confirmName(); }
+        });
+
         document.addEventListener('keydown', function(e) {
             if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
                 e.preventDefault(); togglePlay();
             }
-            if (e.code === 'Escape') closeCertificate();
+            if (e.code === 'Escape') {
+                closeCertificate();
+                closeNameModal();
+                closeDonateModal();
+            }
         });
     </script>
 </body>
