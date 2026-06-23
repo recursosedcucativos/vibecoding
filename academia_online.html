@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Academia Pro | Curso Exclusivo</title>
+    <!-- Tailwind CSS (Framework de diseño potente) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons (Iconografía elegante) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#3b82f6', // Azul profesional
+                        dark: '#0f172a',  // Fondo principal oscuro
+                        panel: '#1e293b'  // Paneles secundarios
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ocultar barra de desplazamiento para un look más limpio */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Rango personalizado para la línea de tiempo del video */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -4px;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #475569;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-dark text-slate-200 h-screen flex flex-col md:flex-row overflow-hidden font-sans">
+
+    <!-- BARRA LATERAL (TEMARIO) -->
+    <aside class="w-full md:w-80 bg-panel border-r border-slate-800 flex flex-col h-1/3 md:h-full shrink-0 z-40 relative">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="ph-fill ph-graduation-cap text-brand text-2xl"></i>
+                Academia Pro
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">Curso de Especialización</p>
+            
+            <!-- Barra de progreso global -->
+            <div class="mt-4">
+                <div class="flex justify-between text-xs mb-1">
+                    <span>Progreso</span>
+                    <span id="progress-text">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-1.5">
+                    <div id="progress-bar" class="bg-brand h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de videos -->
+        <div id="playlist" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+            <!-- Los items se inyectan con JS -->
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE APRENDIZAJE -->
+    <main class="flex-1 flex flex-col h-2/3 md:h-full relative bg-dark">
+        <!-- Contenedor del Video (El Ecosistema Cerrado) -->
+        <div class="w-full bg-black relative flex items-center justify-center flex-1" id="video-wrapper">
+            
+            <!-- PRE-LOADER: Oculta la carga de YouTube -->
+            <div id="preloader" class="absolute inset-0 z-50 bg-dark flex flex-col items-center justify-center transition-opacity duration-300">
+                <i class="ph ph-spinner-gap animate-spin text-4xl text-brand mb-4"></i>
+                <p class="text-slate-400 text-sm">Cargando entorno seguro...</p>
+            </div>
+
+            <!-- CONTENEDOR IFRAME: pointer-events-none es la magia que bloquea clics al reproductor nativo -->
+            <div class="w-full max-w-5xl aspect-video relative pointer-events-none shadow-2xl">
+                <div id="yt-player" class="absolute inset-0 w-full h-full"></div>
+            </div>
+
+            <!-- GLASS WALL: Capa transparente para capturar clics (Pausar/Play) sin tocar YouTube -->
+            <div id="glass-wall" class="absolute inset-0 z-10 cursor-pointer" onclick="togglePlay()"></div>
+
+            <!-- PANTALLA FINAL: Intercepción de estado -->
+            <div id="end-screen" class="absolute inset-0 z-40 bg-slate-900/90 backdrop-blur-md hidden flex-col items-center justify-center">
+                <i class="ph-fill ph-check-circle text-6xl text-emerald-500 mb-4 shadow-lg rounded-full"></i>
+                <h3 class="text-3xl font-bold text-white mb-2">¡Lección Completada!</h3>
+                <p class="text-slate-300 mb-8">Has finalizado esta lección con éxito.</p>
+                <button onclick="playNext()" class="px-8 py-3 bg-brand hover:bg-blue-600 text-white rounded-lg font-semibold transition-transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-brand/30">
+                    Siguiente Lección <i class="ph-bold ph-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- CONTROLES PERSONALIZADOS -->
+            <div class="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black via-black/80 to-transparent p-4 md:p-6 opacity-0 hover:opacity-100 transition-opacity duration-300 group" id="custom-controls">
+                
+                <!-- Línea de tiempo -->
+                <div class="flex items-center gap-4 mb-2">
+                    <span id="time-current" class="text-xs font-mono text-slate-300 w-10 text-right">0:00</span>
+                    <input type="range" id="seek-bar" value="0" step="0.1" class="flex-1">
+                    <span id="time-total" class="text-xs font-mono text-slate-300 w-10">0:00</span>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <button onclick="togglePlay()" class="text-white hover:text-brand transition-colors outline-none" id="btn-play">
+                            <i class="ph-fill ph-play text-3xl"></i>
+                        </button>
+                        <div class="flex items-center gap-2 group/vol">
+                            <button onclick="toggleMute()" class="text-white hover:text-brand transition-colors outline-none" id="btn-mute">
+                                <i class="ph-fill ph-speaker-high text-xl"></i>
+                            </button>
+                            <input type="range" id="volume-bar" value="100" class="w-0 overflow-hidden group-hover/vol:w-20 transition-all duration-300 opacity-0 group-hover/vol:opacity-100">
+                        </div>
+                    </div>
+                    
+                    <button onclick="toggleFullscreen()" class="text-white hover:text-brand transition-colors outline-none">
+                        <i class="ph-bold ph-corners-out text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de la lección -->
+        <div class="p-6 md:p-8 bg-dark shrink-0 border-t border-slate-800">
+            <h2 id="lesson-title" class="text-2xl md:text-3xl font-bold text-white mb-2">Cargando...</h2>
+            <p id="lesson-desc" class="text-slate-400 text-sm md:text-base max-w-3xl leading-relaxed">Preparando la información de la lección.</p>
+        </div>
+    </main>
+
+    <!-- SCRIPT DE LÓGICA Y API DE YOUTUBE -->
+    <script>
+        // 1. ESTRUCTURA DE DATOS (Tus videos de prueba)
+        const lessons = [
+            { id: '7-B-JRC58pQ', title: '1. Introducción al Curso', desc: 'Comenzamos nuestro viaje. Prepara tu entorno y entiende los fundamentos de lo que vamos a construir juntos.', completed: false },
+            { id: 'afK9LermqzM', title: '2. Desarrollo y Arquitectura', desc: 'Profundizamos en la arquitectura del sistema. Veremos cómo estructurar el proyecto para escalar sin problemas.', completed: false },
+            { id: 'S6409_LjzcU', title: '3. Despliegue y Conclusión', desc: 'El paso final. Llevamos nuestro trabajo a producción y repasamos las mejores prácticas para mantenerlo seguro.', completed: false }
+        ];
+
+        let currentIndex = 0;
+        let player;
+        let progressInterval;
+
+        // 2. INYECTAR API DE YOUTUBE
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. INICIALIZAR EL REPRODUCTOR
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('yt-player', {
+                videoId: lessons[currentIndex].id,
+                playerVars: {
+                    'controls': 0,        // Oculta controles nativos
+                    'disablekb': 1,       // Deshabilita teclado (para que no usen atajos de YT)
+                    'fs': 0,              // Deshabilita botón fullscreen nativo
+                    'modestbranding': 1,  // Quita logo de YT
+                    'rel': 0,             // Evita recomendados externos al final
+                    'showinfo': 0,        // Oculta título del video nativo
+                    'iv_load_policy': 3   // Oculta anotaciones
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+            renderPlaylist();
+            updateLessonInfo();
+        }
+
+        // 4. LÓGICA DE CONTROL DEL REPRODUCTOR
+        function onPlayerReady(event) {
+            document.getElementById('preloader').classList.add('opacity-0', 'pointer-events-none');
+            // Hacer que los controles sean visibles inicialmente
+            document.getElementById('custom-controls').classList.remove('opacity-0');
+            
+            // Configurar barra de volumen
+            document.getElementById('volume-bar').addEventListener('input', function() {
+                player.setVolume(this.value);
+                updateVolumeIcon(this.value);
+            });
+
+            // Configurar línea de tiempo
+            const seekBar = document.getElementById('seek-bar');
+            seekBar.addEventListener('input', function() {
+                const newTime = player.getDuration() * (this.value / 100);
+                player.seekTo(newTime, true);
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            const btnPlay = document.getElementById('btn-play');
+            
+            if (event.data == YT.PlayerState.PLAYING) {
+                btnPlay.innerHTML = '<i class="ph-fill ph-pause text-3xl"></i>';
+                startProgressTimer();
+                // Ocultar preloader si seguía ahí
+                document.getElementById('preloader').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('end-screen').classList.add('hidden');
+                document.getElementById('end-screen').classList.remove('flex');
+            } 
+            else if (event.data == YT.PlayerState.PAUSED) {
+                btnPlay.innerHTML = '<i class="ph-fill ph-play text-3xl"></i>';
+                clearInterval(progressInterval);
+            }
+            else if (event.data == YT.PlayerState.ENDED) {
+                // INTERCEPCIÓN DE ESTADO: Muro de finalización instantáneo
+                btnPlay.innerHTML = '<i class="ph-fill ph-play text-3xl"></i>';
+                clearInterval(progressInterval);
+                markAsCompleted(currentIndex);
+                showEndScreen();
+            }
+        }
+
+        // 5. FUNCIONES DE INTERFAZ Y CONTROLES
+        function togglePlay() {
+            if (player.getPlayerState() == YT.PlayerState.PLAYING) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function toggleMute() {
+            if (player.isMuted()) {
+                player.unMute();
+                updateVolumeIcon(player.getVolume());
+            } else {
+                player.mute();
+                document.getElementById('btn-mute').innerHTML = '<i class="ph-fill ph-speaker-x text-xl text-red-400"></i>';
+            }
+        }
+
+        function updateVolumeIcon(vol) {
+            const btn = document.getElementById('btn-mute');
+            if (vol == 0) btn.innerHTML = '<i class="ph-fill ph-speaker-none text-xl"></i>';
+            else if (vol < 50) btn.innerHTML = '<i class="ph-fill ph-speaker-low text-xl"></i>';
+            else btn.innerHTML = '<i class="ph-fill ph-speaker-high text-xl"></i>';
+        }
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('video-wrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(err => {
+                    console.log(`Error al intentar modo pantalla completa: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // 6. ACTUALIZACIÓN DE TIEMPO
+        function startProgressTimer() {
+            clearInterval(progressInterval);
+            progressInterval = setInterval(() => {
+                const currentTime = player.getCurrentTime();
+                const duration = player.getDuration();
+                
+                if (duration > 0) {
+                    const progressPercentage = (currentTime / duration) * 100;
+                    document.getElementById('seek-bar').value = progressPercentage;
+                    document.getElementById('time-current').textContent = formatTime(currentTime);
+                    document.getElementById('time-total').textContent = formatTime(duration);
+                }
+            }, 500);
+        }
+
+        function formatTime(timeInSeconds) {
+            const minutes = Math.floor(timeInSeconds / 60);
+            const seconds = Math.floor(timeInSeconds % 60);
+            return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // 7. GESTIÓN DEL CURSO (Navegación y Vistas)
+        function loadLesson(index) {
+            if (index < 0 || index >= lessons.length) return;
+            
+            currentIndex = index;
+            document.getElementById('preloader').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('flex');
+            
+            player.loadVideoById(lessons[currentIndex].id);
+            updateLessonInfo();
+            renderPlaylist();
+        }
+
+        function playNext() {
+            if (currentIndex < lessons.length - 1) {
+                loadLesson(currentIndex + 1);
+            }
+        }
+
+        function showEndScreen() {
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('end-screen').classList.add('flex');
+        }
+
+        function markAsCompleted(index) {
+            lessons[index].completed = true;
+            renderPlaylist();
+            updateGlobalProgress();
+        }
+
+        function updateLessonInfo() {
+            document.getElementById('lesson-title').textContent = lessons[currentIndex].title;
+            document.getElementById('lesson-desc').textContent = lessons[currentIndex].desc;
+        }
+
+        function updateGlobalProgress() {
+            const completed = lessons.filter(l => l.completed).length;
+            const percentage = Math.round((completed / lessons.length) * 100);
+            document.getElementById('progress-text').textContent = `${percentage}%`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlist');
+            container.innerHTML = '';
+            
+            lessons.forEach((lesson, index) => {
+                const isActive = index === currentIndex;
+                const isCompleted = lesson.completed;
+                
+                const btn = document.createElement('button');
+                btn.onclick = () => loadLesson(index);
+                btn.className = `w-full text-left p-3 rounded-lg flex items-start gap-3 transition-colors duration-200 group ${
+                    isActive ? 'bg-brand/10 border border-brand/30' : 'hover:bg-slate-800 border border-transparent'
+                }`;
+                
+                let icon = '';
+                if (isActive) icon = `<i class="ph-fill ph-play-circle text-brand text-2xl mt-0.5 animate-pulse"></i>`;
+                else if (isCompleted) icon = `<i class="ph-fill ph-check-circle text-emerald-500 text-2xl mt-0.5"></i>`;
+                else icon = `<i class="ph ph-video-camera text-slate-500 group-hover:text-slate-300 text-2xl mt-0.5"></i>`;
+
+                btn.innerHTML = `
+                    ${icon}
+                    <div class="flex-1">
+                        <h4 class="text-sm font-semibold ${isActive ? 'text-brand' : 'text-slate-200'}">${lesson.title}</h4>
+                        <p class="text-xs text-slate-500 mt-1 line-clamp-1">${lesson.desc}</p>
+                    </div>
+                `;
+                container.appendChild(btn);
+            });
+        }
+        
+        // Auto-hide controls for immersion
+        let timeout;
+        document.getElementById('video-wrapper').addEventListener('mousemove', () => {
+            const controls = document.getElementById('custom-controls');
+            controls.style.opacity = '1';
+            document.body.style.cursor = 'default';
+            
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    controls.style.opacity = '0';
+                    document.body.style.cursor = 'none';
+                }
+            }, 2500);
+        });
+
+    </script>
+</body>
+</html>
